@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Root design tokens ─── */
+:root {
+  --virutes-red: #c0392b;
+  --virutes-red-dark: #8b1a1a;
+  --virutes-cream: #f5ecd7;
+  --virutes-cream-light: #fdfaf4;
+  --virutes-olive: #4a5240;
+  --virutes-brown: #3e2723;
+}
+
+/* ─── Base resets ─── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #fdfaf4;
+  color: #3e2723;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* ─── Typography helpers ─── */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* ─── Decorative linen texture via repeating SVG pattern ─── */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Cpath d='M0 0h1v1H0zm2 2h1v1H2z' fill='%233E2723' fill-opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ─── Custom scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #fdfaf4;
+}
+::-webkit-scrollbar-thumb {
+  background: #c0392b55;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c0392b;
+}
+
+/* ─── Reusable component classes ─── */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-virutes-red text-white text-sm font-semibold rounded-full hover:bg-virutes-red-dark active:scale-95 transition-all duration-200;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-current text-sm font-semibold rounded-full hover:bg-current hover:text-white active:scale-95 transition-all duration-200;
+  }
+
+  .btn-outline-cream {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-white/60 text-white text-sm font-semibold rounded-full hover:bg-white/10 active:scale-95 transition-all duration-200;
+  }
+
+  .section-label {
+    @apply text-xs font-bold uppercase tracking-[0.35em] text-virutes-red;
+  }
+
+  .section-title {
+    @apply font-serif text-3xl sm:text-4xl lg:text-5xl text-virutes-brown leading-tight;
+  }
+
+  .section-title-display {
+    @apply font-display text-4xl sm:text-5xl lg:text-6xl text-virutes-red leading-tight;
+  }
+
+  .card-product {
+    @apply relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300;
+  }
+
+  .surface-cream {
+    @apply bg-virutes-cream;
+  }
+
+  .surface-light {
+    @apply bg-virutes-cream-light;
+  }
+}
+
+/* ─── Ingredient illustration decorators (SVG clip paths) ─── */
+.clip-organic {
+  clip-path: polygon(
+    30% 0%,
+    70% 0%,
+    100% 30%,
+    100% 70%,
+    70% 100%,
+    30% 100%,
+    0% 70%,
+    0% 30%
+  );
+}
+
+/* ─── Hero gradient overlay ─── */
+.hero-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(253, 250, 244, 0.1) 0%,
+    rgba(253, 250, 244, 0.3) 40%,
+    rgba(253, 250, 244, 0.75) 80%,
+    rgba(253, 250, 244, 0.95) 100%
+  );
+}
+
+/* ─── Red divider ornament ─── */
+.divider-ornament::before,
+.divider-ornament::after {
+  content: "";
+  display: inline-block;
+  height: 1px;
+  width: 40px;
+  background: #c0392b;
+  vertical-align: middle;
+  margin: 0 12px;
+}
