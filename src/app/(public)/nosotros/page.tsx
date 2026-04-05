@@ -50,8 +50,11 @@ export default function NosotrosPage() {
             <br />
             <span className="text-fire-glow">Aplastar</span>
           </h1>
-          <p className="text-smash-cream/55 text-lg sm:text-xl leading-relaxed font-light max-w-xl mx-auto">
-            No somos una cadena. No somos una franquicia. Somos tres personas con una plancha, una obsesión y Carrer de Colegi, 5.
+          <p className="text-smash-cream/70 text-lg sm:text-2xl leading-relaxed font-light max-w-2xl mx-auto">
+            <span className="block">La plancha manda, nosotros obedecemos.</span>
+            <span className="block text-smash-cream/60">Carne que chispea, pan que abraza y queso que se derrite.</span>
+            <span className="block">No prometemos milagros, prometemos sabor.</span>
+            <span className="block text-smash-sky font-medium">Y cuando lo pruebas, ya lo entiendes.</span>
           </p>
         </div>
       </div>
