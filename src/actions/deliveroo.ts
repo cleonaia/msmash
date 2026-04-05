@@ -82,11 +82,61 @@ export async function syncDeliverooOrders() {
       throw new Error('Deliveroo integration not found')
     }
 
-    // TODO: Llamar a Deliveroo API para obtener órdenes
-    // const deliverooOrders = await deliverooAPI.getOrders(integration.apiKey, integration.merchantId)
-    // const results = await Promise.all(
-    //   deliverooOrders.map(order => convertDeliverooOrderToLocal(order, integration.id))
-    // )
+    const baseUrl = process.env.DELIVEROO_API_BASE_URL
+    if (!baseUrl) {
+      await prisma.deliveryIntegration.update({
+        where: { id: integration.id },
+        data: { syncedAt: new Date(), lastError: null }
+      })
+
+      revalidatePath('/admin/delivery')
+      return {
+        success: true,
+        message: 'Deliveroo integration active (API base URL not configured yet)',
+        ordersCount: 0
+      }
+    }
+
+    const endpoint = `${baseUrl.replace(/\/$/, '')}/orders${integration.merchantId ? `?merchantId=${encodeURIComponent(integration.merchantId)}` : ''}`
+
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${integration.apiKey}`,
+        'X-API-Key': integration.apiKey,
+        ...(integration.merchantId ? { 'X-Restaurant-Id': integration.merchantId } : {}),
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
+
+    if (!response.ok) {
+      throw new Error(`Deliveroo API error (${response.status})`)
+    }
+
+    const payload = await response.json().catch(() => ({}))
+    const deliverooOrders = Array.isArray(payload)
+      ? payload
+      : Array.isArray(payload?.orders)
+        ? payload.orders
+        : Array.isArray(payload?.data)
+          ? payload.data
+          : []
+
+    let processed = 0
+    for (const rawOrder of deliverooOrders) {
+      const platformOrderId = String(rawOrder?.id ?? rawOrder?.order_id ?? '')
+      if (!platformOrderId) continue
+
+      const existing = await prisma.deliveryOrder.findUnique({
+        where: { platformOrderId }
+      })
+
+      if (!existing) {
+        await convertDeliverooOrderToLocal(rawOrder as DeliverooOrder, integration.id)
+        processed += 1
+      }
+    }
 
     await prisma.deliveryIntegration.update({
       where: { id: integration.id },
@@ -94,7 +144,7 @@ export async function syncDeliverooOrders() {
     })
 
     revalidatePath('/admin/delivery')
-    return { success: true, message: 'Deliveroo orders synced' }
+    return { success: true, message: 'Deliveroo orders synced', ordersCount: processed }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
 

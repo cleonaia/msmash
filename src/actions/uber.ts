@@ -92,12 +92,61 @@ export async function syncUberOrders() {
       throw new Error('UberEats integration not found')
     }
 
-    // TODO: Llamar a Uber API para obtener órdenes
-    // const uberOrders = await uberAPI.getOrders(integration.apiKey, integration.merchantId)
-    //
-    // const results = await Promise.all(
-    //   uberOrders.map(order => convertUberOrderToLocal(order, integration.id))
-    // )
+    const baseUrl = process.env.UBEREATS_API_BASE_URL || process.env.UBER_API_BASE_URL
+    if (!baseUrl) {
+      await prisma.deliveryIntegration.update({
+        where: { id: integration.id },
+        data: { syncedAt: new Date(), lastError: null }
+      })
+
+      revalidatePath('/admin/delivery')
+      return {
+        success: true,
+        message: 'UberEats integration active (API base URL not configured yet)',
+        ordersCount: 0
+      }
+    }
+
+    const endpoint = `${baseUrl.replace(/\/$/, '')}/orders${integration.merchantId ? `?merchantId=${encodeURIComponent(integration.merchantId)}` : ''}`
+
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${integration.apiKey}`,
+        'X-API-Key': integration.apiKey,
+        ...(integration.merchantId ? { 'X-Merchant-Id': integration.merchantId } : {}),
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
+
+    if (!response.ok) {
+      throw new Error(`UberEats API error (${response.status})`)
+    }
+
+    const payload = await response.json().catch(() => ({}))
+    const uberOrders = Array.isArray(payload)
+      ? payload
+      : Array.isArray(payload?.orders)
+        ? payload.orders
+        : Array.isArray(payload?.data)
+          ? payload.data
+          : []
+
+    let processed = 0
+    for (const rawOrder of uberOrders) {
+      const platformOrderId = String(rawOrder?.id ?? rawOrder?.order_id ?? '')
+      if (!platformOrderId) continue
+
+      const existing = await prisma.deliveryOrder.findUnique({
+        where: { platformOrderId }
+      })
+
+      if (!existing) {
+        await convertUberOrderToLocal(rawOrder as UberOrder, integration.id)
+        processed += 1
+      }
+    }
 
     await prisma.deliveryIntegration.update({
       where: { id: integration.id },
@@ -105,7 +154,7 @@ export async function syncUberOrders() {
     })
 
     revalidatePath('/admin/delivery')
-    return { success: true, message: 'UberEats orders synced' }
+    return { success: true, message: 'UberEats orders synced', ordersCount: processed }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     
