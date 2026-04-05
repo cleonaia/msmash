@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server'
  */
 export async function POST(request: NextRequest) {
   try {
+    const appUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     const { orderId } = await request.json()
 
     if (!orderId) {
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
       line_items: lineItems,
       mode: 'payment',
       ui_mode: 'embedded',
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/pedidos?success=true&orderId=${orderId}&session_id={CHECKOUT_SESSION_ID}`,
+      return_url: `${appUrl}/pedidos?success=true&orderId=${orderId}&session_id={CHECKOUT_SESSION_ID}`,
       customer_email: order.customerEmail,
       metadata: {
         orderId: order.id,

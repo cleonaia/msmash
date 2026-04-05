@@ -24,7 +24,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://msmash.es"),
+  metadataBase: new URL("https://msmashburger.page"),
   title: {
     default: "M SMASH — Smash Burger Terrassa",
     template: "%s | M SMASH",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     description: "Aplastado. Dorado. Perfecto. El smash burger definitivo de Terrassa.",
     type: "website",
     locale: "es_ES",
-    url: "https://msmash.es",
+    url: "https://msmashburger.page",
     siteName: "M SMASH",
   },
   twitter: {

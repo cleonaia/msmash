@@ -103,7 +103,7 @@ export function Footer() {
             <div className="flex items-center gap-5">
               <div className="p-2 bg-white rounded-xl border border-smash-border shadow-sm">
                 <Image
-                  src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https%3A%2F%2Fmsmash.es%2Fmenu&color=C4B5FD&bgcolor=111111&qzone=1"
+                  src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https%3A%2F%2Fmsmashburger.page%2Fmenu&color=C4B5FD&bgcolor=111111&qzone=1"
                   alt="QR La Carta M SMASH"
                   width={80}
                   height={80}
@@ -114,7 +114,7 @@ export function Footer() {
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.35em] text-smash-cream/25 mb-0.5">Escanea para ver</p>
                 <p className="font-display text-xl text-smash-cream leading-none tracking-widest uppercase">La Carta</p>
-                <p className="text-xs text-smash-cream/25 mt-1">msmash.es/menu</p>
+                <p className="text-xs text-smash-cream/25 mt-1">msmashburger.page/menu</p>
               </div>
             </div>
             <div className="h-12 w-px bg-smash-border hidden sm:block" />
