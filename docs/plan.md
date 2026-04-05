@@ -1,4 +1,4 @@
-# Quebracho Carnes Argentinas – Product & Experience Plan
+# M SMASH Burger – Product & Experience Plan
 
 ## Research Snapshot
 - **Local inspirations**: Referenced patterns from leading Argentine parrillas and carnicerías con e‑commerce (e.g., Cabaña Las Lilas, La Cabrera, Moët Carnes, and boutique butcher platforms like The Butcher’s Society). Common success traits include cinematic hero video/imagery, dual focus on restaurante + carnicería, frictionless reservation flows, prominent provenance storytelling, and curated boxes with pairing suggestions.
@@ -6,7 +6,7 @@
   - *Comensales gourmet* seeking reservas rápidas y menús estacionales.
   - *Asadores entusiastas* que quieren comprar cortes premium, combos y maridajes.
   - *Corporativo/regalos* para cajas empresariales y eventos privados.
-- **Differentiators to highlight**: origen chaqueño del quebracho, maduración artesanal, integración restaurante + carnicería + catering, maridajes con vinos argentinos, reseñas de prensa y comunidad.
+- **Differentiators to highlight**: técnica smash a alta temperatura, carne fresca sin congelados, identidad local en Terrassa, combinaciones exclusivas y comunidad fiel en redes.
 
 ## Experience Architecture
 1. **Home / Inicio**: immersive hero (video or slideshow), propuesta de valor, destacados del restaurante, combos de carnicería, CTA dobles (Reservar / Comprar).
@@ -32,7 +32,7 @@
 - **CI considerations**: lint, type-check, prisma format, jest, playwright smoke.
 
 ## Implementation Phases
-1. **Foundation**: configure Tailwind theme, global layout, typography, palette inspired en quebracho (tonos rojizos, dorados, madera oscura). Setup fonts via `next/font` (e.g., Playfair Display + Inter).
+1. **Foundation**: configure Tailwind theme, global layout, typography, palette inspired en fuego, acero y carbón (rojos intensos, crema y negro profundo). Setup fonts via `next/font` (e.g., Playfair Display + Inter).
 2. **Infrastructure**: Prisma setup + schema, seed script, NextAuth route handlers, middleware, layout shell with header/footer.
 3. **Core UX**: build landing sections, historia, menú (static + CMS-backed), carrito + checkout, reservas (server action storing in DB), contacto, blog listing/detail.
 4. **Account & Admin**: dashboards with protected routes, CRUD forms, tables con búsqueda/filtros.

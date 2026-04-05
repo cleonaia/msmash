@@ -1,239 +1,316 @@
-import { PrismaClient, Role, ProductChannel, PaymentMethod } from "@prisma/client";
-import { hashPassword } from "../src/lib/password";
+import {
+  OrderStatus,
+  PaymentMethod,
+  PaymentStatus,
+  PrismaClient,
+  ProductChannel,
+  Role,
+} from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-async function main() {
-  console.info("🌱 Seeding Quebracho data...");
+const toCents = (price: number) => Math.round(price * 100);
 
-  const adminEmail = "admin@quebracho.com.ar";
-  const adminPassword = await hashPassword("admin123");
+type SeedProduct = {
+  name: string;
+  slug: string;
+  description: string;
+  priceEuro: number;
+  unit: string;
+  stock: number;
+  isFeatured: boolean;
+  badges: string[];
+  pairings: string[];
+  categorySlug: string;
+  images: Array<{ url: string; alt: string }>;
+};
+
+const restaurantCategories = [
+  {
+    name: "Singles",
+    slug: "smash-singles",
+    description: "Smash burgers de una carne con costra brutal y mucho sabor.",
+  },
+  {
+    name: "Doubles",
+    slug: "smash-doubles",
+    description: "Doble carne, doble queso y actitud M SMASH.",
+  },
+  {
+    name: "Especiales",
+    slug: "smash-especiales",
+    description: "Combinaciones de autor para los que buscan algo distinto.",
+  },
+  {
+    name: "Extras",
+    slug: "extras",
+    description: "Guarniciones, toppings y sides para montar tu burger perfecta.",
+  },
+  {
+    name: "Bebidas",
+    slug: "bebidas",
+    description: "Refrescos, cerveza y shakes para acompañar cada bocado.",
+  },
+];
+
+const products: SeedProduct[] = [
+  {
+    name: "The Classic",
+    slug: "the-classic",
+    description:
+      "Carne smash 120g, queso americano, cebolla caramelizada, pepinillo y salsa de la casa.",
+    priceEuro: 9.5,
+    unit: "unidad",
+    stock: 120,
+    isFeatured: true,
+    badges: ["El Original"],
+    pairings: ["Patatas Smash", "Refresco"],
+    categorySlug: "smash-singles",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=900&q=80",
+        alt: "The Classic de M SMASH",
+      },
+    ],
+  },
+  {
+    name: "The Smoky",
+    slug: "the-smoky",
+    description:
+      "Smash ahumado, bacon crujiente, queso gouda y honey mustard.",
+    priceEuro: 11.5,
+    unit: "unidad",
+    stock: 90,
+    isFeatured: true,
+    badges: ["Top Ventas"],
+    pairings: ["Aros de Cebolla", "Cerveza"],
+    categorySlug: "smash-singles",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=900&q=80",
+        alt: "The Smoky con bacon",
+      },
+    ],
+  },
+  {
+    name: "Double Trouble",
+    slug: "double-trouble",
+    description:
+      "Doble smash, doble cheddar, bacon crujiente, cebolla frita y salsa BBQ.",
+    priceEuro: 13.5,
+    unit: "unidad",
+    stock: 80,
+    isFeatured: true,
+    badges: ["El Mas Potente"],
+    pairings: ["Patatas con Queso", "SMASH Shake"],
+    categorySlug: "smash-doubles",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=900&q=80",
+        alt: "Double Trouble",
+      },
+    ],
+  },
+  {
+    name: "Double Fire",
+    slug: "double-fire",
+    description:
+      "Doble smash, queso pepper jack, jalapenos fritos, guacamole y sriracha mayo.",
+    priceEuro: 14.5,
+    unit: "unidad",
+    stock: 70,
+    isFeatured: true,
+    badges: ["Picante"],
+    pairings: ["Patatas Smash", "Agua mineral"],
+    categorySlug: "smash-doubles",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=900&q=80",
+        alt: "Double Fire",
+      },
+    ],
+  },
+  {
+    name: "Blue Sky",
+    slug: "blue-sky",
+    description:
+      "Smash con queso azul, rucula baby, pera caramelizada y miel de romero.",
+    priceEuro: 11.9,
+    unit: "unidad",
+    stock: 65,
+    isFeatured: true,
+    badges: ["Especial"],
+    pairings: ["Aros de Cebolla", "Cerveza"],
+    categorySlug: "smash-especiales",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=900&q=80",
+        alt: "Blue Sky",
+      },
+    ],
+  },
+  {
+    name: "Truffle Smash",
+    slug: "truffle-smash",
+    description:
+      "Smash con aceite de trufa, queso brie y champinones salteados.",
+    priceEuro: 14.9,
+    unit: "unidad",
+    stock: 45,
+    isFeatured: false,
+    badges: ["Edicion limitada"],
+    pairings: ["Patatas con Queso", "SMASH Shake"],
+    categorySlug: "smash-especiales",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1551782450-17144efb9c50?w=900&q=80",
+        alt: "Truffle Smash",
+      },
+    ],
+  },
+  {
+    name: "Patatas Smash",
+    slug: "patatas-smash",
+    description:
+      "Patatas crujientes con sal Maldon y romero. El side imprescindible.",
+    priceEuro: 4.5,
+    unit: "racion",
+    stock: 200,
+    isFeatured: false,
+    badges: ["Must Have"],
+    pairings: ["The Classic"],
+    categorySlug: "extras",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=900&q=80",
+        alt: "Patatas Smash",
+      },
+    ],
+  },
+  {
+    name: "SMASH Shake",
+    slug: "smash-shake",
+    description: "Batido artesano de vainilla, chocolate o fresa.",
+    priceEuro: 4.5,
+    unit: "unidad",
+    stock: 140,
+    isFeatured: false,
+    badges: ["Nuevo"],
+    pairings: ["Double Trouble"],
+    categorySlug: "bebidas",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1546171753-97d7676e4602?w=900&q=80",
+        alt: "SMASH Shake",
+      },
+    ],
+  },
+];
+
+const tags = [
+  { name: "Smash", slug: "smash" },
+  { name: "Tecnica", slug: "tecnica" },
+  { name: "Menu", slug: "menu" },
+  { name: "Terrassa", slug: "terrassa" },
+];
+
+const posts = [
+  {
+    title: "Como lograr una costra smash perfecta",
+    slug: "costra-smash-perfecta",
+    excerpt:
+      "Temperatura, presion y timing: los tres secretos para una burger brutal en plancha.",
+    coverImage:
+      "https://images.unsplash.com/photo-1561758033-d89a9ad46330?auto=format&fit=crop&w=1200&q=80",
+    content:
+      "## La costra lo cambia todo\n\nEn M SMASH trabajamos plancha muy caliente, bola de carne fresca y aplastado rapido para conseguir reaccion de Maillard y sabor intenso.",
+    tagSlugs: ["smash", "tecnica"],
+  },
+  {
+    title: "Las combinaciones favoritas del equipo",
+    slug: "combinaciones-favoritas-equipo",
+    excerpt:
+      "Estas son las burgers y extras que mas piden nuestros cocineros cuando termina el servicio.",
+    coverImage:
+      "https://images.unsplash.com/photo-1586816001966-79b736744398?auto=format&fit=crop&w=1200&q=80",
+    content:
+      "## Picks internos de M SMASH\n\nDouble Trouble con patatas smash y un shake: un combo ganador para cerrar la noche.",
+    tagSlugs: ["menu", "terrassa"],
+  },
+];
+
+async function main() {
+  console.info("🌱 Seeding M SMASH data...");
 
   const admin = await prisma.user.upsert({
-    where: { email: adminEmail },
-    update: {},
-    create: {
-      email: adminEmail,
-      passwordHash: adminPassword,
+    where: { email: "admin@msmash.es" },
+    update: {
       role: Role.ADMIN,
-      profile: {
-        create: {
-          firstName: "Lucía",
-          lastName: "Fernández",
-          phone: "+54 9 11 5555-0000",
-          marketingOptIn: true,
-          favoriteCuts: ["Bife de chorizo", "Tira de asado"],
-        },
-      },
+    },
+    create: {
+      email: "admin@msmash.es",
+      role: Role.ADMIN,
     },
   });
 
-  const restaurantCategories = [
-    {
-      name: "Entradas",
-      slug: "entradas",
-      description: "Empezá la experiencia con estos bocados inspirados en la clásica picada criolla.",
+  await prisma.profile.upsert({
+    where: { userId: admin.id },
+    update: {
+      firstName: "M",
+      lastName: "SMASH",
+      phone: "+34 937 84 12 55",
+      marketingOptIn: true,
+      favoriteCuts: ["The Classic", "Double Trouble"],
     },
-    {
-      name: "Principales",
-      slug: "principales",
-      description: "Cortes premium a la parrilla perfumados con quebracho y hierbas patagónicas.",
+    create: {
+      userId: admin.id,
+      firstName: "M",
+      lastName: "SMASH",
+      phone: "+34 937 84 12 55",
+      marketingOptIn: true,
+      favoriteCuts: ["The Classic", "Double Trouble"],
     },
-    {
-      name: "Postres",
-      slug: "postres",
-      description: "Clásicos argentinos con un giro contemporáneo.",
-    },
-    {
-      name: "Maridajes",
-      slug: "maridajes",
-      description: "Selección de vinos de bodegas boutique y cócteles de autor.",
-    },
-  ];
+  });
 
-  const butcherCategories = [
-    {
-      name: "Cortes parrilleros",
-      slug: "cortes-parrilleros",
-      description: "Los cortes preferidos para una parrillada inolvidable.",
-    },
-    {
-      name: "Madurados",
-      slug: "madurados",
-      description: "Cortes dry-aged de hasta 45 días con sabor intenso.",
-    },
-    {
-      name: "Boxes & combos",
-      slug: "boxes-combos",
-      description: "Selecciones curadas listas para regalar o compartir.",
-    },
-    {
-      name: "Embutidos & acompañamientos",
-      slug: "embutidos-acompanamientos",
-      description: "Chorizos artesanales, provoletas especiadas y salsas caseras.",
-    },
-  ];
-
-  await prisma.productCategory.deleteMany();
-
-  const createdRestaurantCategories = await Promise.all(
-    restaurantCategories.map((category) =>
-      prisma.productCategory.create({
-        data: {
-          ...category,
-          channel: ProductChannel.RESTAURANT,
-        },
-      })
-    )
-  );
-
-  const createdButcherCategories = await Promise.all(
-    butcherCategories.map((category) =>
-      prisma.productCategory.create({
-        data: {
-          ...category,
-          channel: ProductChannel.BUTCHER,
-        },
-      })
-    )
-  );
-
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
+  await prisma.favoriteProduct.deleteMany();
+  await prisma.productImage.deleteMany();
   await prisma.product.deleteMany();
+  await prisma.productCategory.deleteMany();
+  await prisma.blogPost.deleteMany();
+  await prisma.recipeTag.deleteMany();
+  await prisma.contactMessage.deleteMany();
 
-  const products = [
-    {
-      name: "Bife de chorizo dry-aged",
-      slug: "bife-de-chorizo-dry-aged",
-      description:
-        "Corte premium madurado 30 días con hueso, marmoleo perfecto y notas ahumadas a quebracho chaqueño.",
-      price: 14900,
-      unit: "kg",
-      stock: 32,
-      isFeatured: true,
-      badges: ["Madurado 30 días", "Reserva limitada"],
-      pairings: ["Malbec de altura", "Manteca de chimichurri"],
-      categorySlug: "madurados",
-      images: [
-        {
-          url: "https://images.unsplash.com/photo-1604908176997-12518821b87b?auto=format&fit=crop&w=900&q=80",
-          alt: "Bife de chorizo dry-aged sobre tabla",
-        },
-      ],
-    },
-    {
-      name: "Tira de asado premium",
-      slug: "tira-de-asado-premium",
-      description:
-        "Clásica tira ancha con hueso, aliñada con sal marina fueguina y terminación en horno de barro.",
-      price: 8900,
-      unit: "kg",
-      stock: 48,
-      isFeatured: true,
-      badges: ["100% Angus", "Libre de antibióticos"],
-      pairings: ["Blend tinto", "Chimichurri ahumado"],
-      categorySlug: "cortes-parrilleros",
-      images: [
-        {
-          url: "https://images.unsplash.com/photo-1608032205900-bc912c05e06b?auto=format&fit=crop&w=900&q=80",
-          alt: "Tira de asado asándose a las brasas",
-        },
-      ],
-    },
-    {
-      name: "Box Quebracho Signature",
-      slug: "box-quebracho-signature",
-      description:
-        "Selección especial: ojo de bife dry-aged, chorizos criollos, provoleta ahumada, aderezos caseros y maridaje sugerido.",
-      price: 52900,
-      unit: "box",
-      stock: 12,
-      isFeatured: true,
-      badges: ["Ideal regalos", "Incluye maridaje"],
-      pairings: ["Malbec reserva", "Embutidos artesanales"],
-      categorySlug: "boxes-combos",
-      images: [
-        {
-          url: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=900&q=80",
-          alt: "Box gourmet con cortes y vinos",
-        },
-      ],
-    },
-    {
-      name: "Empanadas de carne a cuchillo",
-      slug: "empanadas-carne-cuchillo",
-      description: "Masa hojaldrada rellena con carne braseada, aceitunas verdes y especias norteñas.",
-      price: 4500,
-      unit: "6 unidades",
-      stock: 60,
-      isFeatured: false,
-      badges: ["Receta familiar"],
-      pairings: ["Malbec joven", "Salsa criolla"],
-      categorySlug: "entradas",
-      images: [
-        {
-          url: "https://images.unsplash.com/photo-1598965675760-315ec95f05af?auto=format&fit=crop&w=900&q=80",
-          alt: "Empanadas argentinas en tabla de madera",
-        },
-      ],
-    },
-    {
-      name: "Ojo de bife a la leña",
-      slug: "ojo-de-bife-lena",
-      description:
-        "400g de ojo de bife Angus sellado al quebracho, con manteca de yerba mate y charlotte glaseada.",
-      price: 19800,
-      unit: "plato",
-      stock: 25,
-      isFeatured: true,
-      badges: ["Top seller restaurante"],
-      pairings: ["Cabernet Franc", "Puré de papas trufado"],
-      categorySlug: "principales",
-      images: [
-        {
-          url: "https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=900&q=80",
-          alt: "Ojo de bife servido con guarnición",
-        },
-      ],
-    },
-    {
-      name: "Flan casero con dulce de leche ahumado",
-      slug: "flan-casero-dulce-ahumado",
-      description: "Clásico flan de campo con dulce de leche cocido a fuego de quebracho y crema chantilly.",
-      price: 5400,
-      unit: "porción",
-      stock: 40,
-      isFeatured: false,
-      badges: ["Clásico argentino"],
-      pairings: ["Espumante extra brut"],
-      categorySlug: "postres",
-      images: [
-        {
-          url: "https://images.unsplash.com/photo-1608198093002-ad4e005484ec?auto=format&fit=crop&w=900&q=80",
-          alt: "Flan con dulce de leche",
-        },
-      ],
-    },
-  ];
+  const categoryBySlug = new Map<string, string>();
+  for (const category of restaurantCategories) {
+    const created = await prisma.productCategory.create({
+      data: {
+        ...category,
+        channel: ProductChannel.RESTAURANT,
+      },
+    });
+    categoryBySlug.set(category.slug, created.id);
+  }
 
   for (const product of products) {
-    const category = [...createdRestaurantCategories, ...createdButcherCategories].find(
-      (cat) => cat.slug === product.categorySlug
-    );
-
-    if (!category) continue;
+    const categoryId = categoryBySlug.get(product.categorySlug);
+    if (!categoryId) {
+      continue;
+    }
 
     await prisma.product.create({
       data: {
         name: product.name,
         slug: product.slug,
         description: product.description,
-        price: product.price,
+        price: toCents(product.priceEuro),
         unit: product.unit,
         stock: product.stock,
         isFeatured: product.isFeatured,
         badges: product.badges,
         pairings: product.pairings,
-        categoryId: category.id,
+        categoryId,
         images: {
           create: product.images.map((image, index) => ({
             url: image.url,
@@ -245,109 +322,70 @@ async function main() {
     });
   }
 
-  await prisma.blogPost.deleteMany();
-  await prisma.recipeTag.deleteMany();
-
-  const tags = await prisma.recipeTag.createManyAndReturn({
-    data: [
-      { name: "Parrilla", slug: "parrilla" },
-      { name: "Recetas", slug: "recetas" },
-      { name: "Tips", slug: "tips" },
-      { name: "Maridajes", slug: "maridajes" },
-    ],
+  await prisma.recipeTag.createMany({
+    data: tags,
   });
-
-  await prisma.blogPost.createMany({
-    data: [
-      {
-        title: "El ritual del asado perfecto",
-        slug: "ritual-del-asado-perfecto",
-        excerpt:
-          "Secretos de nuestros parrilleros para lograr el punto exacto, dominar las brasas y conquistar a los invitados.",
-        coverImage:
-          "https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=1200&q=80",
-        content:
-          "## Dominá las brasas\n\nNuestro maestro parrillero comparte una guía paso a paso para encender quebracho colorado, administrar alturas y sellar cortes premium. Sumamos tips de maridaje y guarniciones que elevan la experiencia.",
-        authorId: admin.id,
-        publishedAt: new Date(),
-      },
-      {
-        title: "Maridajes que potencian tus cortes",
-        slug: "maridajes-que-potencian",
-        excerpt:
-          "Sommelier Lucía recomienda vinos y cócteles que resaltan los matices ahumados de nuestros favoritos.",
-        coverImage:
-          "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=80",
-        content:
-          "## Brindemos por el asado\n\nTe compartimos el pairing perfecto para cada corte destacado, incluyendo etiquetas boutique y tragos de autor inspirados en el quebracho.",
-        authorId: admin.id,
-        publishedAt: new Date(),
-      },
-    ],
-  });
-
-  const posts = await prisma.blogPost.findMany();
 
   for (const post of posts) {
-    await prisma.blogPost.update({
-      where: { id: post.id },
+    await prisma.blogPost.create({
       data: {
+        title: post.title,
+        slug: post.slug,
+        excerpt: post.excerpt,
+        coverImage: post.coverImage,
+        content: post.content,
+        authorId: admin.id,
+        publishedAt: new Date(),
         tags: {
-          connect: tags.slice(0, 2).map((tag) => ({ id: tag.id })),
+          connect: post.tagSlugs.map((slug) => ({ slug })),
         },
       },
     });
   }
 
-  await prisma.contactMessage.deleteMany();
-
   await prisma.contactMessage.create({
     data: {
-      name: "Agustina Pérez",
-      email: "agustina@example.com",
-      phone: "+54 9 11 2222-3333",
-      subject: "Evento corporativo",
+      name: "Alex Martin",
+      email: "alex@example.com",
+      phone: "+34 612 34 56 78",
+      subject: "Reserva para grupo",
       message:
-        "Queremos organizar un cocktail para 60 personas el próximo mes. ¿Podemos coordinar una degustación privada?",
+        "Hola equipo, queremos reservar para 10 personas este sabado por la noche. Muchas gracias.",
     },
   });
 
-  await prisma.order.deleteMany();
+  const demoProduct = await prisma.product.findUnique({
+    where: { slug: "double-trouble" },
+  });
 
-  await prisma.order.create({
-    data: {
-      customerName: "Gastón Ríos",
-      customerEmail: "gaston@example.com",
-      customerPhone: "+54 9 11 7777-8888",
-      deliveryMethod: "Retiro en local",
-      status: "CONFIRMED",
-      paymentStatus: "PAID",
-      paymentMethod: PaymentMethod.LOCAL,
-      totalAmount: 52900,
-      notes: "Retira el viernes 19 hs",
-      items: {
-        create: [
-          {
-            product: {
-              connect: {
-                slug: "box-quebracho-signature",
-              },
+  if (demoProduct) {
+    await prisma.order.create({
+      data: {
+        customerName: "Sergio Lopez",
+        customerEmail: "sergio@example.com",
+        customerPhone: "+34 600 11 22 33",
+        deliveryMethod: "Recogida en local",
+        status: OrderStatus.CONFIRMED,
+        paymentStatus: PaymentStatus.PAID,
+        paymentMethod: PaymentMethod.LOCAL,
+        totalAmount: demoProduct.price,
+        notes: "Punto de carne bien dorado.",
+        items: {
+          create: [
+            {
+              productId: demoProduct.id,
+              quantity: 1,
+              unitPrice: demoProduct.price,
+              subtotal: demoProduct.price,
             },
-            quantity: 1,
-            unitPrice: 52900,
-            subtotal: 52900,
-          },
-        ],
-      },
-      user: {
-        connect: {
-          id: admin.id,
+          ],
         },
+        userId: admin.id,
       },
-    },
-  });
+    });
+  }
 
-  console.info("✅ Seed completed");
+  console.info("✅ Seed M SMASH completed");
 }
 
 main()

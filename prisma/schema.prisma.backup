@@ -1,0 +1,246 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+}
+
+enum PaymentMethod {
+  LOCAL
+  STRIPE
+}
+
+enum ProductChannel {
+  RESTAURANT
+  BUTCHER
+}
+
+enum ContactStatus {
+  NEW
+  IN_PROGRESS
+  CLOSED
+}
+
+model User {
+  id            String            @id @default(cuid())
+  email         String            @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  role          Role              @default(CUSTOMER)
+  profile       Profile?
+  reservations  Reservation[]
+  orders        Order[]
+  posts         BlogPost[]
+  favorites     FavoriteProduct[]
+  accounts      Account[]
+  sessions      Session[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model Profile {
+  id              String   @id @default(cuid())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String   @unique
+  firstName       String
+  lastName        String
+  phone           String?
+  birthDate       DateTime?
+  loyaltyPoints   Int      @default(0)
+  marketingOptIn  Boolean  @default(false)
+  favoriteCuts    Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Reservation {
+  id                String            @id @default(cuid())
+  user              User?             @relation(fields: [userId], references: [id])
+  userId            String?
+  name              String
+  email             String
+  phone             String
+  reservationDate   DateTime
+  guests            Int
+  occasion          String?
+  notes             String?
+  status            ReservationStatus @default(PENDING)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+}
+
+model ProductCategory {
+  id          String          @id @default(cuid())
+  name        String
+  slug        String          @unique
+  description String?
+  channel     ProductChannel
+  products    Product[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model Product {
+  id            String             @id @default(cuid())
+  name          String
+  slug          String             @unique
+  description   String
+  price         Int
+  unit          String
+  stock         Int                @default(0)
+  isFeatured    Boolean            @default(false)
+  badges        Json?
+  pairings      Json?
+  category      ProductCategory    @relation(fields: [categoryId], references: [id])
+  categoryId    String
+  images        ProductImage[]
+  orderItems    OrderItem[]
+  favorites     FavoriteProduct[]
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  url       String
+  alt       String
+  order     Int      @default(0)
+}
+
+model FavoriteProduct {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+model Order {
+  id             String         @id @default(cuid())
+  user           User?          @relation(fields: [userId], references: [id])
+  userId         String?
+  customerName   String
+  customerEmail  String
+  customerPhone  String
+  deliveryMethod String         @default("Retiro en local")
+  status         OrderStatus    @default(PENDING)
+  paymentStatus  PaymentStatus  @default(PENDING)
+  paymentMethod  PaymentMethod  @default(LOCAL)
+  notes          String?
+  totalAmount    Int
+  items          OrderItem[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId    String
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  String
+  quantity   Int
+  unitPrice  Int
+  subtotal   Int
+}
+
+model BlogPost {
+  id          String        @id @default(cuid())
+  title       String
+  slug        String        @unique
+  excerpt     String
+  coverImage  String
+  content     String
+  publishedAt DateTime?
+  author      User?         @relation(fields: [authorId], references: [id])
+  authorId    String?
+  tags        RecipeTag[]   @relation("PostTags")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model RecipeTag {
+  id    String     @id @default(cuid())
+  name  String
+  slug  String     @unique
+  posts BlogPost[] @relation("PostTags")
+}
+
+model ContactMessage {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  status    ContactStatus @default(NEW)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+// NextAuth models
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?  @map("refreshToken")
+  access_token      String?  @map("accessToken")
+  expires_at        Int?     @map("expiresAt")
+  token_type        String?  @map("tokenType")
+  scope             String?
+  id_token          String?  @map("idToken")
+  session_state     String?
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="Agua con gas Solán">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0E2431"/>
+      <stop offset="100%" stop-color="#2EC4B6"/>
+    </linearGradient>
+    <linearGradient id="bottle" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F2FEFF" stop-opacity="0.96"/>
+      <stop offset="100%" stop-color="#2EC4B6" stop-opacity="0.70"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg)"/>
+  <circle cx="960" cy="140" r="200" fill="#FFFFFF" opacity="0.14"/>
+  <circle cx="210" cy="650" r="230" fill="#8F7BC1" opacity="0.10"/>
+  <rect x="445" y="105" width="310" height="585" rx="58" fill="url(#bottle)" stroke="#ffffff" stroke-opacity="0.32" stroke-width="8"/>
+  <rect x="470" y="150" width="260" height="70" rx="24" fill="#0F172A" opacity="0.9"/>
+  <text x="600" y="198" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" font-weight="800" fill="#FFFFFF">SOLÁN</text>
+  <text x="600" y="325" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#0E2431">CON GAS</text>
+  <text x="600" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#0E2431">AGUA MINERAL</text>
+  <circle cx="600" cy="540" r="88" fill="#0E2431" opacity="0.10"/>
+  <text x="600" y="553" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#0E2431">BURBUJAS</text>
+</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="M Smash placeholder">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3A1F4A"/>
+      <stop offset="100%" stop-color="#0F0F12"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg)"/>
+  <circle cx="980" cy="120" r="180" fill="#23C7C9" opacity="0.15"/>
+  <circle cx="220" cy="700" r="220" fill="#F59A23" opacity="0.2"/>
+  <rect x="120" y="300" width="960" height="220" rx="28" fill="#0F0F12" stroke="#23C7C9" stroke-width="6"/>
+  <text x="600" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="64" font-weight="700" fill="#F5F0E6">M SMASH BURGER</text>
+  <text x="600" y="460" text-anchor="middle" font-family="Arial, sans-serif" font-size="38" fill="#F59A23">Carta digital</text>
+</svg>

@@ -10,28 +10,29 @@ export function CookieBanner() {
   return (
     <div
       role="dialog"
-      aria-label="Avís de cookies"
-      className="fixed bottom-0 left-0 right-0 z-40 bg-virutes-brown/95 backdrop-blur-sm text-white border-t border-white/10"
+      aria-label="Aviso de cookies"
+      className="fixed bottom-0 left-0 right-0 z-[80] bg-smash-dark/98 backdrop-blur-lg text-white border-t-2 border-smash-fire/30 shadow-[0_-18px_50px_rgba(0,0,0,0.45)] rounded-t-3xl sm:rounded-t-none"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p className="text-sm text-white/80 text-center sm:text-left">
-          Fem servir cookies per millorar la teva experiència a Virutes.{" "}
-          <Link href="/cookies" className="underline text-virutes-cream hover:text-white transition-colors">
-            Més informació
+      <div className="fire-divider" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))] flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
+        <p className="text-sm sm:text-[15px] leading-relaxed text-smash-cream/75 text-center sm:text-left max-w-3xl">
+          Usamos cookies para mejorar tu experiencia en M SMASH.{" "}
+          <Link href="/cookies" className="underline text-smash-sky-light hover:text-white transition-colors">
+            Más información
           </Link>
         </p>
-        <div className="flex shrink-0 gap-3">
+        <div className="flex shrink-0 gap-3 w-full sm:w-auto justify-center sm:justify-end">
           <button
             onClick={() => setDismissed(true)}
-            className="px-4 py-2 text-sm text-white/60 hover:text-white border border-white/20 rounded-full transition-colors"
+            className="px-5 py-2.5 text-sm font-medium text-smash-cream/70 hover:text-white border border-smash-border rounded-full transition-colors bg-smash-smoke/40"
           >
-            Rebutjar
+            Rechazar
           </button>
           <button
             onClick={() => setDismissed(true)}
-            className="btn-primary text-xs px-5 py-2"
+            className="btn-smash text-xs px-6 py-2.5 shadow-fire-sm"
           >
-            Acceptar cookies
+            Aceptar cookies
           </button>
         </div>
       </div>

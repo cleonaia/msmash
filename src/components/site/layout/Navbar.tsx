@@ -13,131 +13,98 @@ export function Navbar() {
   const isHome = pathname === "/";
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50);
+    const onScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
-  const navBg = scrolled || !isHome
-    ? "bg-virutes-cream-light/95 backdrop-blur-md shadow-sm border-b border-virutes-border"
+  const scrolledOrNotHome = scrolled || !isHome;
+  const navBg = scrolledOrNotHome
+    ? "bg-smash-dark/95 backdrop-blur-md border-b border-smash-border shadow-fire-sm"
     : "bg-transparent";
-
-  const textColor = scrolled || !isHome ? "text-virutes-brown" : "text-white";
-  const logoColor = scrolled || !isHome ? "text-virutes-red" : "text-white";
 
   return (
     <>
-      {/* ── Desktop / Main navbar ── */}
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${navBg}`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            {/* Logo */}
-            <Link
-              href="/"
-              className={`font-display text-3xl transition-colors duration-300 hover:opacity-80 ${logoColor}`}
-            >
-              Virutes
-            </Link>
-
-            {/* Desktop nav */}
-            <nav className="hidden md:flex items-center gap-7">
-              {navLinks.map((link) => {
-                const active = pathname === link.href;
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`relative text-sm font-medium tracking-wide transition-colors duration-200
-                      after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:bg-virutes-red
-                      after:transition-all after:duration-300
-                      ${active ? "after:w-full text-virutes-red" : `after:w-0 hover:after:w-full ${textColor} hover:text-virutes-red`}
-                    `}
-                  >
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            {/* Right side */}
-            <div className="flex items-center gap-3">
-              <Link
-                href="/reservas"
-                className="hidden md:inline-flex btn-primary text-xs px-5 py-2.5"
-              >
-                Reserva ara
-              </Link>
-              <button
-                onClick={() => setMobileOpen(true)}
-                className={`md:hidden p-2 rounded-lg transition-colors ${textColor}`}
-                aria-label="Obrir menú"
-              >
-                <Menu className="h-6 w-6" />
-              </button>
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${navBg}`}>
+        <div className="w-full">
+          <div className="max-w-full mx-auto px-3 sm:px-4 lg:px-8">
+            <div className="flex items-center justify-center md:justify-between h-16 sm:h-20">
+              {/* Desktop nav - centered */}
+              <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+                {navLinks.map((link) => {
+                  const active = pathname === link.href;
+                  return (
+                    <Link key={link.href} href={link.href}
+                      className={`relative text-[10px] lg:text-[11px] font-black uppercase tracking-[0.3em] lg:tracking-[0.35em] transition-colors duration-200
+                        after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:bg-smash-turquoise
+                        after:transition-all after:duration-300
+                        ${active
+                          ? "after:w-full text-smash-turquoise"
+                          : "after:w-0 hover:after:w-full text-smash-cream/60 hover:text-smash-turquoise"
+                        }`}>
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </nav>
+              {/* Right - desktop social + mobile menu */}
+              <div className="absolute right-3 sm:right-4 lg:right-8 flex items-center gap-2 sm:gap-3">
+                <a href="https://www.instagram.com/msmashburguer/" target="_blank" rel="noreferrer"
+                  className="hidden md:inline-flex inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2 lg:py-2.5 border border-smash-turquoise/60 text-smash-turquoise text-[9px] lg:text-[10px] font-bold uppercase tracking-[0.2em] rounded-full hover:bg-smash-turquoise hover:text-white active:scale-95 transition-all duration-200">
+                  @msmashburguer
+                </a>
+                <button onClick={() => setMobileOpen(true)}
+                  className="md:hidden p-2 text-smash-cream hover:text-smash-turquoise transition-colors active:scale-90"
+                  aria-label="Abrir menú">
+                  <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* ── Mobile overlay menu ── */}
-      <div
-        className={`fixed inset-0 z-[100] transition-all duration-500 ease-in-out
-          ${mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
-        `}
-      >
-        <div className="absolute inset-0 bg-virutes-cream-light" />
-        {/* Decorative circles */}
-        <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-virutes-cream opacity-60 -translate-y-1/3 translate-x-1/3" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-virutes-cream opacity-60 translate-y-1/3 -translate-x-1/3" />
-
+      {/* Mobile overlay */}
+      <div className={`fixed inset-0 z-[100] transition-all duration-500 md:hidden
+        ${mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}>
+        <div className="absolute inset-0 bg-smash-black" />
+        <div className="absolute inset-0 sky-bg opacity-15" />
+        <div className="absolute top-0 right-0 w-64 sm:w-80 h-48 sm:h-60 overflow-hidden opacity-10 pointer-events-none">
+          <svg width="320" viewBox="0 0 320 120" fill="white" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <ellipse cx="160" cy="80" rx="148" ry="36" />
+            <ellipse cx="100" cy="70" rx="76" ry="46" />
+            <ellipse cx="200" cy="66" rx="72" ry="42" />
+            <ellipse cx="148" cy="55" rx="60" ry="48" />
+          </svg>
+        </div>
         <div className="relative flex flex-col h-full">
-          {/* Header */}
-          <div className="flex items-center justify-between px-6 pt-7 pb-4">
-            <span className="font-display text-3xl text-virutes-red">Virutes</span>
-            <button
-              onClick={() => setMobileOpen(false)}
-              className="p-2 text-virutes-brown hover:text-virutes-red transition-colors"
-              aria-label="Tancar menú"
-            >
-              <X className="h-7 w-7" />
+          <div className="flex items-center justify-between px-4 sm:px-6 pt-5 pb-3">
+            <div />
+            <button onClick={() => setMobileOpen(false)}
+              className="p-2 text-smash-cream/60 hover:text-smash-cream transition-colors active:scale-90"
+              aria-label="Cerrar menú">
+              <X className="h-6 w-6 sm:h-7 sm:w-7" />
             </button>
           </div>
-
-          {/* Nav links */}
-          <nav className="flex flex-col items-center justify-center flex-1 gap-6 -mt-8">
+          <div className="fire-divider mx-4 sm:mx-6" />
+          <nav className="flex flex-col items-center justify-center flex-1 gap-4 sm:gap-5 px-4">
             {navLinks.map((link, i) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                style={{ animationDelay: mobileOpen ? `${i * 60}ms` : "0ms" }}
-                className={`font-serif italic text-4xl text-virutes-brown hover:text-virutes-red transition-colors
-                  ${mobileOpen ? "animate-fade-up" : ""}
-                `}
-              >
+              <Link key={link.href} href={link.href} onClick={() => setMobileOpen(false)}
+                style={{ animationDelay: mobileOpen ? `${i * 70}ms` : "0ms" }}
+                className={`font-display text-4xl sm:text-5xl text-smash-cream hover:text-smash-turquoise transition-colors tracking-widest uppercase
+                  ${mobileOpen ? "animate-fade-up" : ""}`}>
                 {link.label}
               </Link>
             ))}
-            <Link
-              href="/reservas"
-              onClick={() => setMobileOpen(false)}
-              className="mt-4 btn-primary px-10 py-4 text-base"
-            >
-              Reserva ara
-            </Link>
           </nav>
-
-          {/* Footer */}
-          <p className="text-center text-xs text-virutes-brown/40 pb-8">
-            Focacceria Artesanal · Sabadell
+          <div className="fire-divider mx-4 sm:mx-6" />
+          <p className="text-center text-[9px] sm:text-[10px] font-black text-smash-cream/25 uppercase tracking-[0.3em] sm:tracking-[0.4em] py-4 sm:py-6 px-4">
+            Smash Burger · Carrer de Colegi, 5
           </p>
         </div>
       </div>

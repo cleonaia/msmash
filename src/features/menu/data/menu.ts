@@ -1,5 +1,13 @@
-// ─── Virutes Menu Data ─────────────────────────────────────────────────────
-export type Allergen = "gluten" | "lactics" | "ous" | "peix" | "fruits-sec" | "soja";
+// ─── M SMASH Menu Data ─────────────────────────────────────────────────────
+export type Allergen =
+  | "apio"
+  | "crustaceos"
+  | "huevos"
+  | "pescado"
+  | "gluten"
+  | "lacteos"
+  | "mostaza"
+  | "soja";
 
 export interface MenuItem {
   id: string;
@@ -10,270 +18,289 @@ export interface MenuItem {
   image: string;
   allergens: Allergen[];
   featured?: boolean;
-  badge?: string;         // "NOU" | "Preferit" | "Temporada"
-  vegan?: boolean;
-  vegetarian?: boolean;
+  badge?: string;
 }
 
 export type MenuCategory =
-  | "focaccies-classiques"
-  | "focaccies-especials"
-  | "pinses"
-  | "plats"
-  | "postres"
-  | "begudes";
+  | "burguers"
+  | "entrantres"
+  | "frankfurts"
+  | "cervezas"
+  | "bebidas"
+  | "postres";
 
 export const categories: { id: MenuCategory; label: string }[] = [
-  { id: "focaccies-classiques", label: "Focaccies clàssiques" },
-  { id: "focaccies-especials",  label: "Focaccies especials"  },
-  { id: "pinses",               label: "Pinses"               },
-  { id: "plats",                label: "Plats del dia"        },
-  { id: "postres",              label: "Postres"              },
-  { id: "begudes",              label: "Begudes"              },
+  { id: "burguers",     label: "Burguers"    },
+  { id: "entrantres",   label: "Entrantes"   },
+  { id: "frankfurts",   label: "Frankfurts"  },
+  { id: "cervezas",     label: "Cervezas"    },
+  { id: "bebidas",      label: "Bebidas"     },
+  { id: "postres",      label: "Postres"     },
 ];
 
-const FOCACCIA_BASE =
-  "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?w=600&q=80";
-const FOCACCIA_2 =
-  "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=600&q=80";
-const FOCACCIA_3 =
-  "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80";
-const PINSA_IMG =
-  "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80";
-const DESSERT_IMG =
-  "https://images.unsplash.com/photo-1587314168485-3236d6710814?w=600&q=80";
-const DRINK_IMG =
-  "https://images.unsplash.com/photo-1546171753-97d7676e4602?w=600&q=80";
-const PLAT_IMG =
-  "https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=600&q=80";
+// ─── Image placeholders (remplace con tus URLs reales de fotos) ──────────────
+const THE_CRISPY = "/images/products/the-crispy.jpeg";
+const THE_M_SMASH = "/images/products/the-m-smash.jpeg";
+const THE_BASIC = "/images/products/the-basic.jpeg";
+const THE_SUPER_CRISPY = "/images/products/the-super-crispy.jpeg";
+const MENU_KIDS = "/images/products/menu-kids.jpeg";
+const FRANKFURT = "/images/products/frankfurt.jpeg";
+const TEQUENOS = "/images/products/tequenos.jpeg";
+const FRIES_M = "/images/products/fries-m.jpeg";
+const CRISPY_CHICKEN = "/images/products/crispy-chicken.jpeg";
+const CHEESECAKE_NUTELLA = "/images/products/cheesecake-nutella.svg";
+const PEPSI_CLASICA = "/images/products/pepsi-cola.png";
+const LIPTON = "/images/products/lipton.jpeg";
+const PEPSI_ZERO = "/images/products/pepsi-cola-light.jpeg";
+const SPRITE = "/images/products/sprite.png";
+const SCHWEPPES_NARANJA = "/images/products/schweppes-naranja.jpeg";
+const SCHWEPPES_LIMON = "/images/products/schweppes-limon.png";
+const AGUA_SOLAN = "/images/products/agua-solan-de-cabras.webp";
+const AGUA_GAS = "/images/products/agua-con-gas-solan.jpeg";
+const CERVEZA_RADLER = "/images/products/cerveza-radler-33cl.jpeg";
+const CERVEZA_ALAMBRE = "/images/products/cerveza-alambre-33cl.jpeg";
+const CERVEZA_TOSTADA_SIN_ALCOHOL = "/images/products/cerveza-tostada-sin-alcohol.jpeg";
+const CERVEZA_ECOLOGICA = "/images/products/cerveza-ecologica.jpeg";
+const TINTO_DE_VERANO = "/images/products/tinto-de-verano.jpeg";
 
 export const menuItems: MenuItem[] = [
-  // ── Focaccies clàssiques ─────────────────────────────────────────────────
+  // ── BURGUERS ──────────────────────────────────────────────────────────────
   {
-    id: "focaccia-margherita",
-    name: "Margherita clàssica",
-    description: "Tomàquet artesà, mozzarella fior di latte, alfàbrega fresca i AOVE",
-    price: 12.5,
-    category: "focaccies-classiques",
-    image: FOCACCIA_BASE,
-    allergens: ["gluten", "lactics"],
-    vegetarian: true,
-    featured: true,
-    badge: "Preferit",
-  },
-  {
-    id: "focaccia-rosemary",
-    name: "Focaccia al romero",
-    description: "Massa mare 48h, sal gruixuda, all confitat, romaní de temporada i oli d'oliva verge",
-    price: 9.0,
-    category: "focaccies-classiques",
-    image: FOCACCIA_2,
-    allergens: ["gluten"],
-    vegetarian: true,
-    vegan: true,
-    featured: false,
-  },
-  {
-    id: "focaccia-pomodoro",
-    name: "Pomodoro e origano",
-    description: "Tomàquet confit, orègà silvestre, olives negres taggiasche i parmigiano",
+    id: "the-crispy",
+    name: "The Crispy",
+    description: "Pan brioche, smash Burger con queso gouda, bacon crujiente, nuestras salsas caseras, cebolla caramelizada",
     price: 11.0,
-    category: "focaccies-classiques",
-    image: FOCACCIA_3,
-    allergens: ["gluten", "lactics"],
-    vegetarian: true,
+    category: "burguers",
+    image: THE_CRISPY,
+    allergens: ["gluten", "lacteos", "huevos", "soja"],
+    featured: true,
+    badge: "Favorito",
   },
   {
-    id: "focaccia-formaggio",
-    name: "Quattro formaggi",
-    description: "Mozzarella, gorgonzola DOP, parmigià reggiano i ricotta fresca",
-    price: 14.0,
-    category: "focaccies-classiques",
-    image: FOCACCIA_BASE,
-    allergens: ["gluten", "lactics"],
-    vegetarian: true,
+    id: "the-m-smash",
+    name: "The M Smash Burger",
+    description: "Pan brioche, doble Smash Burger, queso Gouda, queso Cheddar, bacon crispy, cebolla caramelizada, huevo, salsa tártara koreana, salsa de la casa",
+    price: 13.0,
+    category: "burguers",
+    image: THE_M_SMASH,
+    allergens: ["lacteos", "gluten", "mostaza", "soja", "huevos"],
     featured: true,
-    badge: "Temporada",
+    badge: "Premium",
+  },
+  {
+    id: "the-basic",
+    name: "The Basic",
+    description: "Pan brioche, smash Burger, queso cheddar, ketchup, encurtido de pepillos",
+    price: 6.5,
+    category: "burguers",
+    image: THE_BASIC,
+    allergens: ["gluten", "lacteos"],
+  },
+  {
+    id: "super-crispy-chicken",
+    name: "THE SÚPER CRISPY CHICKEN BURGER",
+    description: "Pollo extra crujiente marinado con especias japonesas, queso cheddar, tomate Pera, Salsa M, salsa tártara koreana, cebolla caramelizada y su pan brioche",
+    price: 11.9,
+    category: "burguers",
+    image: THE_SUPER_CRISPY,
+    allergens: ["gluten", "lacteos", "huevos"],
+    featured: true,
+  },
+  {
+    id: "menu-kids",
+    name: "MENÚ KIDS",
+    description: "Smash burger, queso cheddar, pan brioche. Acompañada de patatas, refresco y unas gomitas",
+    price: 10.9,
+    category: "burguers",
+    image: MENU_KIDS,
+    allergens: ["gluten", "lacteos"],
+    badge: "Niños",
   },
 
-  // ── Focaccies especials ───────────────────────────────────────────────────
+  // ── ENTRANTRES ────────────────────────────────────────────────────────────
   {
-    id: "focaccia-prosciutto-rucola",
-    name: "Prosciutto e Rucola",
-    description: "Pernil cru italià DOP, rúcula baby, parmesà en escates i maionesa de llimona",
-    price: 15.5,
-    category: "focaccies-especials",
-    image: FOCACCIA_2,
-    allergens: ["gluten", "lactics", "ous"],
-    featured: true,
-    badge: "NOU",
+    id: "tequenos",
+    name: "Tequeños",
+    description: "4 Dedos de queso envueltos en hojaldre",
+    price: 5.0,
+    category: "entrantres",
+    image: TEQUENOS,
+    allergens: ["gluten", "lacteos"],
   },
   {
-    id: "focaccia-bolognese",
-    name: "Ragú de vedella",
-    description: "Ragú lent de vedella de pastura, beixamel artesana i parmigià ratllat",
-    price: 14.0,
-    category: "focaccies-especials",
-    image: FOCACCIA_3,
-    allergens: ["gluten", "lactics"],
+    id: "fries-m",
+    name: "Fries M",
+    description: "Patatas fritas caseras, salsa de queso cheetos y bacon",
+    price: 7.0,
+    category: "entrantres",
+    image: FRIES_M,
+    allergens: ["gluten", "lacteos"],
     featured: true,
   },
   {
-    id: "focaccia-burrata",
-    name: "Burrata & Tomate",
-    description: "Burrata fresca, tomàquet bikino, pesto de alfàbrega i reducció de balsamico",
-    price: 16.0,
-    category: "focaccies-especials",
-    image: FOCACCIA_BASE,
-    allergens: ["gluten", "lactics"],
-    vegetarian: true,
-    badge: "Preferit",
-  },
-  {
-    id: "focaccia-caponata",
-    name: "Caponata siciliana",
-    description: "Albergínia confitada, pebrot groc, pinyons torrats, sultanes i crema de mozzarella",
-    price: 13.5,
-    category: "focaccies-especials",
-    image: FOCACCIA_2,
-    allergens: ["gluten", "lactics", "fruits-sec"],
-    vegetarian: true,
-    vegan: false,
+    id: "crispy-chicken",
+    name: "CRISPY CHICKEN",
+    description: "6 Tiras de pollo rebozadas con especias japonesas y acompañada con una tártara koreana",
+    price: 6.0,
+    category: "entrantres",
+    image: CRISPY_CHICKEN,
+    allergens: ["gluten", "huevos"],
   },
 
-  // ── Pinses ────────────────────────────────────────────────────────────────
+  // ── FRANKFURTS ────────────────────────────────────────────────────────────
   {
-    id: "pinsa-burrata-cherry",
-    name: "Pinsa Burrata",
-    description: "Burrata cremosa, tomàquet cherry confitat, alfàbrega i AOVE d'Arbequina",
-    price: 16.0,
-    category: "pinses",
-    image: PINSA_IMG,
-    allergens: ["gluten", "lactics"],
-    vegetarian: true,
-    featured: true,
-  },
-  {
-    id: "pinsa-salmo",
-    name: "Pinsa Salmó fumat",
-    description: "Salmó fumat, formatge crema, rúcula, tàperes i llimona",
-    price: 17.5,
-    category: "pinses",
-    image: PINSA_IMG,
-    allergens: ["gluten", "lactics", "peix"],
-    badge: "Preferit",
-  },
-  {
-    id: "pinsa-funghi",
-    name: "Pinsa Funghi",
-    description: "Barreja de bolets de temporada, crema de parmentier, farigola i parmigià",
-    price: 15.0,
-    category: "pinses",
-    image: PINSA_IMG,
-    allergens: ["gluten", "lactics"],
-    vegetarian: true,
+    id: "frankfurt",
+    name: "Frankfurt",
+    description: "Pan de brioche, salsa de la casa, maíz, patata palito, ensalada, salchicha, queso gouda rayado",
+    price: 7.0,
+    category: "frankfurts",
+    image: FRANKFURT,
+    allergens: ["gluten", "lacteos", "mostaza", "soja", "huevos"],
   },
 
-  // ── Plats del dia ─────────────────────────────────────────────────────────
+  // ── CERVEZAS ─────────────────────────────────────────────────────────────
   {
-    id: "plat-sopa-tomquet",
-    name: "Sopa de tomàquet",
-    description: "Sopa de tomàquet rostit, oli d'oliva i pa de massa mare tostat",
-    price: 8.5,
-    category: "plats",
-    image: PLAT_IMG,
+    id: "cerveza-radler",
+    name: "Cerveza Radler 33cl",
+    description: "Cerveza estilo radler, refrescante.",
+    price: 2.8,
+    category: "cervezas",
+    image: CERVEZA_RADLER,
     allergens: ["gluten"],
-    vegetarian: true,
-    vegan: true,
   },
   {
-    id: "plat-polpette",
-    name: "Polpette al sugo",
-    description: "Mandonguilles de vedella amb salsa de tomàquet artesà i pa focaccia",
-    price: 12.0,
-    category: "plats",
-    image: PLAT_IMG,
-    allergens: ["gluten", "ous"],
+    id: "cerveza-alambre",
+    name: "Cerveza Alambre 33cl",
+    description: "Cerveza rubia 33cl.",
+    price: 2.8,
+    category: "cervezas",
+    image: CERVEZA_ALAMBRE,
+    allergens: ["gluten"],
   },
   {
-    id: "plat-insalata",
-    name: "Insalata della casa",
-    description: "Enciam, bresaola, parmesà, nous i vinagreta de mostassa",
-    price: 10.0,
-    category: "plats",
-    image: PLAT_IMG,
-    allergens: ["lactics", "fruits-sec"],
+    id: "cerveza-tostada-sin-alcohol",
+    name: "Cerveza Tostada Sin Alcohol",
+    description: "Cerveza tostada 0,0.",
+    price: 2.8,
+    category: "cervezas",
+    image: CERVEZA_TOSTADA_SIN_ALCOHOL,
+    allergens: ["gluten"],
+  },
+  {
+    id: "cerveza-ecologica",
+    name: "Cerveza Ecológica",
+    description: "Cerveza ecológica.",
+    price: 3.0,
+    category: "cervezas",
+    image: CERVEZA_ECOLOGICA,
+    allergens: ["gluten"],
+  },
+  {
+    id: "tinto-de-verano",
+    name: "Tinto de Verano",
+    description: "Tinto de verano.",
+    price: 5.0,
+    category: "cervezas",
+    image: TINTO_DE_VERANO,
+    allergens: ["gluten"],
+    badge: "Top",
   },
 
-  // ── Postres ───────────────────────────────────────────────────────────────
+  // ── BEBIDAS ───────────────────────────────────────────────────────────────
   {
-    id: "postre-tiramisu",
-    name: "Tiramisú artesà",
-    description: "Recepta clàssica amb mascarpone, cafè espresso i cacao de qualitat",
+    id: "pepsi-clasica",
+    name: "PEPSI COLA CLÁSICA",
+    description: "Refresco Pepsi Cola clásica, 330ml",
+    price: 2.5,
+    category: "bebidas",
+    image: PEPSI_CLASICA,
+    allergens: [],
+  },
+  {
+    id: "lipton",
+    name: "LIPTON",
+    description: "Lipton té limón, 330ml",
+    price: 2.5,
+    category: "bebidas",
+    image: LIPTON,
+    allergens: [],
+  },
+  {
+    id: "pepsi-zero",
+    name: "PEPSI COLA ZERO",
+    description: "Pepsi Cola Zero azúcar, 330ml",
+    price: 2.5,
+    category: "bebidas",
+    image: PEPSI_ZERO,
+    allergens: [],
+  },
+  {
+    id: "sprite",
+    name: "Sprite",
+    description: "Refresco Sprite, 330ml",
+    price: 2.5,
+    category: "bebidas",
+    image: SPRITE,
+    allergens: [],
+  },
+  {
+    id: "schweppes-naranja",
+    name: "SCHWEPPES DE NARANJA",
+    description: "Schweppes naranja, 250ml",
+    price: 2.5,
+    category: "bebidas",
+    image: SCHWEPPES_NARANJA,
+    allergens: [],
+  },
+  {
+    id: "schweppes-limon",
+    name: "SCHWEPPES DE LIMÓN",
+    description: "Schweppes limón, 250ml",
+    price: 2.5,
+    category: "bebidas",
+    image: SCHWEPPES_LIMON,
+    allergens: [],
+  },
+  {
+    id: "agua-solan",
+    name: "AGUA SOLAN DE CABRAS",
+    description: "Agua mineral de Solan de Cabras",
+    price: 2.3,
+    category: "bebidas",
+    image: AGUA_SOLAN,
+    allergens: [],
+  },
+  {
+    id: "agua-gas",
+    name: "AGUA CON GAS SOLAN",
+    description: "Agua mineral con gas de Solan",
+    price: 2.5,
+    category: "bebidas",
+    image: AGUA_GAS,
+    allergens: [],
+  },
+
+  // ── POSTRES ───────────────────────────────────────────────────────────────
+  {
+    id: "cheesecake-nutella",
+    name: "Cheesecake dé Nutella",
+    description: "La clásica tarta de queso junto a una base dé Nutella y lluvia de cacao en polvo. Es un buen final Feliz",
     price: 6.5,
     category: "postres",
-    image: DESSERT_IMG,
-    allergens: ["gluten", "lactics", "ous"],
-    featured: true,
-  },
-  {
-    id: "postre-pannacotta",
-    name: "Pannacotta di vaniglia",
-    description: "Panacota de vainilla Bourbon amb coulis de maduixes del Maresme",
-    price: 6.0,
-    category: "postres",
-    image: DESSERT_IMG,
-    allergens: ["lactics"],
-    vegetarian: true,
-  },
-
-  // ── Begudes ───────────────────────────────────────────────────────────────
-  {
-    id: "beguda-agua",
-    name: "Aigua mineral",
-    description: "Natural o amb gas, 50 cl",
-    price: 2.5,
-    category: "begudes",
-    image: DRINK_IMG,
-    allergens: [],
-    vegan: true,
-    vegetarian: true,
-  },
-  {
-    id: "beguda-vi-blanc",
-    name: "Vi blanc de la casa",
-    description: "Garnatxa blanca del Penedés, copa",
-    price: 4.5,
-    category: "begudes",
-    image: DRINK_IMG,
-    allergens: [],
-  },
-  {
-    id: "beguda-vi-negre",
-    name: "Vi negre de la casa",
-    description: "Tempranillo de la Ribera del Duero, copa",
-    price: 4.5,
-    category: "begudes",
-    image: DRINK_IMG,
-    allergens: [],
-  },
-  {
-    id: "beguda-sangria",
-    name: "Sangria de la casa",
-    description: "Recepta pròpia amb fruites de temporada, copa",
-    price: 5.0,
-    category: "begudes",
-    image: DRINK_IMG,
-    allergens: [],
+    image: CHEESECAKE_NUTELLA,
+    allergens: ["gluten", "lacteos", "huevos"],
   },
 ];
 
 export const featuredItems = menuItems.filter((i) => i.featured);
+
 export const allergenLabels: Record<Allergen, string> = {
-  gluten:      "Gluten",
-  lactics:     "Làctics",
-  ous:         "Ous",
-  peix:        "Peix",
-  "fruits-sec": "Fruits secs",
-  soja:        "Soja",
+  apio: "Apio",
+  crustaceos: "Crustáceos",
+  huevos: "Huevos",
+  pescado: "Pescado",
+  gluten: "Gluten",
+  lacteos: "Lácteos",
+  mostaza: "Mostaza",
+  soja: "Soja",
 };

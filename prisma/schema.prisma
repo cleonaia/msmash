@@ -7,54 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  CUSTOMER
-  ADMIN
-}
-
-enum ReservationStatus {
-  PENDING
-  CONFIRMED
-  CANCELLED
-}
-
-enum OrderStatus {
-  PENDING
-  CONFIRMED
-  PREPARING
-  COMPLETED
-  CANCELLED
-}
-
-enum PaymentStatus {
-  PENDING
-  PAID
-  REFUNDED
-}
-
-enum PaymentMethod {
-  LOCAL
-  STRIPE
-}
-
-enum ProductChannel {
-  RESTAURANT
-  BUTCHER
-}
-
-enum ContactStatus {
-  NEW
-  IN_PROGRESS
-  CLOSED
-}
-
 model User {
   id            String            @id @default(cuid())
   email         String            @unique
   emailVerified DateTime?
   passwordHash  String?
-  role          Role              @default(CUSTOMER)
+  role          String            @default("CUSTOMER")
   profile       Profile?
+  employee      Employee?
   reservations  Reservation[]
   orders        Order[]
   posts         BlogPost[]
@@ -75,7 +35,7 @@ model Profile {
   birthDate       DateTime?
   loyaltyPoints   Int      @default(0)
   marketingOptIn  Boolean  @default(false)
-  favoriteCuts    Json?
+  favoriteCuts    String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -91,7 +51,7 @@ model Reservation {
   guests            Int
   occasion          String?
   notes             String?
-  status            ReservationStatus @default(PENDING)
+  status            String            @default("PENDING")
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 }
@@ -101,7 +61,7 @@ model ProductCategory {
   name        String
   slug        String          @unique
   description String?
-  channel     ProductChannel
+  channel     String
   products    Product[]
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
@@ -116,13 +76,14 @@ model Product {
   unit          String
   stock         Int                @default(0)
   isFeatured    Boolean            @default(false)
-  badges        Json?
-  pairings      Json?
+  badges        String?
+  pairings      String?
   category      ProductCategory    @relation(fields: [categoryId], references: [id])
   categoryId    String
   images        ProductImage[]
   orderItems    OrderItem[]
   favorites     FavoriteProduct[]
+  invoiceItems  InvoiceItem[]
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
 }
@@ -148,21 +109,25 @@ model FavoriteProduct {
 }
 
 model Order {
-  id             String         @id @default(cuid())
-  user           User?          @relation(fields: [userId], references: [id])
-  userId         String?
-  customerName   String
-  customerEmail  String
-  customerPhone  String
-  deliveryMethod String         @default("Retiro en local")
-  status         OrderStatus    @default(PENDING)
-  paymentStatus  PaymentStatus  @default(PENDING)
-  paymentMethod  PaymentMethod  @default(LOCAL)
-  notes          String?
-  totalAmount    Int
-  items          OrderItem[]
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  id               String                 @id @default(cuid())
+  user             User?                  @relation(fields: [userId], references: [id])
+  userId           String?
+  customerName     String
+  customerEmail    String
+  customerPhone    String
+  deliveryMethod   String                 @default("Retiro en local")
+  status           String                 @default("PENDING")
+  paymentStatus    String                 @default("PENDING")
+  paymentMethod    String                 @default("LOCAL")
+  notes            String?
+  totalAmount      Int
+  items            OrderItem[]
+  invoice          Invoice?
+  channelMetadata  OrderChannelMetadata?
+  deliveryOrder    DeliveryOrder?
+  stripePaymentId  String?
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
 }
 
 model OrderItem {
@@ -205,9 +170,132 @@ model ContactMessage {
   phone     String?
   subject   String
   message   String
-  status    ContactStatus @default(NEW)
+  status    String        @default("NEW")
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
+}
+
+// ─── FACTURACIÓN ───────────────────────────────────────────────
+model Invoice {
+  id              String        @id @default(cuid())
+  invoiceNumber   String        @unique
+  order           Order?        @relation(fields: [orderId], references: [id])
+  orderId         String?       @unique
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  customerTaxId   String?
+  items           InvoiceItem[]
+  subtotal        Int
+  taxAmount       Int
+  totalAmount     Int
+  status          String        @default("DRAFT")
+  pdfUrl          String?
+  sentAt          DateTime?
+  dueDate         DateTime?
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  invoiceId   String
+  product     Product? @relation(fields: [productId], references: [id])
+  productId   String?
+  description String
+  quantity    Int
+  unitPrice   Int
+  subtotal    Int
+}
+
+// ─── ANALYTICS ───────────────────────────────────────────────
+model AnalyticsEvent {
+  id        String    @id @default(cuid())
+  type      String
+  orderId   String?
+  productId String?
+  userId    String?
+  channel   String?
+  metadata  String?
+  createdAt DateTime  @default(now())
+
+  @@index([type])
+  @@index([createdAt])
+  @@index([channel])
+}
+
+// ─── EMPLEADOS & PERMISOS ───────────────────────────────────────
+model Employee {
+  id            String   @id @default(cuid())
+  firstName     String
+  lastName      String
+  email         String   @unique
+  phone         String?
+  role          String
+  permissions   String?
+  user          User?    @relation(fields: [userId], references: [id])
+  userId        String?  @unique
+  isActive      Boolean  @default(true)
+  salary        Int?
+  startDate     DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ─── DELIVERY INTEGRATION ───────────────────────────────────────
+model DeliveryIntegration {
+  id          String          @id @default(cuid())
+  platform    String
+  isEnabled   Boolean         @default(false)
+  apiKey      String
+  merchantId  String?
+  syncedAt    DateTime?
+  lastError   String?
+  orders      DeliveryOrder[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model DeliveryOrder {
+  id              String            @id @default(cuid())
+  platform        String
+  platformOrderId String            @unique
+  localOrder      Order?            @relation(fields: [orderId], references: [id])
+  orderId         String?           @unique
+  integration     DeliveryIntegration @relation(fields: [integrationId], references: [id])
+  integrationId   String
+  customerName    String
+  customerPhone   String
+  deliveryAddress String
+  items           String
+  totalAmount     Int
+  deliveryFee     Int
+  notes           String?
+  status          String            @default("received")
+  acceptedAt      DateTime?
+  preparedAt      DateTime?
+  collectedAt     DateTime?
+  deliveredAt     DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([platformOrderId])
+  @@index([status])
+}
+
+// ─── ORDER CHANNEL TRACKING ───────────────────────────────────────
+model OrderChannelMetadata {
+  id              String      @id @default(cuid())
+  order           Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId         String      @unique
+  channel         String        @default("WEB")
+  referralSource  String?
+  deviceType      String?
+  conversionTime  Int?
+  metadata        String?
+  createdAt       DateTime    @default(now())
 }
 
 // NextAuth models

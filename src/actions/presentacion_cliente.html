@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEB vs qcamarero</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #1a1a1a;
+            color: white;
+            overflow: hidden;
+        }
+
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            padding: 60px;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.6s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .top-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #ff2b2b, #ffeb3b);
+        }
+
+        h1 {
+            font-size: 3em;
+            color: #ff2b2b;
+            margin-bottom: 30px;
+            font-weight: 900;
+        }
+
+        h2 {
+            font-size: 2.2em;
+            color: #ff2b2b;
+            margin-bottom: 40px;
+            font-weight: 800;
+        }
+
+        p {
+            font-size: 1.2em;
+            line-height: 1.8;
+            color: #e0e0e0;
+            margin: 10px 0;
+        }
+
+        .portada {
+            background: linear-gradient(135deg, #cc1d1d 0%, #ff2b2b 50%, #1a1a1a 100%);
+            text-align: center;
+        }
+
+        .portada h1 {
+            font-size: 4.5em;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            font-size: 2em;
+            color: #ffeb3b;
+            margin-bottom: 30px;
+        }
+
+        .tagline {
+            font-size: 1.3em;
+            max-width: 800px;
+            background: rgba(0,0,0,0.3);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #ffeb3b;
+            line-height: 1.9;
+            color: white;
+            margin: 0 auto;
+        }
+
+        .content-box {
+            max-width: 1000px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .item-list {
+            background: rgba(255,255,255,0.05);
+            border-left: 5px solid #ff2b2b;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .item {
+            font-size: 1.15em;
+            margin: 12px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        .item:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4caf50;
+            font-weight: 900;
+            font-size: 1.2em;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(76,175,80,0.2) 0%, rgba(76,175,80,0.1) 100%);
+            border: 3px solid #4caf50;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 12px;
+        }
+
+        .highlight-box h3 {
+            color: #4caf50;
+            font-size: 1.3em;
+            margin-bottom: 12px;
+        }
+
+        .highlight-box p {
+            font-size: 1.1em;
+            color: #ffffff;
+            line-height: 1.8;
+        }
+
+        .comparison-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .comparison-item {
+            padding: 25px;
+            border-radius: 10px;
+            font-size: 1.05em;
+        }
+
+        .comparison-bad {
+            background: rgba(244,67,54,0.15);
+            border: 2px solid #f44336;
+        }
+
+        .comparison-good {
+            background: rgba(76,175,80,0.15);
+            border: 2px solid #4caf50;
+        }
+
+        .comparison-item h3 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .comparison-bad h3 {
+            color: #f44336;
+        }
+
+        .comparison-good h3 {
+            color: #4caf50;
+        }
+
+        .comparison-item p {
+            line-height: 1.8;
+        }
+
+        .money-box {
+            background: rgba(255,235,59,0.15);
+            border: 3px solid #ffeb3b;
+            padding: 30px;
+            margin: 25px 0;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .money-number {
+            font-size: 2.2em;
+            color: #ffeb3b;
+            font-weight: 900;
+            margin: 15px 0;
+        }
+
+        .final-slide {
+            background: linear-gradient(135deg, #ff2b2b 0%, #cc1d1d 50%, #1a1a1a 100%);
+            text-align: center;
+        }
+
+        .cta-btn {
+            background: #ffeb3b;
+            color: #1a1a1a;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.3em;
+            font-weight: 900;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s;
+        }
+
+        .cta-btn:hover {
+            background: white;
+            transform: scale(1.05);
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        button {
+            background: #ff2b2b;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+
+        button:hover {
+            background: #cc1d1d;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .page-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            font-size: 1.1em;
+            color: #ff2b2b;
+            font-weight: 700;
+        }
+
+        .feature-table {
+            width: 100%;
+            margin: 20px 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .feature-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .feature-row.header {
+            background: #ff2b2b;
+            font-weight: 700;
+            padding: 15px;
+        }
+
+        .feature-row:not(.header) {
+            padding: 15px;
+            align-items: center;
+        }
+
+        .feature-row:nth-child(odd):not(.header) {
+            background: rgba(255,43,43,0.05);
+        }
+
+        .feature-name {
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .check-mark {
+            text-align: center;
+            color: #4caf50;
+            font-weight: 900;
+            font-size: 1.3em;
+        }
+
+        .feature-plus {
+            text-align: center;
+            color: #ffeb3b;
+            font-weight: 700;
+            font-size: 0.9em;
+        }
+
+        .title-section {
+            font-size: 1.35em;
+            color: #ffeb3b;
+            margin: 25px 0 15px 0;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pricing-box {
+            background: rgba(76,175,80,0.15);
+            border: 3px solid #4caf50;
+            padding: 30px;
+            margin: 25px 0;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .pricing-box h3 {
+            color: #4caf50;
+            font-size: 1.4em;
+            margin-bottom: 20px;
+        }
+
+        .price-number {
+            font-size: 2.8em;
+            color: #ffeb3b;
+            font-weight: 900;
+            margin: 15px 0;
+        }
+
+        .pricing-details {
+            font-size: 1.05em;
+            line-height: 2;
+            color: #ffffff;
+        }
+
+        .yearly-option {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            color: #b0b0b0;
+            font-size: 1.05em;
+        }
+
+        @media (max-width: 1024px) {
+            .comparison-box { grid-template-columns: 1fr; }
+            .feature-row { grid-template-columns: 1fr; }
+            h1 { font-size: 2.5em; }
+            h2 { font-size: 1.8em; }
+            .slide { padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="presentation">
+
+    <!-- SLIDE 1: Portada -->
+    <div class="slide portada active">
+        <div class="top-bar"></div>
+        <h1>🍔 SMASH BURGER</h1>
+        <p class="subtitle">vs qcamarero</p>
+        <p class="tagline">
+            Ofreces LO MISMO pero MEJOR<br>
+            Y más barato. Con números reales.
+        </p>
+    </div>
+
+    <!-- SLIDE 2: Lo Que AMBOS Ofrecen (Mejorado) -->
+    <div class="slide">
+        <div class="top-bar"></div>
+        <div class="content-box">
+            <h2>LO QUE AMBOS OFRECEMOS</h2>
+            <p style="margin-bottom: 30px; color: #b0b0b0;">Lo que ofrezco tiene lo mismo que Qcamarero, pero la nuestra está mejorada:</p>
+            
+            <div class="feature-table">
+                <div class="feature-row header">
+                    <div>FUNCIONALIDAD</div>
+                    <div style="text-align: center;">qcamarero</div>
+                    <div style="text-align: center;">WEB</div>
+                    <div style="text-align: center;">DIFERENCIA</div>
+                </div>
+
+                <div class="feature-row">
+                    <div class="feature-name">TPV</div>
+                    <div class="check-mark">✓</div>
+                    <div class="check-mark">✓</div>
+                    <div style="text-align: center; color: #4caf50;">Más rápido</div>
+                </div>
+
+                <div class="feature-row">
+                    <div class="feature-name">Comandero Digital</div>
+                    <div class="check-mark">✓</div>
+                    <div class="check-mark">✓</div>
+                    <div style="text-align: center; color: #4caf50;">Más ágil</div>
+                </div>
+
+                <div class="feature-row">
+                    <div class="feature-name">Carta Digital</div>
+                    <div class="check-mark">✓</div>
+                    <div class="check-mark">✓</div>
+                    <div style="text-align: center; color: #4caf50;">Más moderna</div>
+                </div>
+
+                <div class="feature-row">
+                    <div class="feature-name">Pedir & Pagar</div>
+                    <div class="check-mark">✓</div>
+                    <div class="check-mark">✓</div>
+                    <div style="text-align: center; color: #4caf50;">Más seguro</div>
+                </div>
+
+                <div class="feature-row">
+                    <div class="feature-name">Delivery & Take Away</div>
+                    <div class="check-mark">✓</div>
+                    <div class="check-mark">✓</div>
+                    <div style="text-align: center; color: #4caf50;">Más fiable</div>
+                </div>
+
+                <div class="feature-row">
+                    <div class="feature-name">Control Horario</div>
+                    <div class="check-mark">✓</div>
+                    <div class="check-mark">✓</div>
+                    <div style="text-align: center; color: #4caf50;">Más preciso</div>
+                </div>
+
+                <div class="feature-row">
+                    <div class="feature-name">KDS (Pantalla Cocina)</div>
+                    <div class="check-mark">✓</div>
+                    <div class="check-mark">✓</div>
+                    <div style="text-align: center; color: #4caf50;">En tiempo real</div>
+                </div>
+
+                <div class="feature-row">
+                    <div class="feature-name">Página Web</div>
+                    <div class="check-mark">✓</div>
+                    <div class="check-mark">✓</div>
+                    <div style="text-align: center; color: #4caf50;">Profesional</div>
+                </div>
+
+                <div class="feature-row">
+                    <div class="feature-name">Analítica</div>
+                    <div class="check-mark">✓</div>
+                    <div class="check-mark">✓</div>
+                    <div style="text-align: center; color: #4caf50;">Detallada</div>
+                </div>
+
+                <div class="feature-row">
+                    <div class="feature-name">Fiscalidad</div>
+                    <div class="check-mark">✓</div>
+                    <div class="check-mark">✓</div>
+                    <div style="text-align: center; color: #4caf50;">Automatizada</div>
+                </div>
+
+                <div class="feature-row">
+                    <div class="feature-name">Reservas</div>
+                    <div class="check-mark">✓</div>
+                    <div class="check-mark">✓</div>
+                    <div style="text-align: center; color: #4caf50;">Confirmadas</div>
+                </div>
+
+                <div class="feature-row">
+                    <div class="feature-name">Reseñas</div>
+                    <div class="check-mark">✓</div>
+                    <div class="check-mark">✓</div>
+                    <div style="text-align: center; color: #4caf50;">Visibles</div>
+                </div>
+
+                <div class="feature-row">
+                    <div class="feature-name">Inteligencia Artificial</div>
+                    <div class="check-mark">✓</div>
+                    <div class="check-mark">✓</div>
+                    <div style="text-align: center; color: #4caf50;">Funcional</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 3: DONDE TÚ GANAS (UBER + GLOVO + JUST EAT) -->
+    <div class="slide">
+        <div class="top-bar"></div>
+        <div class="content-box">
+            <h2>DIFERENCIAS</h2>
+            <p style="margin-bottom: 30px; color: #b0b0b0;">Qcamarero solo ofrece pedidos por Uber. Mientras que yo ofrezco las 3 plataformas integradas:</p>
+            
+            <div class="comparison-box">
+                <div class="comparison-item comparison-bad">
+                    <h3>❌ qcamarero</h3>
+                    <p style="margin-top: 20px;">
+                        <strong>Uber Eats:</strong> ✓ Integrado<br><br>
+                        <strong>Glovo:</strong> ✗ NO integrado<br><br>
+                        <strong>Just Eat:</strong> ✗ NO integrado<br><br>
+                        <strong>Resultado:</strong> Solo 1 plataforma
+                    </p>
+                </div>
+
+                <div class="comparison-item comparison-good">
+                    <h3>✅ WEB</h3>
+                    <p style="margin-top: 20px;">
+                        <strong>Uber Eats:</strong> ✓ Integrado automático<br><br>
+                        <strong>Glovo:</strong> ✓ Integrado automático<br><br>
+                        <strong>Just Eat:</strong> ✓ Integrado automático<br><br>
+                        <strong>Resultado:</strong> Las 3 plataformas en 1
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 4: TÚ TIENES MÁS (CHATBOT + WHATSAPP) -->
+    <div class="slide">
+        <div class="top-bar"></div>
+        <div class="content-box">
+            <h2>COSAS QUE SOLO OFRECEMOS</h2>
+            <p style="margin-bottom: 30px; color: #b0b0b0;">Cosas que Qcamarero NO ofrece:</p>
+            
+            <div class="title-section">
+                <span style="font-size: 1.4em;">🤖</span> CHATBOT IA (24/7)
+            </div>
+            <div class="item-list">
+                <div class="item"><strong>Responde automáticamente</strong> mientras trabajas</div>
+                <div class="item">Cliente: "¿Qué horario?" → IA responde al instante</div>
+                <div class="item">Cliente: "¿Hay sin gluten?" → IA consulta tu carta y responde</div>
+                <div class="item"><strong>Resultado:</strong> Ganas clientes porque alguien SIEMPRE responde</div>
+            </div>
+
+            <div class="title-section">
+                <span style="font-size: 1.4em;">📱</span> WHATSAPP AUTOMÁTICO
+            </div>
+            <div class="item-list">
+                <div class="item">Cliente pide en web → Recibe WhatsApp automático "Pedido confirmado"</div>
+                <div class="item">Cocina empieza → Recibe WhatsApp "Tu comida está siendo preparada"</div>
+                <div class="item">Listo → Recibe WhatsApp "¡Tu comida está lista!"</div>
+                <div class="item"><strong>Resultado:</strong> Cliente informado = Sin llamadas = Menos estrés</div>
+            </div>
+
+            <div class="title-section">
+                <span style="font-size: 1.4em;">📊</span> ANALÍTICA PROFUNDA
+            </div>
+            <div class="item-list">
+                <div class="item">Ves EXACTAMENTE cuánto ganaste de Uber, Glovo, y tu web</div>
+                <div class="item">Qué plato se vende más, a qué hora, con qué margen</div>
+                <div class="item"><strong>Resultado:</strong> Decisiones basadas en números reales, no intuición</div>
+            </div>
+
+            <div class="title-section">
+                <span style="font-size: 1.4em;">🌐</span> SEO Y POSICIONAMIENTO
+            </div>
+            <div class="item-list">
+                <div class="item">Mejor posicionamiento en Google</div>
+                <div class="item">Busque "Smash Burger Terrassa" → Saldrás como PRIMERA opción</div>
+                <div class="item">Clientes nuevos que te encuentran sin pagar publicidad</div>
+                <div class="item"><strong>Resultado:</strong> Visibilidad real en buscadores</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 5: DINERO REAL -->
+    <div class="slide">
+        <div class="top-bar"></div>
+        <div class="content-box">
+            <h2>💰 DINERO: LA REALIDAD</h2>
+            <p style="margin-bottom: 30px; color: #b0b0b0;">Comparativa real de costes 3 años:</p>
+            
+            <div class="comparison-box">
+                <div class="comparison-item comparison-bad">
+                    <h3>❌ qcamarero</h3>
+                    <p style="margin-top: 20px;">
+                        <strong>AÑO 1:</strong><br>
+                        €150 × 12 meses = €1.800<br><br>
+
+                        <strong>AÑO 2:</strong><br>
+                        €150 × 12 meses = €1.800<br><br>
+
+                        <strong>AÑO 3:</strong><br>
+                        €150 × 12 meses = €1.800<br><br>
+
+                        <strong style="color: #f44336;">TOTAL 3 AÑOS: €5.400</strong>
+                    </p>
+                </div>
+
+                <div class="comparison-item comparison-good">
+                    <h3>✅ Smash Burger</h3>
+                    <p style="margin-top: 20px;">
+                        <strong>AÑO 1:</strong><br>
+                        €1.400 (todo incluido)<br><br>
+
+                        <strong>AÑO 2:</strong><br>
+                        €480 (mantenimiento opcional)<br><br>
+
+                        <strong>AÑO 3:</strong><br>
+                        €480 (mantenimiento opcional)<br><br>
+
+                        <strong style="color: #4caf50;">TOTAL 3 AÑOS: €2.360</strong>
+                    </p>
+                </div>
+            </div>
+
+            <div class="money-box">
+                <h3>🎯 DIFERENCIA EN 3 AÑOS</h3>
+                <div class="money-number">AHORRAS €3.040</div>
+                <p style="font-size: 1.2em;">Y consigues más ventas porque tienes 3 plataformas + IA + mejor SEO</p>
+            </div>
+
+            <div class="highlight-box">
+                <h3>La realidad</h3>
+                <p><strong>€1.400 único pago</strong> incluye: web profesional con todo lo mencionado + dominio + 1 año mantenimiento + atención personalizada<br><br><strong>Después:</strong> €480/año opcional para mantener todo actualizado.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 6: RESUMEN -->
+    <div class="slide">
+        <div class="top-bar"></div>
+        <div class="content-box">
+            <h2>📊 RESUMEN: WEB vs qcamarero</h2>
+            
+            <div class="title-section">LO QUE OFRECES IGUAL (Pero mejorado):</div>
+            <div class="item-list">
+                <div class="item">✓ TPV, Comandero, Carta, Pagar, Delivery, Control Horario</div>
+                <div class="item">✓ KDS, Página Web, Analítica, Fiscalidad, Reservas, Reseñas, IA</div>
+            </div>
+
+            <div class="title-section">LO QUE SOLO TÚ TIENES:</div>
+            <div class="item-list">
+                <div class="item">✓ Uber + Glovo + Just Eat (ellos solo Uber)</div>
+                <div class="item">✓ Dashboard único (3 plataformas en 1)</div>
+                <div class="item">✓ Chatbot IA 24/7</div>
+                <div class="item">✓ WhatsApp automático</div>
+                <div class="item">✓ Mejor posicionamiento en Google (aparece primero)</div>
+            </div>
+
+            <div class="title-section">LO QUE AHORRAS:</div>
+            <div class="item-list">
+                <div class="item">✓ €3.040 en 3 años</div>
+                <div class="item">✓ Web y dominio tuyo para siempre</div>
+                <div class="item">✓ Un año de mantenimiento incluido</div>
+                <div class="item">✓ Atención personalizada</div>
+            </div>
+
+            <div class="money-box">
+                <h3>LA PREGUNTA REAL</h3>
+                <p style="font-size: 1.3em; color: #ffeb3b; margin-top: 15px;">¿Por qué pagar €5.400 por menos cuando puedes pagar €1.400 por más?</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 7: CONCLUSIÓN FINAL -->
+    <div class="slide final-slide">
+        <div class="top-bar"></div>
+        <h2 style="color: white; font-size: 2.8em; margin-bottom: 50px;">📋 CONCLUSIÓN</h2>
+        
+        <div class="pricing-box">
+            <h3>€1.400 INCLUYE:</h3>
+            <p class="pricing-details">
+                ✓ Web profesional personalizada<br>
+                ✓ Dominio<br>
+                ✓ 1 año de mantenimiento<br>
+                ✓ Atención personalizada<br>
+                ✓ Todo actualizado y funcionando<br><br>
+                <span class="yearly-option">Año 2+: €480/año (opcional) para mantener actualizado</span>
+            </p>
+        </div>
+
+        <p style="font-size: 1.2em; margin-top: 50px; color: #ffffff;">
+            <strong>Ofreces lo mismo que qcamarero.</strong><br>
+            <strong>Pero tienes 3 plataformas en vez de 1.</strong><br>
+            <strong>Y cuesta €4.000 menos en 3 años.</strong>
+        </p>
+
+        <p style="margin-top: 50px; color: #b0b0b0; font-size: 0.95em;">
+            Cleonaia Digital | Plataforma de Delivery & TPV para Restaurantes
+        </p>
+    </div>
+
+</div>
+
+<!-- Controls -->
+<div class="controls">
+    <button id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+    <button id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+</div>
+
+<div class="page-number">
+    <span id="current">1</span> / <span id="total">7</span>
+</div>
+
+<script>
+    let current = 1;
+    const total = document.querySelectorAll('.slide').length;
+    document.getElementById('total').textContent = total;
+
+    function showSlide(n) {
+        const slides = document.querySelectorAll('.slide');
+        if (n > total) current = total;
+        if (n < 1) current = 1;
+        
+        slides.forEach(s => s.classList.remove('active'));
+        slides[current - 1].classList.add('active');
+        
+        document.getElementById('current').textContent = current;
+        document.getElementById('prevBtn').disabled = current === 1;
+        document.getElementById('nextBtn').disabled = current === total;
+    }
+
+    function changeSlide(n) {
+        current += n;
+        showSlide(current);
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') changeSlide(1);
+        if (e.key === 'ArrowLeft') changeSlide(-1);
+    });
+
+    showSlide(current);
+</script>
+
+</body>
+</html>

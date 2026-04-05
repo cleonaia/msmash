@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="Schweppes limón">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4A4400"/>
+      <stop offset="100%" stop-color="#D8C82A"/>
+    </linearGradient>
+    <linearGradient id="can" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFF7B8"/>
+      <stop offset="100%" stop-color="#F3DE5E"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg)"/>
+  <circle cx="980" cy="120" r="220" fill="#FFF0A6" opacity="0.16"/>
+  <circle cx="180" cy="650" r="240" fill="#8F7BC1" opacity="0.10"/>
+  <rect x="430" y="120" width="340" height="560" rx="56" fill="url(#can)" stroke="#ffffff" stroke-opacity="0.25" stroke-width="8"/>
+  <rect x="460" y="165" width="280" height="70" rx="24" fill="#0F172A" opacity="0.9"/>
+  <text x="600" y="214" text-anchor="middle" font-family="Arial, sans-serif" font-size="46" font-weight="800" fill="#FFFFFF">SCHWEPPES</text>
+  <text x="600" y="325" text-anchor="middle" font-family="Arial, sans-serif" font-size="36" font-weight="700" fill="#4A4400">LIMÓN</text>
+  <text x="600" y="404" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#4A4400">250 ml</text>
+  <circle cx="600" cy="530" r="88" fill="#4A4400" opacity="0.12"/>
+  <text x="600" y="543" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#4A4400">BUBBLES</text>
+</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="M Smash placeholder">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3A1F4A"/>
+      <stop offset="100%" stop-color="#0F0F12"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg)"/>
+  <circle cx="980" cy="120" r="180" fill="#23C7C9" opacity="0.15"/>
+  <circle cx="220" cy="700" r="220" fill="#F59A23" opacity="0.2"/>
+  <rect x="120" y="300" width="960" height="220" rx="28" fill="#0F0F12" stroke="#23C7C9" stroke-width="6"/>
+  <text x="600" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="64" font-weight="700" fill="#F5F0E6">M SMASH BURGER</text>
+  <text x="600" y="460" text-anchor="middle" font-family="Arial, sans-serif" font-size="38" fill="#F59A23">Carta digital</text>
+</svg>

@@ -1,75 +1,81 @@
-// ─── Virutes Brand Data ────────────────────────────────────────────────────
+// ─── M SMASH Brand Data ──────────────────────────────────────────────────────
 export const siteConfig = {
-  name: "Virutes",
-  tagline: "Focacceria Artesanal",
-  slogan: "Massa, temps i ànima.",
-  sloganSub: "La focacceria artesanal de Sabadell.",
-  city: "Sabadell",
+  name: "M SMASH",
+  tagline: "Smash Burger",
+  slogan: "Aplastado. Dorado. Perfecto.",
+  sloganSub: "El smash burger definitivo de Terrassa.",
+  city: "Terrassa",
   description:
-    "Focacceria artesanal al cor de Sabadell. Massa mare de 48 hores, ingredients de proximitat i molt de caràcter.",
-  address: "Via de Massagué, 31, 08201 Sabadell, Barcelona",
-  addressShort: "Via de Massagué, 31 · Sabadell",
+    "Smash burgers de fuego en Terrassa. Carne aplastada al momento, queso fundido hasta los bordes y sabores que no se olvidan.",
+  address: "Carrer de Colegi, 5, 08221 Terrassa, Barcelona",
+  addressShort: "Carrer de Colegi, 5",
   googleMapsUrl:
-    "https://www.google.com/maps/search/?api=1&query=Via+de+Massagué+31+08201+Sabadell+Barcelona",
+    "https://www.google.com/maps/search/?api=1&query=Carrer+de+Colegi+5+08221+Terrassa+Barcelona",
   googleMapsEmbed:
-    "https://maps.google.com/maps?q=Via+de+Massagué+31+Sabadell&t=&z=17&ie=UTF8&iwloc=&output=embed",
+    "https://maps.google.com/maps?q=Carrer+de+Colegi+5+Terrassa&t=&z=16&ie=UTF8&iwloc=&output=embed",
 };
 
 export const contactInfo = {
-  phone: "933 34 55 91",
-  phonePretty: "933 34 55 91",
-  phoneHref: "tel:+34933345591",
-  email: "hola@virutes.com",
-  whatsappNumber: "34933345591",
+  phone: "612 59 88 99",
+  phonePretty: "612 59 88 99",
+  phoneHref: "tel:+34612598899",
+  email: "hola@msmash.es",
+  whatsappNumber: "34612598899",
 };
 
 export const socialLinks = {
-  instagram: "https://www.instagram.com/virutes.sbd/",
-  tiktok: "https://www.tiktok.com/@virutes.sbd",
+  instagram: "https://www.instagram.com/msmashburguer/",
+  tiktok: "https://www.tiktok.com/@msmashburguer?_r=1&_t=ZN-95GD8MGZs6Y",
   whatsapp: `https://wa.me/${contactInfo.whatsappNumber}`,
   phone: contactInfo.phone,
   email: contactInfo.email,
 };
 
 export const hours = [
-  { days: "Dilluns",           time: "Tancat",               closed: true },
-  { days: "Dimarts – Divendres", time: "12:00–15:30 / 19:30–22:30", closed: false },
-  { days: "Dissabte",          time: "12:00–23:00",           closed: false },
-  { days: "Diumenge",          time: "12:00–16:30",           closed: false },
+  { days: "Lunes",            time: "Cerrado",                  closed: true  },
+  { days: "Martes – Viernes", time: "13:00–16:00 / 20:00–23:30", closed: false },
+  { days: "Sábado",           time: "13:00–00:00",              closed: false },
+  { days: "Domingo",          time: "13:00–17:00",              closed: false },
 ];
 
 export const navLinks = [
-  { href: "/",           label: "Inici"    },
-  { href: "/menu",       label: "Carta"    },
-  { href: "/qui-som",    label: "Qui som"  },
-  { href: "/galeria",    label: "Galeria"  },
-  { href: "/blog",       label: "Novetats" },
-  { href: "/contacto",   label: "Contacte" },
+  { href: "/",          label: "Inicio"    },
+  { href: "/menu",      label: "La Carta"  },
+  { href: "/pedidos",   label: "Pedidos"   },
+  { href: "/nosotros",  label: "Nosotros"  },
+  { href: "/galeria",   label: "Galería"   },
+  { href: "/contacto",  label: "Contacto"  },
 ];
 
 export const claims = [
-  "Massa, temps i ànima.",
-  "La focacceria artesanal de Sabadell.",
-  "El sabor que et farà tornar.",
+  "Aplastado. Dorado. Perfecto.",
+  "El smash burger más brutal de Terrassa.",
+  "Imposible comer solo uno.",
+];
+
+export const stats = [
+  { value: "180°",  label: "Temperatura plancha" },
+  { value: "100%",  label: "Carne fresca" },
+  { value: "Smash", label: "Técnica artesanal" },
 ];
 
 export const values = [
   {
-    icon: "leaf",
-    title: "Ingredients locals",
+    icon: "flame",
+    title: "Técnica Smash",
     description:
-      "Treballem amb productors de proximitat. Cada ingredient té nom i origen.",
+      "Aplastamos la carne al momento sobre la plancha a máxima temperatura. La costra caramelizada lo es todo.",
   },
   {
-    icon: "clock",
-    title: "48 hores de fermentació",
+    icon: "beef",
+    title: "Carne 100% fresca",
     description:
-      "La nostra massa mare fermenta lentament. No hi ha dreceres quan es cuina amb rigor.",
+      "Sin congelados. Sin trampas. Carne seleccionada cada día para que cada bocado sea brutal.",
   },
   {
-    icon: "sun",
-    title: "Temporada sempre",
+    icon: "star",
+    title: "Combinaciones únicas",
     description:
-      "La carta canvia amb l'estació. Mengem el que la terra ens dona ara.",
+      "Salsas propias, ingredientes que sorprenden. No encontrarás esto en ningún otro sitio.",
   },
 ];

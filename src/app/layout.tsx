@@ -1,68 +1,57 @@
 import type { Metadata } from "next";
-import { Dancing_Script, DM_Sans, Playfair_Display } from "next/font/google";
+import { Bebas_Neue, Inter } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/site/layout/Navbar";
 import { Footer } from "@/components/site/layout/Footer";
 import { CookieBanner } from "@/components/site/layout/CookieBanner";
-import { WhatsAppButton } from "@/components/site/layout/WhatsAppButton";
+import { ChatbotWidget } from "@/components/site/layout/ChatbotWidget";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { CartProvider } from "@/providers/CartProvider";
 
-// ── Google Fonts ─────────────────────────────────────────────────────────────
-const dancingScript = Dancing_Script({
+// ── Google Fonts ──────────────────────────────────────────────────────────────
+const bebasNeue = Bebas_Neue({
   subsets: ["latin"],
   variable: "--font-display",
-  weight: ["400", "500", "600", "700"],
+  weight: ["400"],
   display: "swap",
 });
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
-  weight: ["300", "400", "500", "600", "700"],
-  display: "swap",
-});
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-serif",
-  style: ["normal", "italic"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://virutes.com"),
+  metadataBase: new URL("https://msmash.es"),
   title: {
-    default: "Virutes — Focacceria Artesanal Sabadell",
-    template: "%s | Virutes",
+    default: "M SMASH — Smash Burger Terrassa",
+    template: "%s | M SMASH",
   },
   description:
-    "Focacceria artesanal al cor de Sabadell. Focaccies, pinses i plats del dia fets amb massa mare i ingredients de proximitat.",
+    "Smash burgers de fuego en Carrer de Colegi, 5 (Terrassa). Carne aplastada al momento, queso fundido hasta los bordes y sabores que no se olvidan.",
   keywords: [
-    "focacceria sabadell",
-    "focaccia artesanal",
-    "focaccia sabadell",
-    "pinsa sabadell",
-    "virutes",
-    "restaurant sabadell",
-    "pa artesà",
+    "smash burger terrassa",
+    "hamburguesa terrassa",
+    "m smash",
+    "smash burger barcelona",
+    "msmashburguer",
+    "mejor hamburguesa terrassa",
   ],
-  authors: { name: "Virutes Focacceria Artesanal" },
+  authors: { name: "M SMASH Burger" },
   openGraph: {
-    title: "Virutes — Focacceria Artesanal Sabadell",
-    description:
-      "Focaccia feta amb ànima. Artesanal, honest i de Sabadell.",
+    title: "M SMASH — Smash Burger Terrassa",
+    description: "Aplastado. Dorado. Perfecto. El smash burger definitivo de Terrassa.",
     type: "website",
-    locale: "ca_ES",
-    url: "https://virutes.com",
-    siteName: "Virutes",
+    locale: "es_ES",
+    url: "https://msmash.es",
+    siteName: "M SMASH",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Virutes — Focacceria Artesanal Sabadell",
-    description:
-      "Focaccia feta amb ànima. Artesanal, honest i de Sabadell.",
+    title: "M SMASH — Smash Burger Terrassa",
+    description: "Aplastado. Dorado. Perfecto.",
   },
 };
 
@@ -72,9 +61,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ca" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <body
-        className={`${dancingScript.variable} ${dmSans.variable} ${playfair.variable} font-sans bg-virutes-cream-light text-virutes-brown antialiased min-h-screen overflow-x-hidden`}
+        className={`${bebasNeue.variable} ${inter.variable} font-sans bg-smash-black text-smash-cream antialiased min-h-screen overflow-x-hidden`}
       >
         <AuthProvider>
           <CartProvider>
@@ -82,7 +71,7 @@ export default function RootLayout({
               <Navbar />
               <main className="flex-1">{children}</main>
               <Footer />
-              <WhatsAppButton />
+              <ChatbotWidget />
               <CookieBanner />
             </div>
           </CartProvider>
