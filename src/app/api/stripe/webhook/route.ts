@@ -11,6 +11,13 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
  * Confirma pagos y actualiza estado de órdenes
  */
 export async function POST(request: NextRequest) {
+  if (!stripe) {
+    return NextResponse.json(
+      { error: 'Stripe is not configured' },
+      { status: 503 }
+    )
+  }
+
   const sig = request.headers.get('stripe-signature')
   const body = await request.text()
 

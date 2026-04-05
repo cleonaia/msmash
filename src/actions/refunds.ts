@@ -16,6 +16,10 @@ interface RefundRequest {
  */
 export async function processRefund({ orderId, reason, amount }: RefundRequest) {
   try {
+    if (!stripe) {
+      throw new Error('Stripe no está configurado en este entorno')
+    }
+
     // Obtener la orden
     const order = await prisma.order.findUnique({
       where: { id: orderId }
@@ -80,6 +84,10 @@ export async function processRefund({ orderId, reason, amount }: RefundRequest) 
  */
 export async function getOrderRefunds(orderId: string) {
   try {
+    if (!stripe) {
+      throw new Error('Stripe no está configurado en este entorno')
+    }
+
     const order = await prisma.order.findUnique({
       where: { id: orderId }
     })

@@ -14,12 +14,22 @@ const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''
 )
 
+const isStripeClientConfigured = !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+
 export default function StripeCheckout({
   orderId,
   onSuccess,
   onCancel
 }: StripeCheckoutProps) {
   const [isLoading, setIsLoading] = useState(false)
+
+  if (!isStripeClientConfigured) {
+    return (
+      <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-4 text-sm text-yellow-200">
+        El pago online no está disponible temporalmente. Configura Stripe en Vercel para activarlo.
+      </div>
+    )
+  }
 
   const fetchClientSecret = async () => {
     setIsLoading(true)

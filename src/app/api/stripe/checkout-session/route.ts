@@ -1,6 +1,6 @@
 'use server'
 
-import { stripe } from '@/lib/stripe'
+import { stripe, STRIPE_PUBLIC_KEY } from '@/lib/stripe'
 import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -9,6 +9,13 @@ import { NextRequest, NextResponse } from 'next/server'
  */
 export async function POST(request: NextRequest) {
   try {
+    if (!stripe || !STRIPE_PUBLIC_KEY) {
+      return NextResponse.json(
+        { error: 'Online payments are not configured' },
+        { status: 503 }
+      )
+    }
+
     const appUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     const { orderId } = await request.json()
 
@@ -83,7 +90,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       sessionId: session.id,
       clientSecret: session.client_secret,
-      publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+      publishableKey: STRIPE_PUBLIC_KEY
     })
   } catch (error) {
     console.error('Error creating checkout session:', error)
