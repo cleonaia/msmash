@@ -67,21 +67,21 @@ export default function BlogArticlePage({ params }: BlogArticlePageProps) {
           </p>
           <div className="flex gap-3">
             <a
-              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`https://virutes.com/blog/${post.slug}`)}`}
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`https://msmashburger.page/blog/${post.slug}`)}`}
               target="_blank" rel="noreferrer"
               className="text-xs px-4 py-2 rounded-full border border-virutes-border text-virutes-brown hover:border-virutes-red hover:text-virutes-red transition-colors"
             >
               X / Twitter
             </a>
             <a
-              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://virutes.com/blog/${post.slug}`)}`}
+              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://msmashburger.page/blog/${post.slug}`)}`}
               target="_blank" rel="noreferrer"
               className="text-xs px-4 py-2 rounded-full border border-virutes-border text-virutes-brown hover:border-virutes-red hover:text-virutes-red transition-colors"
             >
               Facebook
             </a>
             <a
-              href={`https://wa.me/?text=${encodeURIComponent(post.title + ' — https://virutes.com/blog/' + post.slug)}`}
+              href={`https://wa.me/?text=${encodeURIComponent(post.title + ' — https://msmashburger.page/blog/' + post.slug)}`}
               target="_blank" rel="noreferrer"
               className="text-xs px-4 py-2 rounded-full bg-[#25D366] text-white hover:bg-[#20b858] transition-colors"
             >
