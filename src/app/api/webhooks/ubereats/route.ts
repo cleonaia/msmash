@@ -35,10 +35,10 @@ function verifyUberSignature(payload: string, signature: string, secret: string)
  */
 export async function POST(request: NextRequest) {
   try {
-    // Obtener webhook secret de variables de entorno
-    const webhookSecret = process.env.UBER_WEBHOOK_SECRET
+    // Soporta ambos nombres para evitar fallos por configuración histórica.
+    const webhookSecret = process.env.UBER_WEBHOOK_SECRET || process.env.UBEREATS_WEBHOOK_SECRET
     if (!webhookSecret) {
-      console.error('UBER_WEBHOOK_SECRET not configured')
+      console.error('UBER_WEBHOOK_SECRET / UBEREATS_WEBHOOK_SECRET not configured')
       return NextResponse.json(
         { error: 'Webhook not configured' },
         { status: 500 }
