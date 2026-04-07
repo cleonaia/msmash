@@ -6,8 +6,9 @@ import { EmployeeManager } from './EmployeeManager'
 import { DeliveryIntegration } from './DeliveryIntegration'
 import { OrderManagement } from './OrderManagement'
 import { AdvancedAnalyticsDashboard } from './AdvancedAnalytics'
+import { InvoiceManager } from './InvoiceManager'
 
-type TabType = 'dashboard' | 'orders' | 'advanced-analytics' | 'delivery' | 'employees' | 'scheduler'
+type TabType = 'dashboard' | 'orders' | 'advanced-analytics' | 'delivery' | 'invoices' | 'employees' | 'scheduler'
 
 export function DashboardOverview() {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard')
@@ -15,6 +16,7 @@ export function DashboardOverview() {
   const tabs: Array<{ id: TabType; label: string; icon: string; badge?: string }> = [
     { id: 'dashboard', label: 'Panel Principal', icon: '📊' },
     { id: 'orders', label: 'Órdenes', icon: '📦' },
+    { id: 'invoices', label: 'Facturas', icon: '🧾' },
     { id: 'advanced-analytics', label: 'Análitica', icon: '📈', badge: 'PRO' },
     { id: 'delivery', label: 'Integraciones', icon: '🚗' },
     { id: 'employees', label: 'Empleados', icon: '👥' },
@@ -83,6 +85,14 @@ export function DashboardOverview() {
                 <h2 className="text-2xl font-bold text-gray-900">📈 Análitica Avanzada</h2>
                 <p className="text-gray-600">Comparativa de desempeño entre UberEats, Glovo, Deliveroo y Just Eat con métricas detalladas</p>
                 <AdvancedAnalyticsDashboard />
+              </div>
+            )}
+
+            {activeTab === 'invoices' && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-gray-900">🧾 Facturación</h2>
+                <p className="text-gray-600">Genera facturas desde órdenes pagadas y gestiona su estado</p>
+                <InvoiceManager />
               </div>
             )}
 

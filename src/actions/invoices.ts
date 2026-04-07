@@ -182,3 +182,44 @@ export async function getOrderInvoiceStatus(orderId: string) {
     throw error
   }
 }
+
+/**
+ * Obtiene todas las facturas para el panel admin
+ */
+export async function getAllInvoices() {
+  try {
+    return await prisma.invoice.findMany({
+      include: {
+        items: true,
+        order: true
+      },
+      orderBy: { createdAt: 'desc' }
+    })
+  } catch (error) {
+    console.error('Error fetching all invoices:', error)
+    throw error
+  }
+}
+
+/**
+ * Obtiene órdenes pagadas que aún no tienen factura
+ */
+export async function getPaidOrdersWithoutInvoice() {
+  try {
+    return await prisma.order.findMany({
+      where: {
+        paymentStatus: 'COMPLETED',
+        invoice: null
+      },
+      include: {
+        items: {
+          include: { product: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    })
+  } catch (error) {
+    console.error('Error fetching paid orders without invoice:', error)
+    throw error
+  }
+}
