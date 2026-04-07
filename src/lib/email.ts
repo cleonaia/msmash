@@ -84,7 +84,7 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData) {
         <p style="color: #666; line-height: 1.6; margin: 20px 0;">
           Si tienes alguna duda, no dudes en contactarnos:<br>
           📞 <strong>+34 XXX XXX XXX</strong><br>
-          📧 <strong>orders@smashburger.com</strong>
+          📧 <strong>echodaytech@gmail.com</strong>
         </p>
 
         <div style="text-align: center; padding: 20px 0; border-top: 1px solid #eee; color: #999; font-size: 12px;">
@@ -96,7 +96,7 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData) {
 
     if (useResend && resend) {
       const result = await resend.emails.send({
-        from: 'Smash Burger <orders@smashburger.com>',
+        from: 'Smash Burger <echodaytech@gmail.com>',
         to: data.customerEmail,
         subject: `✅ Pedido confirmado #${data.orderId.slice(-8)}`,
         html: emailContent
@@ -106,7 +106,7 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData) {
       return { success: true, messageId: result.data?.id }
     } else if (transporter) {
       const result = await transporter.sendMail({
-        from: process.env.SMTP_FROM || 'orders@smashburger.com',
+        from: process.env.SMTP_FROM || 'echodaytech@gmail.com',
         to: data.customerEmail,
         subject: `✅ Pedido confirmado #${data.orderId.slice(-8)}`,
         html: emailContent
@@ -152,7 +152,7 @@ export async function sendPaymentFailedEmail(
             1️⃣ Intenta de nuevo en nuestro sitio<br>
             2️⃣ Verifica los datos de tu tarjeta<br>
             3️⃣ Llámanos: +34 XXX XXX XXX<br>
-            4️⃣ Envía un email a: orders@smashburger.com
+            4️⃣ Envía un email a: echodaytech@gmail.com
           </p>
         </div>
 
@@ -169,7 +169,7 @@ export async function sendPaymentFailedEmail(
 
     if (useResend && resend) {
       const result = await resend.emails.send({
-        from: 'Smash Burger <orders@smashburger.com>',
+        from: 'Smash Burger <echodaytech@gmail.com>',
         to: customerEmail,
         subject: `⚠️ Problema con tu pago - Orden #${orderId.slice(-8)}`,
         html: emailContent
@@ -178,7 +178,7 @@ export async function sendPaymentFailedEmail(
       return { success: true, messageId: result.data?.id }
     } else if (transporter) {
       const result = await transporter.sendMail({
-        from: process.env.SMTP_FROM || 'orders@smashburger.com',
+        from: process.env.SMTP_FROM || 'echodaytech@gmail.com',
         to: customerEmail,
         subject: `⚠️ Problema con tu pago - Orden #${orderId.slice(-8)}`,
         html: emailContent
@@ -229,7 +229,7 @@ export async function sendRefundEmail(
 
         <p style="color: #666; line-height: 1.6; margin: 20px 0;">
           Si tienes cualquier pregunta, estamos aquí para ayudarte 😊<br>
-          📧 <strong>orders@smashburger.com</strong>
+          📧 <strong>echodaytech@gmail.com</strong>
         </p>
 
         <div style="text-align: center; padding: 20px 0; border-top: 1px solid #eee; color: #999; font-size: 12px;">
@@ -241,7 +241,7 @@ export async function sendRefundEmail(
 
     if (useResend && resend) {
       const result = await resend.emails.send({
-        from: 'Smash Burger <orders@smashburger.com>',
+        from: 'Smash Burger <echodaytech@gmail.com>',
         to: customerEmail,
         subject: `🔄 Reembolso procesado - Orden #${orderId.slice(-8)}`,
         html: emailContent
@@ -250,7 +250,7 @@ export async function sendRefundEmail(
       return { success: true, messageId: result.data?.id }
     } else if (transporter) {
       const result = await transporter.sendMail({
-        from: process.env.SMTP_FROM || 'orders@smashburger.com',
+        from: process.env.SMTP_FROM || 'echodaytech@gmail.com',
         to: customerEmail,
         subject: `🔄 Reembolso procesado - Orden #${orderId.slice(-8)}`,
         html: emailContent
