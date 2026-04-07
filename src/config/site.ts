@@ -19,7 +19,7 @@ export const contactInfo = {
   phone: "612 59 88 99",
   phonePretty: "612 59 88 99",
   phoneHref: "tel:+34612598899",
-  email: "hola@msmash.es",
+  email: "msmashburguer2026@gmail.com",
   whatsappNumber: "34612598899",
 };
 

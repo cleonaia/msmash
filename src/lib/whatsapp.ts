@@ -94,7 +94,7 @@ ${orderData.customerName}, parece que hubo un problema con tu pago.
 🔄 *Por favor:*
 1. Intenta de nuevo en nuestro sitio
 2. O llámanos: +34 XXX XXX XXX
-3. O envía un email a: orders@smashburger.com
+3. O envía un email a: msmashburguer2026@gmail.com
 
 Estamos aquí para ayudarte 🙌
     `.trim()

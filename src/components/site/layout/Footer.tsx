@@ -146,6 +146,8 @@ export function Footer() {
           <div className="flex items-center gap-6 text-xs text-smash-cream/20">
             <Link href="/privacidad" className="hover:text-smash-turquoise transition-colors">Privacidad</Link>
             <Link href="/cookies" className="hover:text-smash-turquoise transition-colors">Cookies</Link>
+            <Link href="/terminos" className="hover:text-smash-turquoise transition-colors">Términos</Link>
+            <Link href="/alergenos" className="hover:text-smash-turquoise transition-colors">Alérgenos</Link>
             <Link href="/aviso-legal" className="hover:text-smash-turquoise transition-colors">Aviso legal</Link>
           </div>
         </div>
