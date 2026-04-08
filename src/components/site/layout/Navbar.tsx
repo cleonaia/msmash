@@ -54,6 +54,10 @@ export function Navbar() {
               </nav>
               {/* Right - desktop social + mobile menu */}
               <div className="absolute right-3 sm:right-4 lg:right-8 flex items-center gap-2 sm:gap-3">
+                <Link href="/auth/admin"
+                  className="hidden md:inline-flex items-center justify-center px-4 sm:px-5 py-2 lg:py-2.5 border border-smash-cream/35 text-smash-cream text-[9px] lg:text-[10px] font-bold uppercase tracking-[0.2em] rounded-full hover:border-smash-turquoise hover:text-smash-turquoise active:scale-95 transition-all duration-200">
+                  Admin
+                </Link>
                 <a href="https://www.instagram.com/msmashburguer/" target="_blank" rel="noreferrer"
                   className="hidden md:inline-flex inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2 lg:py-2.5 border border-smash-turquoise/60 text-smash-turquoise text-[9px] lg:text-[10px] font-bold uppercase tracking-[0.2em] rounded-full hover:bg-smash-turquoise hover:text-white active:scale-95 transition-all duration-200">
                   @msmashburguer
@@ -101,6 +105,13 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              href="/auth/admin"
+              onClick={() => setMobileOpen(false)}
+              className="mt-2 font-display text-2xl sm:text-3xl text-smash-turquoise hover:text-smash-cream transition-colors tracking-wider uppercase"
+            >
+              Admin
+            </Link>
           </nav>
           <div className="fire-divider mx-4 sm:mx-6" />
           <p className="text-center text-[9px] sm:text-[10px] font-black text-smash-cream/25 uppercase tracking-[0.3em] sm:tracking-[0.4em] py-4 sm:py-6 px-4">

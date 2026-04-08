@@ -99,7 +99,7 @@ export function Footer() {
 
         {/* QR codes */}
         <div className="mt-12 pt-10 border-t border-smash-border">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 items-center">
             <div className="flex items-center gap-5">
               <div className="p-2 bg-white rounded-xl border border-smash-border shadow-sm">
                 <Image
@@ -117,7 +117,6 @@ export function Footer() {
                 <p className="text-xs text-smash-cream/25 mt-1">msmashburger.page/menu</p>
               </div>
             </div>
-            <div className="h-12 w-px bg-smash-border hidden sm:block" />
             <div className="flex items-center gap-5">
               <div className="p-2 bg-white rounded-xl border border-smash-border shadow-sm">
                 <Image
@@ -133,6 +132,23 @@ export function Footer() {
                 <p className="text-[10px] font-black uppercase tracking-[0.35em] text-smash-cream/25 mb-0.5">Síguenos en</p>
                 <p className="font-display text-xl text-smash-cream leading-none tracking-widest uppercase">Instagram</p>
                 <p className="text-xs text-smash-cream/25 mt-1">@msmashburguer</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-5">
+              <div className="p-2 bg-white rounded-xl border border-smash-border shadow-sm">
+                <Image
+                  src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https%3A%2F%2Fwww.google.com%2Fmaps%2Fplace%2FM%2BSMASH%2BBURGER%2F%4041.5633%2C1.9900%2C17z%2Freviews&color=C4B5FD&bgcolor=111111&qzone=1"
+                  alt="QR Reseñas Google M SMASH"
+                  width={80}
+                  height={80}
+                  className="rounded-lg"
+                  unoptimized
+                />
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.35em] text-smash-cream/25 mb-0.5">Escanea para</p>
+                <p className="font-display text-xl text-smash-cream leading-none tracking-widest uppercase">Reseñas</p>
+                <p className="text-xs text-smash-cream/25 mt-1">Google Maps</p>
               </div>
             </div>
           </div>

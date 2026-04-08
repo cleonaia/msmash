@@ -18,30 +18,24 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
-      // Create Basic Auth header
-      const credentials = btoa(`${username}:${password}`);
-      
-      // Test credentials by making a request to a protected route
-      const response = await fetch('/admin/dashboard', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Basic ${credentials}`
-        }
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
       });
 
-      if (response.status === 401) {
+      if (!response.ok) {
         setError('Usuario o contraseña incorrectos');
         setLoading(false);
         return;
       }
 
-      if (response.status === 200) {
-        // Store credentials in sessionStorage for subsequent requests
-        sessionStorage.setItem('adminAuth', credentials);
-        
-        // Redirect to admin
-        router.push('/admin/dashboard');
-      }
+      const nextFromQuery = typeof window !== 'undefined'
+        ? new URLSearchParams(window.location.search).get('next')
+        : null;
+      const nextPath = nextFromQuery || '/admin/dashboard';
+      router.push(nextPath);
+      router.refresh();
     } catch (err) {
       setError('Error al conectar. Intenta de nuevo.');
       console.error(err);
