@@ -43,12 +43,16 @@ const THE_CRISPY = "/images/products/the-crispy.jpeg";
 const THE_M_SMASH = "/images/products/the-m-smash.jpeg";
 const THE_BASIC = "/images/products/the-basic.jpeg";
 const THE_SUPER_CRISPY = "/images/products/the-super-crispy.jpeg";
+const THE_VEGANA = "/images/products/placeholder.svg";
+const THE_SPECIAL = "/images/products/placeholder.svg";
+const CHEESECAKE_OREO = "/images/products/placeholder.svg";
 const MENU_KIDS = "/images/products/menu-kids.jpeg";
 const FRANKFURT = "/images/products/frankfurt.jpeg";
 const TEQUENOS = "/images/products/tequenos.jpeg";
 const FRIES_M = "/images/products/fries-m.jpeg";
 const CRISPY_CHICKEN = "/images/products/crispy-chicken.jpeg";
 const CHEESECAKE_NUTELLA = "/images/products/cheesecake-nutella.svg";
+const PRODUCT_CARD_PLACEHOLDER = "/images/products/placeholder.svg";
 const PEPSI_CLASICA = "/images/products/pepsi-cola.png";
 const LIPTON = "/images/products/lipton.jpeg";
 const PEPSI_ZERO = "/images/products/pepsi-cola-light.jpeg";
@@ -107,6 +111,26 @@ export const menuItems: MenuItem[] = [
     featured: true,
   },
   {
+    id: "the-vegana",
+    name: "The Vegana",
+    description: "Pan Brioche (VEGANO), queso vegano, TEXTURIZADO de Soja, cebolla caramelizada, tomate, Bacon Vegano y salsa Tártara Vegana.",
+    price: 12.5,
+    category: "burguers",
+    image: PRODUCT_CARD_PLACEHOLDER,
+    allergens: ["gluten", "soja"],
+    badge: "Vegana",
+  },
+  {
+    id: "the-special",
+    name: "THE SPECIAL🍔",
+    description: "Pan brioche,Smash Burguer, Queso cheddar, lechuga, tomate, Huevo, Patata palito, salsas de la casa,bacon.",
+    price: 11.5,
+    category: "burguers",
+    image: PRODUCT_CARD_PLACEHOLDER,
+    allergens: ["gluten", "lacteos", "huevos"],
+    featured: true,
+  },
+  {
     id: "menu-kids",
     name: "MENÚ KIDS",
     description: "Smash burger, queso cheddar, pan brioche. Acompañada de patatas, refresco y unas gomitas",
@@ -145,6 +169,15 @@ export const menuItems: MenuItem[] = [
     category: "entrantres",
     image: CRISPY_CHICKEN,
     allergens: ["gluten", "huevos"],
+  },
+  {
+    id: "fries-and-ribs",
+    name: "Fríes and Ribs",
+    description: "Patatas fritas caseras con barbecue sauce y mermelada de bacon.",
+    price: 7.0,
+    category: "entrantres",
+    image: PRODUCT_CARD_PLACEHOLDER,
+    allergens: ["gluten", "lacteos"],
   },
 
   // ── FRANKFURTS ────────────────────────────────────────────────────────────
@@ -283,11 +316,20 @@ export const menuItems: MenuItem[] = [
   // ── POSTRES ───────────────────────────────────────────────────────────────
   {
     id: "cheesecake-nutella",
-    name: "Cheesecake dé Nutella",
-    description: "La clásica tarta de queso junto a una base dé Nutella y lluvia de cacao en polvo. Es un buen final Feliz",
+    name: "Cheesecake de Nutella",
+    description: "La clásica tarta de queso junto a una base de Nutella y lluvia de cacao en polvo. Es un buen final feliz",
     price: 6.5,
     category: "postres",
     image: CHEESECAKE_NUTELLA,
+    allergens: ["gluten", "lacteos", "huevos"],
+  },
+  {
+    id: "cheesecake-oreo",
+    name: "Cheesecake de Oreo",
+    description: "La clásica tarta de queso junto a una base de Oreo y lluvia de cacao en polvo. Es un buen final feliz",
+    price: 6.5,
+    category: "postres",
+    image: PRODUCT_CARD_PLACEHOLDER,
     allergens: ["gluten", "lacteos", "huevos"],
   },
 ];

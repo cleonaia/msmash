@@ -74,6 +74,37 @@ function isDrinkPhoto(itemId: string) {
   );
 }
 
+function ProductImage({
+  src,
+  alt,
+  itemId,
+  positions,
+}: {
+  src: string;
+  alt: string;
+  itemId: string;
+  positions: { mobile: string; desktop: string };
+}) {
+  const [imageSrc, setImageSrc] = useState(src || '/images/products/placeholder.svg');
+  const isPlaceholder = imageSrc.endsWith('.svg') || imageSrc.includes('placeholder');
+
+  return (
+    <Image
+      src={imageSrc}
+      alt={alt}
+      fill
+      onError={() => setImageSrc('/images/products/placeholder.svg')}
+      className={
+        isDrinkPhoto(itemId) || isPlaceholder
+          ? 'object-cover object-center'
+          : 'object-cover object-[var(--mobile-pos)] sm:object-[var(--desktop-pos)]'
+      }
+      style={{ '--mobile-pos': positions.mobile, '--desktop-pos': positions.desktop } as Record<string, string>}
+      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+    />
+  );
+}
+
 export function CarteProfessional() {
   const [activeCategory, setActiveCategory] = useState<string>('all');
 
@@ -163,13 +194,11 @@ export function CarteProfessional() {
               className="surface-smoke overflow-hidden border border-smash-border hover:border-smash-fire/50 transition-all duration-300 flex flex-col"
             >
               <div className="relative h-44 sm:h-48 w-full bg-smash-smoke-mid">
-                <Image
-                  src={item.image || '/images/products/placeholder.svg'}
+                <ProductImage
+                  src={item.image}
                   alt={item.name}
-                  fill
-                  className={isDrinkPhoto(item.id) ? 'object-contain object-center p-2' : 'object-cover object-[var(--mobile-pos)] sm:object-[var(--desktop-pos)]'}
-                  style={{ '--mobile-pos': positions.mobile, '--desktop-pos': positions.desktop } as Record<string, string>}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                  itemId={item.id}
+                  positions={positions}
                 />
                 <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-smash-black/55 to-transparent pointer-events-none" />
                 {item.badge && (

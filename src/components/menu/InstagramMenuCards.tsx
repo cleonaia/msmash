@@ -26,6 +26,7 @@ function getMobileImagePosition(itemId: string) {
 
 export function InstagramMenuCards() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   const filteredItems = selectedCategory
     ? menuItems.filter((item) => item.category === selectedCategory)
@@ -49,6 +50,10 @@ export function InstagramMenuCards() {
         {filteredItems.map((item) => {
           const mobilePosition = getMobileImagePosition(item.id);
           const desktopPosition = getImagePosition(item.id);
+          const imageSrc = imageErrors[item.id]
+            ? '/images/products/placeholder.svg'
+            : item.image || '/images/products/placeholder.svg';
+          const isPlaceholder = imageSrc.endsWith('.svg') || imageSrc.includes('placeholder');
           return (
           <div
             key={item.id}
@@ -56,15 +61,23 @@ export function InstagramMenuCards() {
           >
             {/* Imagen */}
             <div className="relative w-full h-64 bg-gray-200">
-              {item.image && (
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  fill
-                  className="object-cover object-[var(--mobile-pos)] sm:object-[var(--desktop-pos)]"
-                  style={{ '--mobile-pos': mobilePosition, '--desktop-pos': desktopPosition } as Record<string, string>}
-                />
-              )}
+              <Image
+                src={imageSrc}
+                alt={item.name}
+                fill
+                onError={() =>
+                  setImageErrors((prev) => ({
+                    ...prev,
+                    [item.id]: true,
+                  }))
+                }
+                className={
+                  isPlaceholder
+                    ? 'object-cover object-center'
+                    : 'object-cover object-[var(--mobile-pos)] sm:object-[var(--desktop-pos)]'
+                }
+                style={{ '--mobile-pos': mobilePosition, '--desktop-pos': desktopPosition } as Record<string, string>}
+              />
               {item.badge && (
                 <div className="absolute top-3 right-3 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold">
                   {item.badge}
