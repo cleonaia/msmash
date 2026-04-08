@@ -7,8 +7,9 @@ import { DeliveryIntegration } from './DeliveryIntegration'
 import { OrderManagement } from './OrderManagement'
 import { AdvancedAnalyticsDashboard } from './AdvancedAnalytics'
 import { InvoiceManager } from './InvoiceManager'
+import { QRManager } from './QRManager'
 
-type TabType = 'dashboard' | 'orders' | 'advanced-analytics' | 'delivery' | 'invoices' | 'employees' | 'scheduler'
+type TabType = 'dashboard' | 'orders' | 'advanced-analytics' | 'delivery' | 'invoices' | 'employees' | 'scheduler' | 'qr'
 
 export function DashboardOverview() {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard')
@@ -20,7 +21,8 @@ export function DashboardOverview() {
     { id: 'advanced-analytics', label: 'Análitica', icon: '📈', badge: 'PRO' },
     { id: 'delivery', label: 'Integraciones', icon: '🚗' },
     { id: 'employees', label: 'Empleados', icon: '👥' },
-    { id: 'scheduler', label: 'Sincronización', icon: '⏰', badge: 'AUTO' }
+    { id: 'scheduler', label: 'Sincronización', icon: '⏰', badge: 'AUTO' },
+    { id: 'qr', label: 'Códigos QR', icon: '📱' }
   ]
 
   return (
@@ -115,6 +117,12 @@ export function DashboardOverview() {
                 <h2 className="text-2xl font-bold text-gray-900">⏰ Sincronización Automática</h2>
                 <p className="text-gray-600">Configura la sincronización automática de órdenes desde todas tus plataformas</p>
                 <SchedulerPanel />
+              </div>
+            )}
+
+            {activeTab === 'qr' && (
+              <div className="space-y-6">
+                <QRManager />
               </div>
             )}
           </div>

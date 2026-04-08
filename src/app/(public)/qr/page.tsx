@@ -1,4 +1,9 @@
+'use client';
+
 import Image from 'next/image';
+import Link from 'next/link';
+import { Download, Share2, Copy } from 'lucide-react';
+import { useState } from 'react';
 
 export const metadata = {
   title: 'QR Codes - M SMASH BURGER',

@@ -22,6 +22,25 @@ export const contactInfo = {
   email: "msmashburguer2026@gmail.com",
   whatsappNumber: "34612598899",
 };
+export const legalInfo = {
+  taxName: "WILLIAM DA SILVA FERRARI",
+  taxId: "Z0944573Z",
+  commercialName: "M SMASH BURGUER",
+  typeEntity: "autónomo",
+  address: "Carrer del Col-legi 5, 08221 Terrassa, Barcelona",
+  legalEmail: contactInfo.email,
+  supportPhone: contactInfo.phonePretty,
+
+  iban: "ES55 2100 0087 6302 0212 1332",
+  bic: "CAIXESBBXXX",
+  bankAccountHolder: "William Da Silva Ferrari",
+
+  owner: {
+    name: "William Da Silva Ferrari",
+    role: "Titular",
+  },
+};
+
 
 export const socialLinks = {
   instagram: "https://www.instagram.com/msmashburguer/",
@@ -32,10 +51,8 @@ export const socialLinks = {
 };
 
 export const hours = [
-  { days: "Lunes",            time: "Cerrado",                  closed: true  },
-  { days: "Martes – Viernes", time: "13:00–16:00 / 20:00–23:30", closed: false },
-  { days: "Sábado",           time: "13:00–00:00",              closed: false },
-  { days: "Domingo",          time: "13:00–17:00",              closed: false },
+  { days: "Domingo – Jueves", time: "13:00–23:00", closed: false },
+  { days: "Viernes – Sábado", time: "13:00–23:30", closed: false },
 ];
 
 export const navLinks = [
@@ -44,6 +61,7 @@ export const navLinks = [
   { href: "/pedidos",   label: "Pedidos"   },
   { href: "/nosotros",  label: "Nosotros"  },
   { href: "/galeria",   label: "Galería"   },
+  { href: "/qr",        label: "QR"        },
   { href: "/contacto",  label: "Contacto"  },
 ];
 
