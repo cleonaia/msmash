@@ -5,7 +5,7 @@ export async function POST() {
   const response = NextResponse.json({ ok: true })
   response.cookies.set(getAdminAuthCookieName(), '', {
     httpOnly: true,
-    sameSite: 'lax',
+    sameSite: 'strict',
     secure: process.env.NODE_ENV === 'production',
     path: '/',
     maxAge: 0,

@@ -61,7 +61,6 @@ export const navLinks = [
   { href: "/pedidos",   label: "Pedidos"   },
   { href: "/nosotros",  label: "Nosotros"  },
   { href: "/galeria",   label: "Galería"   },
-  { href: "/qr",        label: "QR"        },
   { href: "/contacto",  label: "Contacto"  },
 ];
 

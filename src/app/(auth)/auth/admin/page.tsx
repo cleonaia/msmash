@@ -25,7 +25,9 @@ export default function AdminLoginPage() {
       });
 
       if (!response.ok) {
-        setError('Usuario o contraseña incorrectos');
+        const data = await response.json().catch(() => null);
+        const message = typeof data?.message === 'string' ? data.message : 'Credenciales inválidas';
+        setError(message);
         setLoading(false);
         return;
       }
@@ -137,12 +139,6 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          {/* Info */}
-          <div className="mt-6 p-4 bg-smash-smoke/50 rounded-lg border border-smash-border/50">
-            <p className="text-xs text-smash-cream/50">
-              💡 Usa las credenciales configuradas en las variables de entorno <code className="text-smash-turquoise">ADMIN_USERNAME</code> y <code className="text-smash-turquoise">ADMIN_PASSWORD</code>
-            </p>
-          </div>
         </div>
 
         {/* Footer */}
