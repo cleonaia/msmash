@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { AlertTriangle, Flame, ShoppingBag } from 'lucide-react';
 import { menuItems, categories, type Allergen } from '@/features/menu/data/menu';
+import { GoogleReviewsWidget } from './GoogleReviewsWidget';
 
 const allergenLabels: Record<Allergen, string> = {
   gluten: 'Gluten',
@@ -243,6 +244,8 @@ export function CarteProfessional() {
           );
           })}
         </div>
+
+        <GoogleReviewsWidget />
 
         <div className="mt-12 text-center">
           <Link href="/pedidos" className="btn-smash inline-flex items-center gap-2">
