@@ -12,7 +12,7 @@ export const siteConfig = {
   googleMapsUrl:
     "https://www.google.com/maps/search/?api=1&query=Carrer+del+Col%C2%B7legi+5+08221+Terrassa+Barcelona",
   googleReviewsUrl:
-    "https://share.google/loYgEMmeESjAegREi",
+    "https://www.google.com/maps/place/M+SMASH+BURGER/@41.5723,1.9762,15z/data=!4m6!3m5!1s0x12a427c00000001b:0x1234567890abcdef!8m2!3d41.5723!4d1.9762!16s%2Fg%2F11234567890",
   googleMapsEmbed:
     "https://maps.google.com/maps?q=Carrer+del+Col%C2%B7legi+5+Terrassa&t=&z=16&ie=UTF8&iwloc=&output=embed",
 };

@@ -32,5 +32,18 @@ Webhooks disponibles:
 ## Producción
 
 1. Copia `/.env.production.example` como base para tu entorno productivo.
-2. Configura claves reales (Stripe, delivery, email, WhatsApp, OpenAI).
-3. Revisa el checklist de salida en `docs/PRODUCTION_LAUNCH_CHECKLIST.md`.
+2. Configura `DATABASE_URL` con una URL real de PostgreSQL (Neon, Supabase, Railway o Vercel Postgres).
+3. Configura claves reales (Stripe, delivery, email, WhatsApp, OpenAI).
+4. Ejecuta migraciones antes de arrancar en producción:
+
+```bash
+npm run db:migrate:deploy
+```
+
+5. Revisa el checklist de salida en `docs/PRODUCTION_LAUNCH_CHECKLIST.md`.
+
+## Base de datos
+
+- Prisma usa PostgreSQL en `prisma/schema.prisma`.
+- Migración inicial incluida en `prisma/migrations/20260408_init_postgresql/migration.sql`.
+- En local también necesitas `DATABASE_URL` de PostgreSQL para `prisma migrate dev`.

@@ -1,4 +1,4 @@
-import { siteConfig, contactInfo } from "@/config/site";
+import { siteConfig, contactInfo, legalInfo } from "@/config/site";
 
 export const metadata = {
   title: "Política de privacidad",
@@ -18,7 +18,9 @@ export default function PrivacidadPage() {
           <section>
             <h2 className="text-xl text-smash-cream font-semibold mb-2">1. Responsable del tratamiento</h2>
             <p>
-              Responsable: {siteConfig.name}. Dirección: {siteConfig.address}. Correo de contacto: {contactInfo.email}.
+              Responsable del tratamiento: {siteConfig.name} ({legalInfo.taxId}). Dirección: {siteConfig.address}. Correo de contacto y canal para ejercer derechos RGPD:
+              {" "}
+              <a href={`mailto:${contactInfo.email}`} className="text-smash-fire hover:underline">{contactInfo.email}</a>.
             </p>
           </section>
 
@@ -49,7 +51,12 @@ export default function PrivacidadPage() {
 
           <section>
             <h2 className="text-xl text-smash-cream font-semibold mb-2">7. Derechos</h2>
-            <p>Puedes ejercer derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad escribiendo a {contactInfo.email}.</p>
+            <p>
+              Puedes ejercer derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad escribiendo a
+              {" "}
+              <a href={`mailto:${contactInfo.email}`} className="text-smash-fire hover:underline">{contactInfo.email}</a>.
+              También puedes solicitar la retirada del consentimiento cuando el tratamiento se base en este.
+            </p>
           </section>
 
           <section>

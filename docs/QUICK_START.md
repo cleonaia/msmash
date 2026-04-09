@@ -207,7 +207,7 @@ http://localhost:3000/admin/orders
 
 ```bash
 # Database
-DATABASE_URL="file:./prisma/dev.db"
+DATABASE_URL="postgresql://user:password@host:5432/database?sslmode=require"
 
 # Stripe
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."

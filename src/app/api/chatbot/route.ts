@@ -122,7 +122,7 @@ function getMenuReply(raw: string): MenuReply | null {
     };
   }
 
-  if (/(entrante|entrantes|entrad|starter|aperitivo|tequenos|tequeños|fries|patatas|pollo crujiente)/.test(text)) {
+  if (/(entrante|entrantes|entrad|starter|aperitivo|tequenos|tequeños|fries|patatas|pollo crujiente|ribs|barbecue|bbq)/.test(text)) {
     return {
       title: "Entrantes",
       text: buildCategoryReply(starterItems, "entrantes"),

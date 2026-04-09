@@ -49,7 +49,15 @@ export async function POST(request: NextRequest) {
           // Obtener orden con items
           const order = await prisma.order.findUnique({
             where: { id: orderId },
-            include: { items: { include: { product: true } } }
+            include: {
+              items: {
+                include: {
+                  product: {
+                    include: { category: true }
+                  }
+                }
+              }
+            }
           })
 
           if (order) {
@@ -63,6 +71,60 @@ export async function POST(request: NextRequest) {
                 stripePaymentId: session.payment_intent
               }
             })
+
+            // Crear factura automática si aún no existe
+            const existingInvoice = await prisma.invoice.findUnique({
+              where: { orderId: order.id }
+            })
+
+            if (!existingInvoice) {
+              const taxBreakdown = order.items.reduce(
+                (acc, item) => {
+                  const categorySlug = item.product.category?.slug?.toLowerCase() || ''
+                  const categoryName = item.product.category?.name?.toLowerCase() || ''
+                  const isDrink = categorySlug === 'bebidas' || categoryName.includes('bebida')
+                  const vatRate = isDrink ? 0.21 : 0.1
+
+                  const lineSubtotal = Math.round(item.subtotal / (1 + vatRate))
+                  const lineTax = item.subtotal - lineSubtotal
+
+                  acc.subtotal += lineSubtotal
+                  acc.tax += lineTax
+                  return acc
+                },
+                { subtotal: 0, tax: 0 }
+              )
+
+              const roundingDiff = order.totalAmount - (taxBreakdown.subtotal + taxBreakdown.tax)
+              const subtotal = taxBreakdown.subtotal
+              const taxAmount = taxBreakdown.tax + roundingDiff
+
+              const invoiceCount = await prisma.invoice.count()
+              const invoiceNumber = `INV-${new Date().getFullYear()}-${String(invoiceCount + 1).padStart(5, '0')}`
+
+              await prisma.invoice.create({
+                data: {
+                  invoiceNumber,
+                  orderId: order.id,
+                  customerName: order.customerName,
+                  customerEmail: order.customerEmail,
+                  customerPhone: order.customerPhone,
+                  subtotal,
+                  taxAmount,
+                  totalAmount: order.totalAmount,
+                  status: 'DRAFT',
+                  items: {
+                    create: order.items.map((item: any) => ({
+                      description: item.product.name,
+                      quantity: item.quantity,
+                      unitPrice: item.unitPrice,
+                      subtotal: item.subtotal,
+                      productId: item.productId
+                    }))
+                  }
+                }
+              })
+            }
 
             // 📧 Enviar email de confirmación
             await sendOrderConfirmationEmail({

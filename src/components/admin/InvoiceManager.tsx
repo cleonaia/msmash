@@ -14,6 +14,7 @@ interface Invoice {
   invoiceNumber: string
   customerName: string
   customerEmail: string
+  customerTaxId?: string | null
   totalAmount: number
   status: string
   createdAt: string | Date
@@ -188,6 +189,9 @@ export function InvoiceManager() {
                     <td className="py-3 pr-4">
                       <p className="text-gray-900">{invoice.customerName}</p>
                       <p className="text-xs text-gray-500">{invoice.customerEmail}</p>
+                      {invoice.customerTaxId ? (
+                        <p className="text-xs text-gray-500">NIF/CIF: {invoice.customerTaxId}</p>
+                      ) : null}
                     </td>
                     <td className="py-3 pr-4">{formatMoney(invoice.totalAmount)}</td>
                     <td className="py-3 pr-4">
@@ -200,6 +204,14 @@ export function InvoiceManager() {
                     </td>
                     <td className="py-3 pr-4">
                       <div className="flex gap-2">
+                        <a
+                          href={`/api/invoices/${invoice.id}/download`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-3 py-1.5 rounded-lg bg-gray-900 text-white text-xs hover:bg-black"
+                        >
+                          Descargar PDF
+                        </a>
                         {invoice.status === 'DRAFT' && (
                           <button
                             onClick={() => handleSendInvoice(invoice.id)}

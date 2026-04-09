@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export const metadata = {
   title: "Política de cookies",
   description: "Información sobre cookies y tecnologías similares en M SMASH Burger."
@@ -9,6 +11,21 @@ export default function CookiesPage() {
   return (
     <div className="min-h-screen bg-smash-black pt-28 pb-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto bg-smash-smoke border border-smash-border rounded-2xl p-6 sm:p-10">
+        <div className="flex flex-wrap gap-3 mb-6">
+          <Link
+            href="/"
+            className="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] bg-smash-fire text-white hover:bg-smash-fire/90 transition-colors"
+          >
+            Volver al inicio
+          </Link>
+          <Link
+            href="/contacto"
+            className="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] border border-smash-border text-smash-cream/80 hover:text-smash-sky hover:border-smash-sky/50 transition-colors"
+          >
+            Contacto
+          </Link>
+        </div>
+
         <h1 className="font-display text-4xl uppercase tracking-wide text-smash-cream mb-3">Política de cookies</h1>
         <p className="text-smash-cream/50 text-sm mb-8">Última actualización: {updatedAt}</p>
 
@@ -20,7 +37,21 @@ export default function CookiesPage() {
 
           <section>
             <h2 className="text-xl text-smash-cream font-semibold mb-2">2. Tipos de cookies que usamos</h2>
-            <p>Cookies técnicas necesarias, cookies de preferencias y, cuando aplique, cookies analíticas para entender el uso de la web.</p>
+            <p>
+              Usamos cookies técnicas necesarias y, con tu consentimiento, cookies analíticas y de marketing.
+              A continuación se muestra el detalle de proveedores habituales en esta web:
+            </p>
+            <ul className="mt-3 space-y-2 list-disc pl-5 text-smash-cream/70">
+              <li>
+                Google Analytics 4 (analítica): medir visitas, páginas más consultadas, rendimiento y mejoras de experiencia de usuario.
+              </li>
+              <li>
+                Meta Pixel (marketing): medir conversiones de campañas y audiencias para publicidad en plataformas Meta.
+              </li>
+              <li>
+                Cookies técnicas propias: mantener sesión, seguridad del sitio y funcionamiento básico del proceso de pedido.
+              </li>
+            </ul>
           </section>
 
           <section>
