@@ -31,7 +31,7 @@ const qrCodes: QRCode[] = [
   {
     id: 'ubicacion',
     name: 'Ubicación',
-    url: siteConfig.googleMapsUrl,
+    url: 'https://msmashburger.page/go/maps',
     description: 'Código QR que abre la ubicación en Google Maps',
     icon: '📍'
   },
@@ -48,7 +48,7 @@ export function QRManager() {
   const [copied, setCopied] = useState<string | null>(null);
 
   const getQrImageUrl = (url: string) => {
-    return `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(url)}`;
+    return `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(url)}&color=2D2A32&bgcolor=EEF7FF&qzone=2`;
   };
 
   const handleCopy = (text: string, id: string) => {

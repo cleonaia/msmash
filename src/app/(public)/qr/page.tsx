@@ -9,12 +9,12 @@ export const metadata = {
 export default function QRPage() {
   const cartUrl = 'https://msmashburger.page/menu';
   const reviewsUrl = siteConfig.googleReviewsUrl;
-  const locationUrl = siteConfig.googleMapsUrl;
+  const locationQrTargetUrl = 'https://msmashburger.page/go/maps';
   
   // Generate QR codes using qr-server API
-  const cartQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(cartUrl)}`;
-  const reviewsQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(reviewsUrl)}`;
-  const locationQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(locationUrl)}`;
+  const cartQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(cartUrl)}&color=2D2A32&bgcolor=EEF7FF&qzone=2`;
+  const reviewsQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(reviewsUrl)}&color=2D2A32&bgcolor=EEF7FF&qzone=2`;
+  const locationQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(locationQrTargetUrl)}&color=2D2A32&bgcolor=EEF7FF&qzone=2`;
 
   return (
     <main className="min-h-screen bg-smash-black pt-20 pb-16">
@@ -98,7 +98,7 @@ export default function QRPage() {
                 Carrer del Col·legi, 5 · Terrassa
               </p>
               <p className="text-smash-turquoise text-sm font-semibold break-all">
-                {locationUrl}
+                {locationQrTargetUrl}
               </p>
             </div>
           </div>
