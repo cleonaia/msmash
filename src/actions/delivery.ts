@@ -66,6 +66,63 @@ export async function getDeliveryIntegrations() {
 }
 
 /**
+ * Obtiene órdenes de delivery recientes para el panel admin
+ * @param days - Ventana en días (por defecto 30)
+ */
+export async function getDeliveryOrders(days = 30) {
+  try {
+    const fromDate = new Date()
+    fromDate.setDate(fromDate.getDate() - days)
+
+    const orders = await prisma.deliveryOrder.findMany({
+      where: { createdAt: { gte: fromDate } },
+      include: { integration: true },
+      orderBy: { createdAt: 'desc' }
+    })
+
+    return orders.map((order) => {
+      let parsedItems: Array<{ name: string; quantity: number; price: number }> = []
+
+      try {
+        const rawItems = JSON.parse(order.items || '[]')
+        if (Array.isArray(rawItems)) {
+          parsedItems = rawItems.map((item: any) => ({
+            name: String(item?.name || item?.title || 'Producto'),
+            quantity: Number(item?.quantity || 1),
+            price: Number(item?.price || item?.unitPrice || 0)
+          }))
+        }
+      } catch {
+        parsedItems = []
+      }
+
+      return {
+        id: order.id,
+        platform: order.platform,
+        externalOrderId: order.platformOrderId,
+        merchantId: order.integration?.merchantId || '',
+        status: order.status,
+        customerName: order.customerName,
+        customerPhone: order.customerPhone,
+        deliveryAddress: order.deliveryAddress,
+        items: parsedItems,
+        totalPrice: order.totalAmount / 100,
+        currency: 'EUR',
+        receivedAt: order.createdAt,
+        acceptedAt: order.acceptedAt,
+        preparedAt: order.preparedAt,
+        collectedAt: order.collectedAt,
+        deliveredAt: order.deliveredAt,
+        cancelledAt: null
+      }
+    })
+  } catch (error) {
+    console.error('Error fetching delivery orders:', error)
+    return []
+  }
+}
+
+/**
  * Sincroniza órdenes desde una plataforma de delivery
  * Nota: La implementación específica depende de cada API
  * @param platform - Plataforma a sincronizar

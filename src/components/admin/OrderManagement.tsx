@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
-import { getDeliveryIntegrations } from '@/actions/delivery'
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import { getDeliveryOrders } from '@/actions/delivery'
 
 interface DeliveryOrder {
   id: string
@@ -15,12 +15,12 @@ interface DeliveryOrder {
   items: Array<{ name: string; quantity: number; price: number }>
   totalPrice: number
   currency: string
-  receivedAt: Date
-  acceptedAt?: Date | null
-  preparedAt?: Date | null
-  collectedAt?: Date | null
-  deliveredAt?: Date | null
-  cancelledAt?: Date | null
+  receivedAt: Date | string
+  acceptedAt?: Date | string | null
+  preparedAt?: Date | string | null
+  collectedAt?: Date | string | null
+  deliveredAt?: Date | string | null
+  cancelledAt?: Date | string | null
 }
 
 type SortField = 'date' | 'price' | 'status' | 'platform'
@@ -44,6 +44,9 @@ const PLATFORM_COLORS: Record<string, string> = {
 export function OrderManagement() {
   const [orders, setOrders] = useState<DeliveryOrder[]>([])
   const [loading, setLoading] = useState(true)
+  const [autoPrintEnabled, setAutoPrintEnabled] = useState(false)
+  const [printQueue, setPrintQueue] = useState<string[]>([])
+  const [activePrintOrderId, setActivePrintOrderId] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all')
   const [selectedStatus, setSelectedStatus] = useState<string>('all')
@@ -54,94 +57,88 @@ export function OrderManagement() {
   const [sortField, setSortField] = useState<SortField>('date')
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table')
+  const autoPrintEnabledRef = useRef(false)
+  const knownOrderIdsRef = useRef<Set<string>>(new Set())
+  const initializedOrdersRef = useRef(false)
 
-  useEffect(() => {
-    loadOrders()
-  }, [])
-
-  const loadOrders = async () => {
+  const loadOrders = useCallback(async () => {
     try {
       setLoading(true)
-      // En producción, implementar endpoint real
-      // const response = await fetch('/api/orders')
-      // const data = await response.json()
-      // setOrders(data)
+      const data = await getDeliveryOrders(30)
+      const nextOrders = (data as DeliveryOrder[]) || []
+      const currentIds = new Set(nextOrders.map((o) => o.id))
 
-      // Por ahora: datos de ejemplo
-      setOrders([
-        {
-          id: 'ord-001',
-          platform: 'UBEREATS',
-          externalOrderId: 'UBE-12345',
-          merchantId: 'merchant-123',
-          status: 'delivered',
-          customerName: 'Juan García',
-          customerPhone: '666123456',
-          deliveryAddress: 'Calle Principal 123, Barcelona',
-          items: [
-            { name: 'Burger Clásica', quantity: 2, price: 12.5 },
-            { name: 'Papas Fritas', quantity: 2, price: 3.5 }
-          ],
-          totalPrice: 31.5,
-          currency: 'EUR',
-          receivedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-          acceptedAt: new Date(Date.now() - 110 * 60 * 1000),
-          preparedAt: new Date(Date.now() - 65 * 60 * 1000),
-          collectedAt: new Date(Date.now() - 45 * 60 * 1000),
-          deliveredAt: new Date(Date.now() - 10 * 60 * 1000),
-          cancelledAt: null
-        },
-        {
-          id: 'ord-002',
-          platform: 'GLOVO',
-          externalOrderId: 'GLO-67890',
-          merchantId: 'merchant-123',
-          status: 'prepared',
-          customerName: 'María López',
-          customerPhone: '666654321',
-          deliveryAddress: 'Avenida Diagonal 456, Barcelona',
-          items: [
-            { name: 'Focaccia Mari', quantity: 1, price: 8.9 },
-            { name: 'Bebida', quantity: 1, price: 2.5 }
-          ],
-          totalPrice: 11.4,
-          currency: 'EUR',
-          receivedAt: new Date(Date.now() - 45 * 60 * 1000),
-          acceptedAt: new Date(Date.now() - 40 * 60 * 1000),
-          preparedAt: new Date(Date.now() - 15 * 60 * 1000),
-          collectedAt: null,
-          deliveredAt: null,
-          cancelledAt: null
-        },
-        {
-          id: 'ord-003',
-          platform: 'DELIVEROO',
-          externalOrderId: 'DEL-11111',
-          merchantId: 'merchant-123',
-          status: 'accepted',
-          customerName: 'Carlos Ruiz',
-          customerPhone: '666999888',
-          deliveryAddress: 'Plaza Real 789, Barcelona',
-          items: [
-            { name: 'Burger Premium', quantity: 1, price: 15.0 },
-            { name: 'Ensalada', quantity: 1, price: 7.5 }
-          ],
-          totalPrice: 22.5,
-          currency: 'EUR',
-          receivedAt: new Date(Date.now() - 20 * 60 * 1000),
-          acceptedAt: new Date(Date.now() - 15 * 60 * 1000),
-          preparedAt: null,
-          collectedAt: null,
-          deliveredAt: null,
-          cancelledAt: null
+      if (initializedOrdersRef.current && autoPrintEnabledRef.current) {
+        const newOrders = nextOrders.filter((o) => !knownOrderIdsRef.current.has(o.id))
+
+        if (newOrders.length > 0) {
+          setPrintQueue((prev) => {
+            const dedup = new Set(prev)
+            for (const order of newOrders) dedup.add(order.id)
+            return Array.from(dedup)
+          })
         }
-      ])
+      }
+
+      knownOrderIdsRef.current = currentIds
+      initializedOrdersRef.current = true
+      setOrders(nextOrders)
     } catch (error) {
       console.error('Error loading orders:', error)
+      setOrders([])
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    loadOrders()
+  }, [loadOrders])
+
+  useEffect(() => {
+    autoPrintEnabledRef.current = autoPrintEnabled
+  }, [autoPrintEnabled])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const storedEnabled = window.localStorage.getItem('deliveryAutoPrintEnabled')
+    if (storedEnabled === 'true') {
+      setAutoPrintEnabled(true)
+      autoPrintEnabledRef.current = true
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem('deliveryAutoPrintEnabled', String(autoPrintEnabled))
+  }, [autoPrintEnabled])
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      loadOrders()
+    }, 15000)
+
+    return () => {
+      window.clearInterval(interval)
+    }
+  }, [loadOrders])
+
+  useEffect(() => {
+    if (activePrintOrderId || printQueue.length === 0) return
+
+    const [nextOrderId, ...rest] = printQueue
+    setActivePrintOrderId(nextOrderId)
+    setPrintQueue(rest)
+
+    const releaseTimer = window.setTimeout(() => {
+      setActivePrintOrderId(null)
+    }, 2500)
+
+    return () => {
+      window.clearTimeout(releaseTimer)
+    }
+  }, [activePrintOrderId, printQueue])
 
   // Filtrar órdenes
   const filteredOrders = useMemo(() => {
@@ -299,6 +296,34 @@ export function OrderManagement() {
             ))}
           </div>
         </div>
+
+        <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">Impresión automática TPV</p>
+              <p className="text-xs text-gray-600">
+                Detecta pedidos nuevos y lanza impresión en este equipo.
+              </p>
+            </div>
+
+            <button
+              onClick={() => setAutoPrintEnabled((prev) => !prev)}
+              className={`px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                autoPrintEnabled
+                  ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              {autoPrintEnabled ? 'ACTIVADO' : 'DESACTIVADO'}
+            </button>
+          </div>
+
+          {printQueue.length > 0 && (
+            <p className="mt-3 text-xs text-amber-700">
+              Cola de impresión: {printQueue.length} pedido(s) pendiente(s).
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Results Counter */}
@@ -356,6 +381,7 @@ export function OrderManagement() {
                 >
                   Fecha {sortField === 'date' && (sortOrder === 'asc' ? '↑' : '↓')}
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -389,6 +415,14 @@ export function OrderManagement() {
                         hour: '2-digit',
                         minute: '2-digit'
                       })}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      <button
+                        onClick={() => window.open(`/admin/delivery/print/${order.id}`, '_blank', 'noopener,noreferrer')}
+                        className="rounded bg-black px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800"
+                      >
+                        Imprimir
+                      </button>
                     </td>
                   </tr>
                 )
@@ -433,6 +467,13 @@ export function OrderManagement() {
                       {statusInfo?.icon} {order.status}
                     </span>
                   </div>
+
+                  <button
+                    onClick={() => window.open(`/admin/delivery/print/${order.id}`, '_blank', 'noopener,noreferrer')}
+                    className="w-full rounded bg-black px-3 py-2 text-xs font-semibold text-white hover:bg-gray-800"
+                  >
+                    Imprimir ticket
+                  </button>
                 </div>
               </div>
             )
@@ -444,6 +485,14 @@ export function OrderManagement() {
         <div className="text-center py-12 bg-gray-50 rounded-lg">
           <p className="text-gray-600">No se encontraron órdenes con los filtros seleccionados</p>
         </div>
+      )}
+
+      {activePrintOrderId && (
+        <iframe
+          title="auto-print-delivery-ticket"
+          src={`/admin/delivery/print/${activePrintOrderId}?autoprint=1&ts=${Date.now()}`}
+          className="hidden"
+        />
       )}
     </div>
   )

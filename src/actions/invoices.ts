@@ -18,7 +18,11 @@ export async function createInvoiceFromOrder(
       where: { id: orderId },
       include: {
         items: {
-          include: { product: true }
+          include: {
+            product: {
+              include: { category: true }
+            }
+          }
         }
       }
     })
@@ -27,9 +31,30 @@ export async function createInvoiceFromOrder(
       throw new Error(`Orden ${orderId} no encontrada`)
     }
 
-    // Calcular impuestos (IVA 21% - ajustar según país)
-    const ivaTax = Math.round(order.totalAmount * 0.21)
-    const subtotal = order.totalAmount - ivaTax
+    // Calcular impuestos con IVA incluido en precio:
+    // - Comida: 10%
+    // - Bebidas: 21%
+    const taxBreakdown = order.items.reduce(
+      (acc, item) => {
+        const categorySlug = item.product.category?.slug?.toLowerCase() || ''
+        const categoryName = item.product.category?.name?.toLowerCase() || ''
+        const isDrink = categorySlug === 'bebidas' || categoryName.includes('bebida')
+        const vatRate = isDrink ? 0.21 : 0.1
+
+        const lineSubtotal = Math.round(item.subtotal / (1 + vatRate))
+        const lineTax = item.subtotal - lineSubtotal
+
+        acc.subtotal += lineSubtotal
+        acc.tax += lineTax
+        return acc
+      },
+      { subtotal: 0, tax: 0 }
+    )
+
+    // Ajuste por redondeo para cuadrar exactamente con el total de la orden
+    const roundingDiff = order.totalAmount - (taxBreakdown.subtotal + taxBreakdown.tax)
+    const subtotal = taxBreakdown.subtotal
+    const ivaTax = taxBreakdown.tax + roundingDiff
 
     // Generar número de factura único
     const invoiceCount = await prisma.invoice.count()

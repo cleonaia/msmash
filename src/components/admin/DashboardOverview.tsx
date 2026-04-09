@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { AnalyticsDashboard } from './AnalyticsDashboard'
 import { EmployeeManager } from './EmployeeManager'
 import { DeliveryIntegration } from './DeliveryIntegration'
@@ -8,6 +8,8 @@ import { OrderManagement } from './OrderManagement'
 import { AdvancedAnalyticsDashboard } from './AdvancedAnalytics'
 import { InvoiceManager } from './InvoiceManager'
 import { QRManager } from './QRManager'
+import { executeSyncCycle, getSyncHistory, getSyncStats, setSyncInterval } from '@/actions/scheduler'
+import { getDeliveryIntegrations } from '@/actions/delivery'
 
 type TabType = 'dashboard' | 'orders' | 'advanced-analytics' | 'delivery' | 'invoices' | 'employees' | 'scheduler' | 'qr'
 
@@ -148,13 +150,87 @@ export function DashboardOverview() {
 
 // Scheduler Panel Component
 function SchedulerPanel() {
-  const [isRunning, setIsRunning] = useState(true)
-  const [syncInterval, setSyncInterval] = useState(5)
-  const [lastSync, setLastSync] = useState(new Date(Date.now() - 3 * 60 * 1000))
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSyncing, setIsSyncing] = useState(false)
+  const [syncIntervalMinutes, setSyncIntervalMinutes] = useState(5)
+  const [lastSyncAt, setLastSyncAt] = useState<Date | null>(null)
+  const [enabledIntegrations, setEnabledIntegrations] = useState(0)
+  const [successfulSyncs, setSuccessfulSyncs] = useState(0)
+  const [failedSyncs, setFailedSyncs] = useState(0)
+  const [avgDurationMs, setAvgDurationMs] = useState(0)
+  const [history, setHistory] = useState<
+    Array<{
+      id: string
+      timestamp: string | Date
+      totalDuration: number
+      successCount: number
+      failureCount: number
+    }>
+  >([])
 
-  const handleManualSync = () => {
-    setLastSync(new Date())
+  const loadSchedulerData = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const [stats, syncHistory, integrations] = await Promise.all([
+        getSyncStats(),
+        getSyncHistory(5),
+        getDeliveryIntegrations()
+      ])
+
+      const normalizedStats = (stats as any) || {}
+      const normalizedHistory = Array.isArray(syncHistory) ? syncHistory : []
+      const normalizedIntegrations = Array.isArray(integrations) ? integrations : []
+
+      setSyncIntervalMinutes(Number(normalizedStats.nextSyncInterval || 5))
+      setSuccessfulSyncs(Number(normalizedStats.successfulSyncs || 0))
+      setFailedSyncs(Number(normalizedStats.failedSyncs || 0))
+      setAvgDurationMs(Number(normalizedStats.averageDuration || 0))
+      setLastSyncAt(normalizedStats.lastSync ? new Date(normalizedStats.lastSync) : null)
+      setEnabledIntegrations(normalizedIntegrations.length)
+
+      setHistory(
+        normalizedHistory.map((entry: any) => ({
+          id: String(entry.id || `${entry.timestamp}`),
+          timestamp: entry.timestamp,
+          totalDuration: Number(entry.totalDuration || 0),
+          successCount: Number(entry.successCount || 0),
+          failureCount: Number(entry.failureCount || 0)
+        }))
+      )
+    } catch (error) {
+      console.error('Error loading scheduler data:', error)
+      setHistory([])
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadSchedulerData()
+  }, [loadSchedulerData])
+
+  const handleManualSync = async () => {
+    try {
+      setIsSyncing(true)
+      await executeSyncCycle()
+      await loadSchedulerData()
+    } catch (error) {
+      console.error('Error running manual sync:', error)
+    } finally {
+      setIsSyncing(false)
+    }
   }
+
+  const handleIntervalChange = async (value: number) => {
+    setSyncIntervalMinutes(value)
+    try {
+      await setSyncInterval(value)
+    } catch (error) {
+      console.error('Error setting sync interval:', error)
+    }
+  }
+
+  const isRunning = enabledIntegrations > 0
 
   return (
     <div className="space-y-6">
@@ -178,9 +254,9 @@ function SchedulerPanel() {
             <div>
               <p className="text-blue-600 text-sm font-medium">Última Sincronización</p>
               <p className="text-2xl font-bold mt-2 text-blue-900">
-                Hace {Math.round((Date.now() - lastSync.getTime()) / 60000)}m
+                {lastSyncAt ? `Hace ${Math.round((Date.now() - lastSyncAt.getTime()) / 60000)}m` : 'Sin datos'}
               </p>
-              <p className="text-xs text-blue-600 mt-1">{lastSync.toLocaleTimeString('es-ES')}</p>
+              <p className="text-xs text-blue-600 mt-1">{lastSyncAt ? lastSyncAt.toLocaleTimeString('es-ES') : '---'}</p>
             </div>
             <div className="text-5xl">🔄</div>
           </div>
@@ -190,7 +266,7 @@ function SchedulerPanel() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-purple-600 text-sm font-medium">Intervalo</p>
-              <p className="text-3xl font-bold mt-2 text-purple-900">{syncInterval} min</p>
+              <p className="text-3xl font-bold mt-2 text-purple-900">{syncIntervalMinutes} min</p>
               <p className="text-xs text-purple-600 mt-1">Entre sincronizaciones</p>
             </div>
             <div className="text-5xl">⏱️</div>
@@ -206,14 +282,14 @@ function SchedulerPanel() {
           {/* Interval Slider */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
-              Intervalo de Sincronización: <span className="font-bold text-black">{syncInterval} minutos</span>
+              Intervalo de Sincronización: <span className="font-bold text-black">{syncIntervalMinutes} minutos</span>
             </label>
             <input
               type="range"
               min="1"
               max="60"
-              value={syncInterval}
-              onChange={(e) => setSyncInterval(parseInt(e.target.value))}
+              value={syncIntervalMinutes}
+              onChange={(e) => handleIntervalChange(parseInt(e.target.value, 10))}
               className="w-full cursor-pointer"
             />
             <p className="text-xs text-gray-500 mt-2">⚠️ Mínimo 1 minuto (máxima sincronía), máximo 60 minutos (menor carga)</p>
@@ -222,16 +298,14 @@ function SchedulerPanel() {
           {/* Scheduler Status Toggle */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">Control del Scheduler</label>
-            <button
-              onClick={() => setIsRunning(!isRunning)}
-              className={`w-full py-3 rounded-lg font-bold transition text-lg ${
-                isRunning
-                  ? 'bg-red-50 border-2 border-red-200 text-red-700 hover:bg-red-100'
-                  : 'bg-green-50 border-2 border-green-200 text-green-700 hover:bg-green-100'
-              }`}
-            >
-              {isRunning ? '⏸️ Pausar Sincronización' : '▶️ Reanudar Sincronización'}
-            </button>
+            <div className={`w-full py-3 rounded-lg font-bold text-lg text-center border-2 ${
+              isRunning
+                ? 'bg-green-50 border-green-200 text-green-700'
+                : 'bg-amber-50 border-amber-200 text-amber-700'
+            }`}>
+              {isRunning ? '⚡ Integraciones activas' : '⏸️ Sin integraciones activas'}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">Integraciones habilitadas: {enabledIntegrations}</p>
           </div>
         </div>
 
@@ -239,9 +313,10 @@ function SchedulerPanel() {
         <div>
           <button
             onClick={handleManualSync}
+            disabled={isSyncing}
             className="w-full bg-gradient-to-r from-black to-gray-800 text-white py-4 rounded-lg font-bold hover:from-gray-800 hover:to-gray-900 transition flex items-center justify-center gap-2 text-lg"
           >
-            🔄 Sincronizar Ahora (UberEats + Glovo + Deliveroo + Just Eat)
+            {isSyncing ? '⏳ Sincronizando...' : '🔄 Sincronizar Ahora (UberEats + Glovo + Deliveroo + Just Eat)'}
           </button>
         </div>
 
@@ -249,29 +324,53 @@ function SchedulerPanel() {
         <div className="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4">
           <p className="text-sm text-blue-900">
             <strong>ℹ️ ¿Cómo funciona?</strong><br />
-            El scheduler sincroniza automáticamente todas tus órdenes desde UberEats, Glovo, Deliveroo y Just Eat cada X minutos. 
-            Si una sincronización falla, se reintentar automáticamente hasta 3 veces.
+            Esta sección usa datos reales de sincronización y del historial guardado en base de datos.
+            Si una plataforma falla, el error se registra en la integración correspondiente.
           </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <p className="text-xs text-gray-500">Sincronizaciones OK</p>
+            <p className="text-2xl font-bold text-green-700">{successfulSyncs}</p>
+          </div>
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <p className="text-xs text-gray-500">Sincronizaciones con fallo</p>
+            <p className="text-2xl font-bold text-red-700">{failedSyncs}</p>
+          </div>
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <p className="text-xs text-gray-500">Duración media</p>
+            <p className="text-2xl font-bold text-gray-800">{(avgDurationMs / 1000).toFixed(1)}s</p>
+          </div>
         </div>
 
         {/* Sync Log */}
         <div>
           <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">📋 Historial de Sincronizaciones (últimas 5)</h4>
-          <div className="space-y-2">
-            {[
-              { time: '14:30', status: '✓ Exitosa', duration: '2.4s', orders: '12' },
-              { time: '14:25', status: '✓ Exitosa', duration: '2.1s', orders: '8' },
-              { time: '14:20', status: '✓ Exitosa', duration: '2.8s', orders: '15' },
-              { time: '14:15', status: '✓ Exitosa', duration: '2.2s', orders: '5' },
-              { time: '14:10', status: '✓ Exitosa', duration: '2.5s', orders: '10' }
-            ].map((log, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-                <span className="text-sm text-gray-900 font-medium">{log.time}</span>
-                <span className="text-sm text-green-600 font-bold">{log.status}</span>
-                <span className="text-xs text-gray-500">{log.orders} órdenes | {log.duration}</span>
-              </div>
-            ))}
-          </div>
+          {isLoading ? (
+            <p className="text-sm text-gray-500">Cargando historial...</p>
+          ) : history.length === 0 ? (
+            <p className="text-sm text-gray-500">Aún no hay sincronizaciones registradas.</p>
+          ) : (
+            <div className="space-y-2">
+              {history.map((log) => {
+                const ok = log.failureCount === 0
+                return (
+                  <div key={log.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <span className="text-sm text-gray-900 font-medium">
+                      {new Date(log.timestamp).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                    <span className={`text-sm font-bold ${ok ? 'text-green-600' : 'text-amber-700'}`}>
+                      {ok ? '✓ Exitosa' : '⚠ Con incidencias'}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {log.successCount} ok / {log.failureCount} fallos | {(log.totalDuration / 1000).toFixed(1)}s
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -13,7 +13,8 @@ import {
   DollarSign,
   Package,
   Zap,
-  Loader
+  Loader,
+  Printer
 } from 'lucide-react'
 
 interface Order {
@@ -79,6 +80,10 @@ export default function AdminOrdersPanel() {
   const [orders, setOrders] = useState<Order[]>([])
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(false)
+  const [autoPrintEnabled, setAutoPrintEnabled] = useState(false)
+  const [autoPrintMode, setAutoPrintMode] = useState<'ALL' | 'PAID'>('PAID')
+  const [printQueue, setPrintQueue] = useState<string[]>([])
+  const [activePrintOrderId, setActivePrintOrderId] = useState<string | null>(null)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [showRefundModal, setShowRefundModal] = useState(false)
   const [refundReason, setRefundReason] = useState('')
@@ -97,14 +102,60 @@ export default function AdminOrdersPanel() {
   })
 
   const filtersRef = useRef(filters)
+  const autoPrintEnabledRef = useRef(false)
+  const autoPrintModeRef = useRef<'ALL' | 'PAID'>('PAID')
+  const knownOrderIdsRef = useRef<Set<string>>(new Set())
+  const initializedOrdersRef = useRef(false)
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+
+  const getPrintedOrderIds = () => {
+    if (typeof window === 'undefined') return new Set<string>()
+
+    try {
+      const raw = window.localStorage.getItem('adminPrintedOrderIds')
+      const parsed = raw ? JSON.parse(raw) : []
+      return new Set<string>(Array.isArray(parsed) ? parsed : [])
+    } catch {
+      return new Set<string>()
+    }
+  }
+
+  const markOrderPrinted = useCallback((orderId: string) => {
+    if (typeof window === 'undefined') return
+
+    const printed = getPrintedOrderIds()
+    printed.add(orderId)
+    window.localStorage.setItem('adminPrintedOrderIds', JSON.stringify(Array.from(printed).slice(-500)))
+  }, [])
 
   // Cargar órdenes
   const fetchOrders = useCallback(async () => {
     setLoading(true)
     try {
       const data = await getAllOrders()
+      const currentIds = new Set(data.map((o) => o.id))
+
+      if (initializedOrdersRef.current && autoPrintEnabledRef.current) {
+        const newOrders = data.filter((o) => !knownOrderIdsRef.current.has(o.id))
+        const printed = getPrintedOrderIds()
+        const eligible = newOrders.filter((o) => {
+          if (printed.has(o.id)) return false
+          if (autoPrintModeRef.current === 'PAID') return o.paymentStatus === 'COMPLETED'
+          return true
+        })
+
+        if (eligible.length > 0) {
+          setPrintQueue((prev) => {
+            const dedup = new Set(prev)
+            for (const order of eligible) dedup.add(order.id)
+            return Array.from(dedup)
+          })
+        }
+      }
+
+      knownOrderIdsRef.current = currentIds
+      initializedOrdersRef.current = true
       setOrders(data)
       setFilteredOrders(filterOrders(data, filtersRef.current))
       setStats(getOrderStats(data))
@@ -118,6 +169,68 @@ export default function AdminOrdersPanel() {
   useEffect(() => {
     fetchOrders()
   }, [fetchOrders])
+
+  useEffect(() => {
+    autoPrintEnabledRef.current = autoPrintEnabled
+  }, [autoPrintEnabled])
+
+  useEffect(() => {
+    autoPrintModeRef.current = autoPrintMode
+  }, [autoPrintMode])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const storedEnabled = window.localStorage.getItem('adminAutoPrintEnabled')
+    const storedMode = window.localStorage.getItem('adminAutoPrintMode')
+
+    if (storedEnabled === 'true') {
+      setAutoPrintEnabled(true)
+      autoPrintEnabledRef.current = true
+    }
+
+    if (storedMode === 'ALL' || storedMode === 'PAID') {
+      setAutoPrintMode(storedMode)
+      autoPrintModeRef.current = storedMode
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem('adminAutoPrintEnabled', String(autoPrintEnabled))
+  }, [autoPrintEnabled])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem('adminAutoPrintMode', autoPrintMode)
+  }, [autoPrintMode])
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      fetchOrders()
+    }, 15000)
+
+    return () => {
+      window.clearInterval(interval)
+    }
+  }, [fetchOrders])
+
+  useEffect(() => {
+    if (activePrintOrderId || printQueue.length === 0) return
+
+    const [nextOrderId, ...rest] = printQueue
+    setActivePrintOrderId(nextOrderId)
+    setPrintQueue(rest)
+
+    const releaseTimer = window.setTimeout(() => {
+      markOrderPrinted(nextOrderId)
+      setActivePrintOrderId(null)
+    }, 2500)
+
+    return () => {
+      window.clearTimeout(releaseTimer)
+    }
+  }, [activePrintOrderId, printQueue, markOrderPrinted])
 
   const handleFilterChange = (key: keyof FilterState, value: string) => {
     const newFilters = { ...filters, [key]: value }
@@ -296,6 +409,47 @@ export default function AdminOrdersPanel() {
               <option value="week">Última semana</option>
             </select>
           </div>
+
+          <div className="mt-4 rounded-lg border border-slate-600 bg-slate-900/40 p-4">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-white">Impresión automática TPV</p>
+                <p className="text-xs text-slate-400">
+                  Detecta pedidos nuevos y lanza impresión en este equipo (debe estar abierto aquí).
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <label className="text-xs text-slate-300">Modo</label>
+                <select
+                  value={autoPrintMode}
+                  onChange={(e) => setAutoPrintMode(e.target.value as 'ALL' | 'PAID')}
+                  disabled={!autoPrintEnabled}
+                  className="bg-slate-700 text-white rounded px-3 py-2 border border-slate-600 text-xs disabled:opacity-50"
+                >
+                  <option value="PAID">Solo pagados</option>
+                  <option value="ALL">Todos los pedidos</option>
+                </select>
+
+                <button
+                  onClick={() => setAutoPrintEnabled((prev) => !prev)}
+                  className={`px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                    autoPrintEnabled
+                      ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                      : 'bg-slate-700 text-slate-200 hover:bg-slate-600'
+                  }`}
+                >
+                  {autoPrintEnabled ? 'ACTIVADO' : 'DESACTIVADO'}
+                </button>
+              </div>
+            </div>
+
+            {printQueue.length > 0 && (
+              <p className="mt-3 text-xs text-amber-300">
+                Cola de impresión: {printQueue.length} pedido(s) pendiente(s).
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Orders Table */}
@@ -401,6 +555,17 @@ export default function AdminOrdersPanel() {
 
                                 <button
                                   onClick={() => {
+                                    window.open(`/admin/orders/print/${order.id}`, '_blank', 'noopener,noreferrer')
+                                    setOpenDropdown(null)
+                                  }}
+                                  className="w-full px-4 py-2 text-sm text-emerald-400 hover:bg-slate-600 text-left flex items-center gap-2 border-t border-slate-600"
+                                >
+                                  <Printer className="w-4 h-4" />
+                                  Imprimir ticket
+                                </button>
+
+                                <button
+                                  onClick={() => {
                                     window.location.href = `mailto:${order.customerEmail}?subject=Tu pedido #${order.id.slice(-8)}`
                                     setOpenDropdown(null)
                                   }}
@@ -482,6 +647,14 @@ export default function AdminOrdersPanel() {
             </div>
           </div>
         </div>
+      )}
+
+      {activePrintOrderId && (
+        <iframe
+          title="auto-print-ticket"
+          src={`/admin/orders/print/${activePrintOrderId}?autoprint=1&ts=${Date.now()}`}
+          className="hidden"
+        />
       )}
     </div>
   )

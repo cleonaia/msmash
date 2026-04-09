@@ -75,7 +75,14 @@ export async function getRevenueKPIs() {
     }
   } catch (error) {
     console.error('Error fetching revenue KPIs:', error)
-    throw error
+    return {
+      today: 0,
+      month: 0,
+      quarter: 0,
+      ordersToday: 0,
+      avgTicket: 0,
+      currency: 'EUR'
+    }
   }
 }
 
@@ -101,7 +108,7 @@ export async function getOrdersByChannel() {
     }))
   } catch (error) {
     console.error('Error fetching orders by channel:', error)
-    throw error
+    return []
   }
 }
 
@@ -134,10 +141,15 @@ export async function getTopProducts(limit = 5) {
       })
     )
 
-    return enriched
+    return enriched.map((item: any) => ({
+      id: item.productId,
+      name: item.product?.name || 'Producto sin nombre',
+      quantity: item._sum.quantity || 0,
+      revenue: item._sum.subtotal || 0
+    }))
   } catch (error) {
     console.error('Error fetching top products:', error)
-    throw error
+    return []
   }
 }
 
@@ -178,7 +190,7 @@ export async function getRevenueTrend(days = 7) {
     return trend
   } catch (error) {
     console.error('Error fetching revenue trend:', error)
-    throw error
+    return []
   }
 }
 
@@ -210,7 +222,13 @@ export async function getConversionMetrics() {
     }
   } catch (error) {
     console.error('Error fetching conversion metrics:', error)
-    throw error
+    return {
+      menuViews: 0,
+      checkouts: 0,
+      orders: 0,
+      viewToCheckout: '0%',
+      checkoutToOrder: '0%'
+    }
   }
 }
 
@@ -227,7 +245,7 @@ export async function getOrdersByStatus() {
     return Object.fromEntries(statuses.map((s: any) => [s.status, s._count]))
   } catch (error) {
     console.error('Error fetching orders by status:', error)
-    throw error
+    return {}
   }
 }
 
@@ -248,6 +266,6 @@ export async function getPaymentMethodStats() {
     return methods
   } catch (error) {
     console.error('Error fetching payment method stats:', error)
-    throw error
+    return []
   }
 }
