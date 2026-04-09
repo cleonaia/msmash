@@ -360,7 +360,7 @@ export default function HomePage() {
           <ScrollReveal delay="d1">
             <h2 className="font-display display-md text-smash-cream uppercase tracking-wide mb-6">
               Estamos en<br />
-              Carrer de Colegi, 5
+              Carrer del Col·legi, 5
             </h2>
           </ScrollReveal>
           <ScrollReveal delay="d3">

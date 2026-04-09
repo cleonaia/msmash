@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Download, Share2, Copy, QrCode } from 'lucide-react';
+import { siteConfig } from '@/config/site';
 
 interface QRCode {
   id: string;
@@ -16,28 +17,28 @@ const qrCodes: QRCode[] = [
   {
     id: 'carta',
     name: 'Carta Digital',
-    url: 'https://www.msmashburger.page/menu',
+    url: 'https://msmashburger.page/menu',
     description: 'Código QR que enlaza a la carta digital del menú',
     icon: '📋'
   },
   {
     id: 'resenas',
     name: 'Reseñas Google',
-    url: 'https://www.google.com/maps/place/M+SMASH+BURGER/@41.5633,1.9900,17z/reviews',
+    url: siteConfig.googleReviewsUrl,
     description: 'Código QR que enlaza a las reseñas en Google Maps (5.0 ⭐)',
     icon: '⭐'
   },
   {
     id: 'ubicacion',
     name: 'Ubicación',
-    url: 'https://www.google.com/maps/place/M+SMASH+BURGER/@41.5633,1.9900,17z',
+    url: siteConfig.googleMapsUrl,
     description: 'Código QR que abre la ubicación en Google Maps',
     icon: '📍'
   },
   {
     id: 'pedidos',
     name: 'Realizar Pedido',
-    url: 'https://www.msmashburger.page/pedidos',
+    url: 'https://msmashburger.page/pedidos',
     description: 'Código QR para acceder directamente a la página de pedidos',
     icon: '🛒'
   }

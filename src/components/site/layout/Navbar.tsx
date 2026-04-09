@@ -115,7 +115,7 @@ export function Navbar() {
           </nav>
           <div className="fire-divider mx-4 sm:mx-6" />
           <p className="text-center text-[9px] sm:text-[10px] font-black text-smash-cream/25 uppercase tracking-[0.3em] sm:tracking-[0.4em] py-4 sm:py-6 px-4">
-            Smash Burger · Carrer de Colegi, 5
+            Smash Burger · Carrer del Col·legi, 5
           </p>
         </div>
       </div>

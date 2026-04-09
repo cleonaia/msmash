@@ -61,7 +61,7 @@ export async function getDeliveryIntegrations() {
     return integrations
   } catch (error) {
     console.error('Error fetching delivery integrations:', error)
-    throw error
+    return []
   }
 }
 

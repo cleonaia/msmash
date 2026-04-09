@@ -137,7 +137,7 @@ export function DeliveryIntegration() {
         return
       }
 
-      const webhookSecret = process.env[`NEXT_PUBLIC_${platform}_WEBHOOK_SECRET`] || 'webhook-secret'
+      const webhookSecret = 'webhook-secret'
 
       if (platform === 'UBEREATS') {
         await registerUberEatsIntegration(apiKey, merchantId, webhookSecret)

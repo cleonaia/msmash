@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { Star, MapPin } from 'lucide-react';
+import { siteConfig } from '@/config/site';
 
 export function GoogleReviewsWidget() {
-  const googleMapsUrl = "https://www.google.com/maps/place/M+SMASH+BURGER/@41.5633,1.9900,17z/data=!3m1!4b1!4m6!3m5!1s0x12a49eab5c5c5c5d:0x5c5c5c5c5c5c5c5c!8m2!3d41.5633!4d1.9900!16s%2Fg%2F11j2q7m8q9";
-  const reviewsUrl = "https://www.google.com/maps/place/M+SMASH+BURGER/@41.5633,1.9900,17z/reviews";
+  const googleMapsUrl = siteConfig.googleMapsUrl;
+  const reviewsUrl = siteConfig.googleReviewsUrl;
 
   return (
     <section className="w-full bg-smash-dark border-t border-b border-smash-border py-16">
@@ -65,18 +66,18 @@ export function GoogleReviewsWidget() {
 
           {/* Lado derecho: Embed de Google Maps */}
           <div className="flex justify-center lg:justify-end">
-            <div className="w-full max-w-md">
+            <div className="w-full max-w-xl">
               <div className="relative bg-smash-smoke border border-smash-border rounded-2xl overflow-hidden shadow-2xl">
-                {/* Imagen placeholder con iframe embebido */}
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3001.9834455816434!2d1.987922!3d41.563320!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12a49eab5c5c5c5d%3A0x5c5c5c5c5c5c5c5c!2sM%20SMASH%20BURGER!5e0!3m2!1ses!2ses!4v1712600000000"
+                  src={siteConfig.googleMapsEmbed}
                   width="100%"
-                  height="400"
+                  height="360"
                   style={{ border: 0 }}
                   allowFullScreen={true}
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  className="rounded-xl"
+                  className="rounded-xl w-full h-[320px] sm:h-[360px] lg:h-[400px]"
+                  title="Ubicación M SMASH en Google Maps"
                 />
               </div>
             </div>

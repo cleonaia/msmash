@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { siteConfig } from '@/config/site';
 
 export const metadata = {
   title: 'QR Codes - M SMASH BURGER',
@@ -6,12 +7,14 @@ export const metadata = {
 };
 
 export default function QRPage() {
-  const cartUrl = 'https://www.msmashburger.page/menu';
-  const reviewsUrl = 'https://www.google.com/maps/place/M+SMASH+BURGER/@41.5633,1.9900,17z/reviews';
+  const cartUrl = 'https://msmashburger.page/menu';
+  const reviewsUrl = siteConfig.googleReviewsUrl;
+  const locationUrl = siteConfig.googleMapsUrl;
   
   // Generate QR codes using qr-server API
   const cartQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(cartUrl)}`;
   const reviewsQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(reviewsUrl)}`;
+  const locationQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(locationUrl)}`;
 
   return (
     <main className="min-h-screen bg-smash-black pt-20 pb-16">
@@ -26,7 +29,7 @@ export default function QRPage() {
         </div>
 
         {/* Grid de QRs */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
           
           {/* QR Carta Digital */}
           <div className="flex flex-col items-center text-center space-y-6">
@@ -71,7 +74,31 @@ export default function QRPage() {
                 Mira qué dicen nuestros clientes
               </p>
               <p className="text-smash-turquoise text-sm font-semibold break-all">
-                5.0 ⭐ Maps Reviews
+                {reviewsUrl}
+              </p>
+            </div>
+          </div>
+
+          {/* QR Ubicación */}
+          <div className="flex flex-col items-center text-center space-y-6">
+            <div className="bg-white p-8 rounded-2xl shadow-2xl">
+              <Image
+                src={locationQrUrl}
+                alt="QR Ubicación M SMASH"
+                width={400}
+                height={400}
+                className="w-full h-auto"
+              />
+            </div>
+            <div>
+              <h2 className="font-display text-2xl uppercase tracking-wide text-smash-cream mb-2">
+                Ubicación
+              </h2>
+              <p className="text-smash-cream/60 mb-4">
+                Carrer del Col·legi, 5 · Terrassa
+              </p>
+              <p className="text-smash-turquoise text-sm font-semibold break-all">
+                {locationUrl}
               </p>
             </div>
           </div>

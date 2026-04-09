@@ -17,7 +17,7 @@ function Cloud({ className, opacity = 0.55, width = 280 }: { className?: string;
 
 const milestones = [
   { year: "2025", text: "Aquí nació la idea: crear una smash burger de verdad en Terrassa, con técnica, producto fresco y personalidad propia." },
-  { year: "2026", text: "Empezamos a hacerlo realidad en Carrer de Colegi, 5. Estamos en el inicio del proyecto y vamos paso a paso, con ambición." },
+  { year: "2026", text: "Empezamos a hacerlo realidad en Carrer del Col·legi, 5. Estamos en el inicio del proyecto y vamos paso a paso, con ambición." },
   { year: "Próximo", text: "Lo siguiente lo iremos construyendo con la comunidad: nuevas recetas, más contenido y más fuego." },
 ];
 
@@ -77,7 +77,7 @@ export default function NosotrosPage() {
               una, supimos que teníamos algo.
             </p>
             <p>
-              Encontramos el local en Carrer de Colegi, 5, lo montamos casi solos y abrimos sin hacer ruido.
+              Encontramos el local en Carrer del Col·legi, 5, lo montamos casi solos y abrimos sin hacer ruido.
               El ruido lo hizo la gente. Y TikTok hizo el resto.
             </p>
           </div>

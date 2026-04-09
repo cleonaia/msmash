@@ -7,12 +7,14 @@ export const siteConfig = {
   city: "Terrassa",
   description:
     "Smash burgers de fuego en Terrassa. Carne aplastada al momento, queso fundido hasta los bordes y sabores que no se olvidan.",
-  address: "Carrer de Colegi, 5, 08221 Terrassa, Barcelona",
-  addressShort: "Carrer de Colegi, 5",
+  address: "Carrer del Col·legi, 5, 08221 Terrassa, Barcelona",
+  addressShort: "Carrer del Col·legi, 5",
   googleMapsUrl:
-    "https://www.google.com/maps/search/?api=1&query=Carrer+de+Colegi+5+08221+Terrassa+Barcelona",
+    "https://www.google.com/maps/search/?api=1&query=Carrer+del+Col%C2%B7legi+5+08221+Terrassa+Barcelona",
+  googleReviewsUrl:
+    "https://share.google/loYgEMmeESjAegREi",
   googleMapsEmbed:
-    "https://maps.google.com/maps?q=Carrer+de+Colegi+5+Terrassa&t=&z=16&ie=UTF8&iwloc=&output=embed",
+    "https://maps.google.com/maps?q=Carrer+del+Col%C2%B7legi+5+Terrassa&t=&z=16&ie=UTF8&iwloc=&output=embed",
 };
 
 export const contactInfo = {

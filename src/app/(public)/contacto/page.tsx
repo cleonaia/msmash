@@ -226,7 +226,7 @@ export default function ContactoPage() {
                 <div className="relative z-10">
                   <span className="label-sky block mb-3">¿Cuándo venís?</span>
                   <h3 className="font-display text-2xl text-smash-cream uppercase tracking-wide mb-3 leading-tight">
-                    Carrer de Colegi, 5
+                    Carrer del Col·legi, 5
                   </h3>
                   <p className="text-sm text-smash-cream/50 mb-5 leading-relaxed">
                     Sin reservas. Sin esperas largas. Solo ven, pide y disfruta.

@@ -137,7 +137,7 @@ export function Footer() {
             <div className="flex items-center gap-5">
               <div className="p-2 bg-white rounded-xl border border-smash-border shadow-sm">
                 <Image
-                  src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https%3A%2F%2Fwww.google.com%2Fmaps%2Fplace%2FM%2BSMASH%2BBURGER%2F%4041.5633%2C1.9900%2C17z%2Freviews&color=C4B5FD&bgcolor=111111&qzone=1"
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(siteConfig.googleReviewsUrl)}&color=C4B5FD&bgcolor=111111&qzone=1`}
                   alt="QR Reseñas Google M SMASH"
                   width={80}
                   height={80}

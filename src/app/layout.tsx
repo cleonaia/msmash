@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: "%s | M SMASH",
   },
   description:
-    "Smash burgers de fuego en Carrer de Colegi, 5 (Terrassa). Carne aplastada al momento, queso fundido hasta los bordes y sabores que no se olvidan.",
+    "Smash burgers de fuego en Carrer del Col·legi, 5 (Terrassa). Carne aplastada al momento, queso fundido hasta los bordes y sabores que no se olvidan.",
   keywords: [
     "smash burger terrassa",
     "hamburguesa terrassa",
