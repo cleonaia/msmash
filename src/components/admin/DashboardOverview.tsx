@@ -32,12 +32,14 @@ export function DashboardOverview() {
       {/* Header */}
       <div className="bg-gradient-to-r from-black to-gray-800 text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold">🍔 Panel de Control M SMASH</h1>
-              <p className="text-gray-300 mt-2">Centro de operaciones integral para tu pizzería</p>
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-3xl">
+              <h1 className="text-3xl sm:text-4xl font-bold leading-tight">🍔 Panel de Control M SMASH</h1>
+              <p className="text-gray-300 mt-2 text-sm sm:text-base leading-relaxed">
+                Centro de operaciones integral para tu smash burger y gestión de pedidos.
+              </p>
             </div>
-            <div className="text-5xl">⚙️</div>
+            <div className="text-4xl sm:text-5xl shrink-0">⚙️</div>
           </div>
         </div>
       </div>
