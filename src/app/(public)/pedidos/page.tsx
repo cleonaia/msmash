@@ -103,7 +103,7 @@ export default function PedidosPage() {
 
   const total     = useMemo(() => cartItems.reduce((s, i) => s + i.subtotal, 0), [cartItems]);
   const totalItems = useMemo(() => cart.reduce((s, i) => s + i.qty, 0), [cart]);
-  const canSend   = cartItems.length > 0 && name.trim().length > 0 && phone.trim().length > 0 && email.trim().length > 0 && time.length > 0;
+  const canSend   = cartItems.length > 0 && name.trim().length > 0 && phone.trim().length > 0 && time.length > 0;
 
   /* Filtered items */
   const filtered = useMemo(() =>
@@ -398,23 +398,6 @@ export default function PedidosPage() {
                   </div>
                 </div>
 
-                {/* Email */}
-                <div>
-                  <label className="text-[9px] font-black uppercase tracking-[0.3em] text-smash-cream/35 block mb-1.5">
-                    Email *
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-smash-cream/20" />
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="tu@email.com"
-                      className="input-dark pl-9"
-                    />
-                  </div>
-                </div>
-
                 {/* Pickup time */}
                 <div>
                   <label className="text-[9px] font-black uppercase tracking-[0.3em] text-smash-cream/35 block mb-1.5">
@@ -450,7 +433,7 @@ export default function PedidosPage() {
                   </div>
                 </div>
 
-                {/* Form display logic */}
+                  {/* Form display logic - SOLO MOSTRAR CHECKOUT SI NO SE HA ENVIADO */}
                 {sent && orderId ? (
                   <StripeCheckout
                     orderId={orderId}
@@ -470,32 +453,34 @@ export default function PedidosPage() {
                     }}
                   />
                 ) : (
-                  <>
-                    {/* Email field - only show before checkout */}
-                    <div>
-                      <label className="text-[9px] font-black uppercase tracking-[0.3em] text-smash-cream/35 block mb-1.5">
-                        Email *
-                      </label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-smash-cream/20" />
-                        <input
-                          type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="tu@email.com"
-                          className="input-dark pl-9"
-                        />
-                      </div>
-                    </div>
+                    <>
+                      {/* Mostrar Email opcional solo si hay items */}
+                      {cartItems.length > 0 && (
+                        <div>
+                          <label className="text-[9px] font-black uppercase tracking-[0.3em] text-smash-cream/35 block mb-1.5">
+                            Email (opcional)
+                          </label>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-smash-cream/20" />
+                            <input
+                              type="email"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              placeholder="tu@email.com (opcional)"
+                              className="input-dark pl-9"
+                            />
+                          </div>
+                        </div>
+                      )}
 
-                    {/* Error message */}
+                      {/* Error message */}
                     {orderError && (
                       <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
                         <p className="text-sm text-red-400">{orderError}</p>
                       </div>
                     )}
 
-                    {/* Confirm button */}
+                      {/* CTA Button */}
                     <button
                       onClick={handleCreateOrder}
                       disabled={!canSend || isCreatingOrder}
@@ -521,7 +506,6 @@ export default function PedidosPage() {
                       <p className="text-[10px] text-smash-cream/25 text-center leading-relaxed">
                         {!name.trim() && "• Añade tu nombre  "}
                         {!phone.trim() && "• Añade tu teléfono  "}
-                        {!email.trim() && "• Añade tu email  "}
                         {!time && "• Elige hora de recogida"}
                       </p>
                     )}

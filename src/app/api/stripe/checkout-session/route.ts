@@ -3,6 +3,7 @@
 import { stripe, STRIPE_PUBLIC_KEY } from '@/lib/stripe'
 import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
+import type Stripe from 'stripe'
 
 /**
  * Crea una sesión de Stripe Checkout para una orden
@@ -11,7 +12,7 @@ export async function POST(request: NextRequest) {
   try {
     if (!stripe || !STRIPE_PUBLIC_KEY) {
       return NextResponse.json(
-        { error: 'Online payments are not configured' },
+        { error: 'Pago online no disponible: configura claves Stripe validas' },
         { status: 503 }
       )
     }
@@ -63,21 +64,27 @@ export async function POST(request: NextRequest) {
       quantity: item.quantity
     }))
 
-    // Crear sesión de checkout
-    const session = await stripe.checkout.sessions.create({
+    const checkoutSessionParams: Stripe.Checkout.SessionCreateParams = {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
       ui_mode: 'embedded',
       return_url: `${appUrl}/pedidos?success=true&orderId=${orderId}&session_id={CHECKOUT_SESSION_ID}`,
-      customer_email: order.customerEmail,
       metadata: {
         orderId: order.id,
         customerName: order.customerName,
         customerPhone: order.customerPhone
       },
       billing_address_collection: 'auto'
-    })
+    }
+
+    const sanitizedEmail = order.customerEmail?.trim()
+    if (sanitizedEmail) {
+      checkoutSessionParams.customer_email = sanitizedEmail
+    }
+
+    // Crear sesión de checkout
+    const session = await stripe.checkout.sessions.create(checkoutSessionParams)
 
     // Guardar el stripeSessionId en la orden
     await prisma.order.update({
@@ -94,8 +101,22 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Error creating checkout session:', error)
+
+    const rawMessage =
+      error && typeof error === 'object' && 'message' in error
+        ? String((error as { message?: string }).message || 'Internal server error')
+        : 'Internal server error'
+
+    const isInvalidStripeKey = rawMessage.toLowerCase().includes('invalid api key')
+    if (isInvalidStripeKey) {
+      return NextResponse.json(
+        { error: 'Pago online no disponible: STRIPE_SECRET_KEY invalida. Actualiza la clave en .env.local y reinicia el servidor.' },
+        { status: 503 }
+      )
+    }
+
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: rawMessage },
       { status: 500 }
     )
   }

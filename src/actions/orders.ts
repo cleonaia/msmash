@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache'
 
 export interface CreateOrderData {
   customerName: string
-  customerEmail: string
+ customerEmail?: string
   customerPhone: string
   items: Array<{
     productId: string
@@ -22,7 +22,7 @@ export interface CreateOrderData {
  */
 export async function createOrder(data: CreateOrderData) {
   try {
-    if (!data.customerName || !data.customerEmail || !data.customerPhone) {
+      if (!data.customerName || !data.customerPhone) {
       throw new Error('Customer information is required')
     }
 
@@ -30,13 +30,25 @@ export async function createOrder(data: CreateOrderData) {
       throw new Error('Order must have at least one item')
     }
 
-    // Validar que los productos existan
-    const productIds = data.items.map(item => item.productId)
+    // Validar que los productos existan (id o slug) para soportar seeds antiguos
+    const requestedProductIds = Array.from(new Set(data.items.map((item) => item.productId)))
     const products = await prisma.product.findMany({
-      where: { id: { in: productIds } }
+      where: {
+        OR: [
+          { id: { in: requestedProductIds } },
+          { slug: { in: requestedProductIds } },
+        ],
+      },
     })
 
-    if (products.length !== productIds.length) {
+    const productLookup = new Map<string, (typeof products)[number]>()
+    for (const product of products) {
+      productLookup.set(product.id, product)
+      productLookup.set(product.slug, product)
+    }
+
+    const missingProducts = requestedProductIds.filter((id) => !productLookup.has(id))
+    if (missingProducts.length > 0) {
       throw new Error('One or more products not found')
     }
 
@@ -46,7 +58,7 @@ export async function createOrder(data: CreateOrderData) {
     const order = await prisma.order.create({
       data: {
         customerName: data.customerName,
-        customerEmail: data.customerEmail,
+         customerEmail: data.customerEmail || '',
         customerPhone: data.customerPhone,
         totalAmount: toMinorUnits(data.totalAmount),
         deliveryMethod: data.deliveryMethod || 'Retiro en local',
@@ -55,12 +67,20 @@ export async function createOrder(data: CreateOrderData) {
         paymentStatus: 'PENDING', // Pendiente de pago
         paymentMethod: 'STRIPE', // Será pagado por Stripe
         items: {
-          create: data.items.map(item => ({
-            productId: item.productId,
-            quantity: item.quantity,
-            unitPrice: toMinorUnits(item.unitPrice),
-            subtotal: toMinorUnits(item.unitPrice * item.quantity)
-          }))
+          create: data.items.map((item) => {
+            const product = productLookup.get(item.productId)
+            if (!product) {
+              throw new Error('One or more products not found')
+            }
+
+            const unitPrice = product.price
+            return {
+              productId: product.id,
+              quantity: item.quantity,
+              unitPrice,
+              subtotal: unitPrice * item.quantity,
+            }
+          }),
         }
       },
       include: { items: true }
