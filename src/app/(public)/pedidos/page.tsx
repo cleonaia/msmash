@@ -129,7 +129,7 @@ export default function PedidosPage() {
         items: cartItems.map(item => ({
           productId: item.id,
           quantity: item.qty,
-          unitPrice: Math.round(item.price * 100) // Convert to cents
+          unitPrice: item.price // Price is already in EUR
         })),
         totalAmount: total
       });
