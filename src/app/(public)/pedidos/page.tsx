@@ -3,9 +3,11 @@
 import { useState, useMemo, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Minus, Plus, ShoppingBag, Trash2, ArrowRight, CheckCircle, Clock, User, MessageSquare, Flame } from "lucide-react";
+import { Minus, Plus, ShoppingBag, Trash2, ArrowRight, CheckCircle, Clock, User, MessageSquare, Flame, Mail, Loader } from "lucide-react";
 import { menuItems, categories } from "@/features/menu/data/menu";
 import { contactInfo } from "@/config/site";
+import { createOrder } from "@/actions/orders";
+import StripeCheckout from "@/components/stripe/StripeCheckout";
 
 /* ─── Types ─── */
 type CartItem = { id: string; qty: number };
@@ -67,9 +69,14 @@ export default function PedidosPage() {
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [name, setName]   = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [time, setTime]   = useState("");
   const [notes, setNotes] = useState("");
   const [sent, setSent]   = useState(false);
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+  const [orderError, setOrderError] = useState<string | null>(null);
 
   /* Cart helpers */
   const getQty = useCallback((id: string) => cart.find((c) => c.id === id)?.qty ?? 0, [cart]);
@@ -96,7 +103,7 @@ export default function PedidosPage() {
 
   const total     = useMemo(() => cartItems.reduce((s, i) => s + i.subtotal, 0), [cartItems]);
   const totalItems = useMemo(() => cart.reduce((s, i) => s + i.qty, 0), [cart]);
-  const canSend   = cartItems.length > 0 && name.trim().length > 0 && time.length > 0;
+  const canSend   = cartItems.length > 0 && name.trim().length > 0 && phone.trim().length > 0 && email.trim().length > 0 && time.length > 0;
 
   /* Filtered items */
   const filtered = useMemo(() =>
@@ -105,10 +112,37 @@ export default function PedidosPage() {
       : menuItems.filter((m) => m.category === activeCategory),
   [activeCategory]);
 
-  /* Confirm order without automatic WhatsApp */
-  const sendOrder = () => {
-    if (!canSend) return;
-    setSent(true);
+  /* Create order and proceed to payment */
+  const handleCreateOrder = async () => {
+    if (!canSend || isCreatingOrder) return;
+    
+    setIsCreatingOrder(true);
+    setOrderError(null);
+
+    try {
+      const order = await createOrder({
+        customerName: name,
+        customerEmail: email,
+        customerPhone: phone,
+        notes: notes,
+        deliveryMethod: "Retiro en local",
+        items: cartItems.map(item => ({
+          productId: item.id,
+          quantity: item.qty,
+          unitPrice: Math.round(item.price * 100) // Convert to cents
+        })),
+        totalAmount: total
+      });
+
+      setOrderId(order.id);
+      setSent(true);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Error al crear la orden";
+      setOrderError(message);
+      console.error("Error creating order:", error);
+    } finally {
+      setIsCreatingOrder(false);
+    }
   };
 
   const badge: Record<string, string> = {
@@ -347,6 +381,40 @@ export default function PedidosPage() {
                   </div>
                 </div>
 
+                {/* Phone */}
+                <div>
+                  <label className="text-[9px] font-black uppercase tracking-[0.3em] text-smash-cream/35 block mb-1.5">
+                    Teléfono *
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-smash-cream/20" />
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+34 600 123 456"
+                      className="input-dark pl-9"
+                    />
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="text-[9px] font-black uppercase tracking-[0.3em] text-smash-cream/35 block mb-1.5">
+                    Email *
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-smash-cream/20" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="tu@email.com"
+                      className="input-dark pl-9"
+                    />
+                  </div>
+                </div>
+
                 {/* Pickup time */}
                 <div>
                   <label className="text-[9px] font-black uppercase tracking-[0.3em] text-smash-cream/35 block mb-1.5">
@@ -382,38 +450,82 @@ export default function PedidosPage() {
                   </div>
                 </div>
 
-                {/* WhatsApp button */}
-                {sent ? (
-                  <div className="text-center py-4">
-                    <div className="w-14 h-14 rounded-full bg-[#25D366]/15 border border-[#25D366]/30 flex items-center justify-center mx-auto mb-3">
-                      <CheckCircle className="h-7 w-7 text-[#25D366]" />
-                    </div>
-                    <p className="font-display text-2xl text-smash-cream uppercase tracking-wide mb-1">¡Pedido enviado!</p>
-                    <p className="text-xs text-smash-cream/40 mb-4">Te confirmamos por WhatsApp en minutos.</p>
-                    <button onClick={() => { setCart([]); setName(""); setTime(""); setNotes(""); setSent(false); }}
-                      className="text-[10px] font-black uppercase tracking-[0.3em] text-smash-fire underline underline-offset-2">
-                      Nuevo pedido
-                    </button>
-                  </div>
+                {/* Form display logic */}
+                {sent && orderId ? (
+                  <StripeCheckout
+                    orderId={orderId}
+                    onSuccess={() => {
+                      setCart([]);
+                      setName("");
+                      setPhone("");
+                      setEmail("");
+                      setTime("");
+                      setNotes("");
+                      setSent(false);
+                      setOrderId(null);
+                    }}
+                    onCancel={() => {
+                      setSent(false);
+                      setOrderId(null);
+                    }}
+                  />
                 ) : (
-                  <button
-                    onClick={sendOrder}
-                    disabled={!canSend}
-                    className={`w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm uppercase tracking-[0.15em] transition-all duration-200
-                      ${canSend
-                        ? "bg-green-600 text-white hover:bg-green-700 shadow-[0_4px_24px_rgba(37,211,102,0.35)]"
-                        : "bg-smash-smoke border border-smash-border text-smash-cream/25 cursor-not-allowed"}`}
-                  >
-                    <CheckCircle className="h-5 w-5" />
-                    {canSend ? "Confirmar Pedido" : "Completa tu pedido"}
-                  </button>
-                )}
+                  <>
+                    {/* Email field - only show before checkout */}
+                    <div>
+                      <label className="text-[9px] font-black uppercase tracking-[0.3em] text-smash-cream/35 block mb-1.5">
+                        Email *
+                      </label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-smash-cream/20" />
+                        <input
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="tu@email.com"
+                          className="input-dark pl-9"
+                        />
+                      </div>
+                    </div>
 
-                {!canSend && cartItems.length > 0 && (
-                  <p className="text-[10px] text-smash-cream/25 text-center leading-relaxed">
-                    {!name.trim() && "• Añade tu nombre  "}
-                    {!time && "• Elige hora de recogida"}
-                  </p>
+                    {/* Error message */}
+                    {orderError && (
+                      <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                        <p className="text-sm text-red-400">{orderError}</p>
+                      </div>
+                    )}
+
+                    {/* Confirm button */}
+                    <button
+                      onClick={handleCreateOrder}
+                      disabled={!canSend || isCreatingOrder}
+                      className={`w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm uppercase tracking-[0.15em] transition-all duration-200
+                        ${canSend && !isCreatingOrder
+                          ? "bg-green-600 text-white hover:bg-green-700 shadow-[0_4px_24px_rgba(37,211,102,0.35)]"
+                          : "bg-smash-smoke border border-smash-border text-smash-cream/25 cursor-not-allowed"}`}
+                    >
+                      {isCreatingOrder ? (
+                        <>
+                          <Loader className="h-5 w-5 animate-spin" />
+                          Creando pedido...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="h-5 w-5" />
+                          Continuar al Pago
+                        </>
+                      )}
+                    </button>
+
+                    {!canSend && cartItems.length > 0 && (
+                      <p className="text-[10px] text-smash-cream/25 text-center leading-relaxed">
+                        {!name.trim() && "• Añade tu nombre  "}
+                        {!phone.trim() && "• Añade tu teléfono  "}
+                        {!email.trim() && "• Añade tu email  "}
+                        {!time && "• Elige hora de recogida"}
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
 
