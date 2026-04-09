@@ -15,6 +15,7 @@ export interface CreateOrderData {
   totalAmount: number
   notes?: string
   deliveryMethod?: string
+  paymentMethod?: 'STRIPE' | 'LOCAL'
 }
 
 /**
@@ -24,6 +25,10 @@ export async function createOrder(data: CreateOrderData) {
   try {
       if (!data.customerName || !data.customerPhone) {
       throw new Error('Customer information is required')
+    }
+
+    if (data.paymentMethod && !['STRIPE', 'LOCAL'].includes(data.paymentMethod)) {
+      throw new Error('Invalid payment method')
     }
 
     if (!data.items || data.items.length === 0) {
@@ -65,7 +70,7 @@ export async function createOrder(data: CreateOrderData) {
         notes: data.notes,
         status: 'PENDING',
         paymentStatus: 'PENDING', // Pendiente de pago
-        paymentMethod: 'STRIPE', // Será pagado por Stripe
+        paymentMethod: data.paymentMethod || 'STRIPE',
         items: {
           create: data.items.map((item) => {
             const product = productLookup.get(item.productId)

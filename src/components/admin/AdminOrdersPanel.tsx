@@ -24,6 +24,7 @@ interface Order {
   customerPhone: string
   status: string
   paymentStatus: string
+  paymentMethod: string
   totalAmount: number
   items: Array<{ product: { name: string }; quantity: number }>
   createdAt: Date
@@ -289,6 +290,20 @@ export default function AdminOrdersPanel() {
     return <RefreshCw className="w-4 h-4 text-gray-600" />
   }
 
+  const getPaymentMethodLabel = (method: string) => {
+    if (method === 'STRIPE') {
+      return {
+        label: 'Tarjeta',
+        classes: 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/30'
+      }
+    }
+
+    return {
+      label: 'Efectivo',
+      classes: 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+    }
+  }
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'PENDING':
@@ -504,9 +519,17 @@ export default function AdminOrdersPanel() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-col gap-1.5">
+                          <span
+                            className={`inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${getPaymentMethodLabel(order.paymentMethod).classes}`}
+                          >
+                            {getPaymentMethodLabel(order.paymentMethod).label}
+                          </span>
+
+                          <div className="flex items-center gap-2">
                           {getPaymentStatusIcon(order.paymentStatus)}
                           <span className="text-sm text-slate-300">{order.paymentStatus}</span>
+                          </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-400">

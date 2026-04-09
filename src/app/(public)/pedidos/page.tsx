@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Minus, Plus, ShoppingBag, Trash2, ArrowRight, CheckCircle, Clock, User, MessageSquare, Flame, Mail, Loader } from "lucide-react";
+import { Minus, Plus, ShoppingBag, Trash2, ArrowRight, CheckCircle, Clock, User, MessageSquare, Flame, Mail, Loader, CreditCard, Banknote } from "lucide-react";
 import { menuItems, categories } from "@/features/menu/data/menu";
 import { contactInfo } from "@/config/site";
 import { createOrder } from "@/actions/orders";
@@ -75,6 +75,8 @@ export default function PedidosPage() {
   const [notes, setNotes] = useState("");
   const [sent, setSent]   = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"STRIPE" | "LOCAL">("STRIPE");
+  const [cashOrderConfirmed, setCashOrderConfirmed] = useState(false);
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [orderError, setOrderError] = useState<string | null>(null);
 
@@ -126,6 +128,7 @@ export default function PedidosPage() {
         customerPhone: phone,
         notes: notes,
         deliveryMethod: "Retiro en local",
+        paymentMethod,
         items: cartItems.map(item => ({
           productId: item.id,
           quantity: item.qty,
@@ -135,7 +138,13 @@ export default function PedidosPage() {
       });
 
       setOrderId(order.id);
-      setSent(true);
+      if (paymentMethod === "STRIPE") {
+        setSent(true);
+        setCashOrderConfirmed(false);
+      } else {
+        setCashOrderConfirmed(true);
+        setSent(false);
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Error al crear la orden";
       setOrderError(message);
@@ -416,6 +425,44 @@ export default function PedidosPage() {
                   </div>
                 </div>
 
+                {/* Payment method */}
+                <div>
+                  <label className="text-[9px] font-black uppercase tracking-[0.3em] text-smash-cream/35 block mb-2">
+                    Método de pago *
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("STRIPE")}
+                      className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-[10px] font-black uppercase tracking-[0.15em] transition-all ${
+                        paymentMethod === "STRIPE"
+                          ? "border-smash-fire bg-smash-fire/15 text-smash-fire"
+                          : "border-smash-border bg-smash-smoke text-smash-cream/50 hover:border-smash-fire/40"
+                      }`}
+                    >
+                      <CreditCard className="h-4 w-4" />
+                      Tarjeta
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("LOCAL")}
+                      className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-[10px] font-black uppercase tracking-[0.15em] transition-all ${
+                        paymentMethod === "LOCAL"
+                          ? "border-green-500 bg-green-500/10 text-green-400"
+                          : "border-smash-border bg-smash-smoke text-smash-cream/50 hover:border-green-500/40"
+                      }`}
+                    >
+                      <Banknote className="h-4 w-4" />
+                      Efectivo
+                    </button>
+                  </div>
+                  <p className="mt-2 text-[11px] leading-relaxed text-smash-cream/45">
+                    {paymentMethod === "STRIPE"
+                      ? "Pago online seguro con tarjeta antes de confirmar el pedido."
+                      : "Pagas en efectivo al recoger tu pedido en el local."}
+                  </p>
+                </div>
+
                 {/* Notes */}
                 <div>
                   <label className="text-[9px] font-black uppercase tracking-[0.3em] text-smash-cream/35 block mb-1.5">
@@ -446,12 +493,41 @@ export default function PedidosPage() {
                       setNotes("");
                       setSent(false);
                       setOrderId(null);
+                      setCashOrderConfirmed(false);
+                      setPaymentMethod("STRIPE");
                     }}
                     onCancel={() => {
                       setSent(false);
                       setOrderId(null);
                     }}
                   />
+                ) : cashOrderConfirmed && orderId ? (
+                  <div className="space-y-3 rounded-xl border border-green-500/30 bg-green-500/10 p-4">
+                    <div className="flex items-center gap-2 text-green-400">
+                      <CheckCircle className="h-5 w-5" />
+                      <p className="text-sm font-semibold">Pedido confirmado</p>
+                    </div>
+                    <p className="text-sm text-smash-cream/75 leading-relaxed">
+                      Tu pedido #{orderId.slice(-8)} quedó registrado para pagar en efectivo al recoger.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCart([]);
+                        setName("");
+                        setPhone("");
+                        setEmail("");
+                        setTime("");
+                        setNotes("");
+                        setOrderId(null);
+                        setCashOrderConfirmed(false);
+                        setPaymentMethod("STRIPE");
+                      }}
+                      className="w-full rounded-xl bg-green-600 py-3 text-xs font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-green-700"
+                    >
+                      Hacer otro pedido
+                    </button>
+                  </div>
                 ) : (
                     <>
                       {/* Mostrar Email opcional solo si hay items */}
@@ -497,7 +573,7 @@ export default function PedidosPage() {
                       ) : (
                         <>
                           <CheckCircle className="h-5 w-5" />
-                          Continuar al Pago
+                          {paymentMethod === "STRIPE" ? "Continuar al pago" : "Confirmar pedido"}
                         </>
                       )}
                     </button>
