@@ -1,6 +1,7 @@
 'use server'
 
 import twilio from 'twilio'
+import { contactInfo } from '@/config/site'
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID
 const authToken = process.env.TWILIO_AUTH_TOKEN
@@ -66,6 +67,50 @@ Gracias por tu pedido 🙌
     return { success: true, messageId: result.sid }
   } catch (error) {
     console.error('❌ Error enviando WhatsApp:', error)
+    return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' }
+  }
+}
+
+/**
+ * Envía aviso interno al restaurante con el resumen de un pedido confirmado
+ */
+export async function sendWhatsAppRestaurantOrderAlert(orderData: {
+  orderId: string
+  customerName: string
+  totalAmount: number
+  items: Array<{ name: string; quantity: number }>
+  deliveryMethod: string
+}) {
+  if (!client || !twilioPhone) {
+    console.warn('⚠️ WhatsApp restaurant alert not configured')
+    return { success: false, error: 'WhatsApp no configurado' }
+  }
+
+  try {
+    const formattedPhone = contactInfo.whatsappNumber.startsWith('+')
+      ? contactInfo.whatsappNumber
+      : `+34${contactInfo.whatsappNumber.replace(/\D/g, '')}`
+
+    const message = [
+      `📣 *Nuevo pedido confirmado #${orderData.orderId.slice(-8)}*`,
+      `👤 Cliente: ${orderData.customerName}`,
+      `💰 Total: €${(orderData.totalAmount / 100).toFixed(2)}`,
+      `🛵 Entrega: ${orderData.deliveryMethod}`,
+      '',
+      '*Productos:*',
+      ...orderData.items.map((item) => `• ${item.name} × ${item.quantity}`)
+    ].join('\n')
+
+    const result = await client.messages.create({
+      from: `whatsapp:${twilioPhone}`,
+      to: `whatsapp:${formattedPhone}`,
+      body: message
+    })
+
+    console.log(`✅ WhatsApp restaurante enviado a ${formattedPhone}:`, result.sid)
+    return { success: true, messageId: result.sid }
+  } catch (error) {
+    console.error('❌ Error enviando WhatsApp al restaurante:', error)
     return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' }
   }
 }
