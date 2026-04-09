@@ -107,6 +107,20 @@ Esta integracion imprime tickets de pedido desde la web (no procesa cobros con t
    - Sin cabecera/pie
    - Margenes minimos
 
+## Prueba rapida en 2 minutos (Mac)
+
+1. Entra al panel admin en tu Mac.
+2. En la seccion `Impresion automatica TPV`, pulsa `Ticket de prueba`.
+3. Se abrira la ruta: `/admin/orders/print/test-ticket?autoprint=1`.
+4. Debe saltar automaticamente el dialogo de impresion.
+5. Selecciona tu impresora termica 80mm y verifica:
+   - Papel 80mm.
+   - Escala 100%.
+   - Sin cabecera/pie.
+6. Imprime y comprueba que el ticket sale completo y legible.
+
+Si la prueba sale bien, ya puedes imprimir pedidos reales desde `Imprimir ticket` en cada orden.
+
 ## LAN opcional
 
 Si conectas por LAN, instala la impresora por IP en el sistema operativo.

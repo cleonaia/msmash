@@ -435,6 +435,13 @@ export default function AdminOrdersPanel() {
               </div>
 
               <div className="flex items-center gap-3">
+                <button
+                  onClick={() => window.open('/admin/orders/print/test-ticket?autoprint=1', '_blank', 'noopener,noreferrer')}
+                  className="rounded-lg border border-emerald-500/50 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-300 transition-colors hover:bg-emerald-500/20"
+                >
+                  Ticket de prueba
+                </button>
+
                 <label className="text-xs text-slate-300">Modo</label>
                 <select
                   value={autoPrintMode}

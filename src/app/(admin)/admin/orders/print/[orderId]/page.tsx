@@ -10,6 +10,62 @@ type PrintOrderPageProps = {
   }
 }
 
+type TicketOrder = {
+  id: string
+  createdAt: Date
+  customerName: string
+  customerPhone: string
+  deliveryMethod: string
+  paymentStatus: string
+  paymentMethod: string
+  status: string
+  totalAmount: number
+  notes: string | null
+  items: Array<{
+    id: string
+    quantity: number
+    subtotal: number
+    product: {
+      name: string
+    }
+  }>
+}
+
+function getTestOrder(): TicketOrder {
+  return {
+    id: 'test-ticket-0001',
+    createdAt: new Date(),
+    customerName: 'Cliente de prueba',
+    customerPhone: '600 000 000',
+    deliveryMethod: 'Retiro en local',
+    paymentStatus: 'PENDING',
+    paymentMethod: 'LOCAL',
+    status: 'PENDING',
+    totalAmount: 2890,
+    notes: 'Ticket de prueba TPV (puedes ignorarlo).',
+    items: [
+      {
+        id: 'item-test-1',
+        quantity: 1,
+        subtotal: 1290,
+        product: { name: 'The M Smash' }
+      },
+      {
+        id: 'item-test-2',
+        quantity: 1,
+        subtotal: 400,
+        product: { name: 'Patatas' }
+      },
+      {
+        id: 'item-test-3',
+        quantity: 1,
+        subtotal: 1200,
+        product: { name: 'Combo bebida' }
+      }
+    ]
+  }
+}
+
 function formatMoney(cents: number) {
   return `${(cents / 100).toFixed(2)} EUR`
 }
@@ -25,14 +81,18 @@ function formatDate(date: Date | string) {
 }
 
 export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
-  const order = await prisma.order.findUnique({
-    where: { id: params.orderId },
-    include: {
-      items: {
-        include: { product: true }
-      }
-    }
-  })
+  const isTestTicket = params.orderId === 'test-ticket'
+
+  const order: TicketOrder | null = isTestTicket
+    ? getTestOrder()
+    : await prisma.order.findUnique({
+        where: { id: params.orderId },
+        include: {
+          items: {
+            include: { product: true }
+          }
+        }
+      })
 
   if (!order) {
     notFound()
@@ -88,7 +148,7 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
       <section className="ticket mx-auto w-[360px] max-w-full border border-dashed border-gray-400 p-3 font-mono text-[12px]">
         <header className="text-center">
           <p className="text-[16px] font-bold">M SMASH BURGER</p>
-          <p>Ticket de pedido</p>
+          <p>{isTestTicket ? 'Ticket de prueba' : 'Ticket de pedido'}</p>
           <p>{formatDate(order.createdAt)}</p>
           <p>Pedido: #{order.id.slice(-8)}</p>
         </header>
@@ -99,7 +159,7 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
           <p>Cliente: {order.customerName}</p>
           <p>Telefono: {order.customerPhone}</p>
           <p>Entrega: {order.deliveryMethod}</p>
-          <p>Pago: {order.paymentStatus}</p>
+          <p>Pago: {order.paymentStatus} ({order.paymentMethod === 'STRIPE' ? 'Tarjeta' : 'Efectivo'})</p>
           <p>Estado: {order.status}</p>
         </div>
 
