@@ -491,7 +491,7 @@ export default function PedidosPage() {
                       }`}
                     >
                       <CreditCard className="h-4 w-4" />
-                      Tarjeta
+                      Tarjeta / Apple Pay
                     </button>
                     <button
                       type="button"
@@ -510,7 +510,7 @@ export default function PedidosPage() {
                     {!isCardPaymentAvailable
                       ? "Pago con tarjeta temporalmente no disponible. Puedes finalizar en efectivo sin problema."
                       : paymentMethod === "STRIPE"
-                      ? "Pago online seguro con tarjeta antes de confirmar el pedido."
+                      ? "Pago online seguro con tarjeta o Apple Pay (en iPhone/Mac Safari compatibles)."
                       : "Pagas en efectivo al recoger tu pedido en el local."}
                   </p>
                 </div>

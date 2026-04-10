@@ -26,7 +26,7 @@ function formatDate(date: Date | string) {
 }
 
 function getReviewsQrUrl() {
-  return `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(siteConfig.googleReviewsUrl)}&color=111111&bgcolor=ffffff&qzone=1`
+  return `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(siteConfig.googleMapsUrl)}&color=111111&bgcolor=ffffff&qzone=1`
 }
 
 export default async function PrintDeliveryOrderPage({ params }: PrintDeliveryOrderPageProps) {
