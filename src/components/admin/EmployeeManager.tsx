@@ -390,51 +390,51 @@ export function EmployeeManager() {
       {/* Modal/Form */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <h3 className="text-lg font-bold mb-4">
+          <div className="bg-gray-800 rounded-lg max-w-md w-full p-6 border border-gray-700">
+            <h3 className="text-lg font-bold mb-4 text-white">
               {formType === 'create' ? 'Nuevo Empleado' : 'Editar Empleado'}
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Nombre</label>
+                <label className="block text-sm font-medium text-gray-300">Nombre</label>
                 <input
                   type="text"
                   value={formData.firstName}
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                  className="w-full mt-1 px-3 py-2 border border-gray-600 bg-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-white focus:border-transparent"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Apellido</label>
+                <label className="block text-sm font-medium text-gray-300">Apellido</label>
                 <input
                   type="text"
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                  className="w-full mt-1 px-3 py-2 border border-gray-600 bg-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-white focus:border-transparent"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Email</label>
+                <label className="block text-sm font-medium text-gray-300">Email</label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                  className="w-full mt-1 px-3 py-2 border border-gray-600 bg-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-white focus:border-transparent"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Rol</label>
+                <label className="block text-sm font-medium text-gray-300">Rol</label>
                 <select
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                  className="w-full mt-1 px-3 py-2 border border-gray-600 bg-gray-700 rounded-lg text-white focus:ring-2 focus:ring-white focus:border-transparent"
                 >
                   {ROLES.map((role) => (
                     <option key={role.value} value={role.value}>
@@ -445,51 +445,51 @@ export function EmployeeManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Salario Mensual</label>
+                <label className="block text-sm font-medium text-gray-300">Salario Mensual</label>
                 <div className="flex items-center mt-1">
-                  <span className="text-gray-600">€</span>
+                  <span className="text-gray-400">€</span>
                   <input
                     type="number"
                     value={formData.salary}
                     onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
-                    className="flex-1 ml-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                    className="flex-1 ml-2 px-3 py-2 border border-gray-600 bg-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-white focus:border-transparent"
                     min="0"
                   />
                 </div>
               </div>
 
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
-                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-700">Acceso trabajador</p>
+              <div className="rounded-lg border border-gray-700 bg-gray-700 p-3">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-300">Acceso trabajador</p>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Usuario login</label>
+                    <label className="block text-sm font-medium text-gray-300">Usuario login</label>
                     <input
                       type="text"
                       value={formData.loginUsername}
                       onChange={(e) => setFormData({ ...formData, loginUsername: e.target.value })}
-                      className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                      className="w-full mt-1 px-3 py-2 border border-gray-600 bg-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-white focus:border-transparent"
                       placeholder="ej: juan.caja"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Codigo de acceso</label>
+                    <label className="block text-sm font-medium text-gray-300">Codigo de acceso</label>
                     <input
                       type="text"
                       value={formData.accessCode}
                       onChange={(e) => setFormData({ ...formData, accessCode: e.target.value.toUpperCase() })}
-                      className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                      className="w-full mt-1 px-3 py-2 border border-gray-600 bg-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-white focus:border-transparent"
                       placeholder="ej: MSM-1024"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Contrasena</label>
+                    <label className="block text-sm font-medium text-gray-300">Contrasena</label>
                     <input
                       type="password"
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                      className="w-full mt-1 px-3 py-2 border border-gray-600 bg-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-white focus:border-transparent"
                       placeholder={formType === 'edit' ? 'Dejar vacio para mantener actual' : 'Contrasena inicial'}
                     />
                   </div>
@@ -607,8 +607,8 @@ export function EmployeeManager() {
 
       {showAccessModal && accessEmployee && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-6">
-            <h3 className="text-lg font-bold text-gray-900">Acceso y jornadas · {accessEmployee.firstName} {accessEmployee.lastName}</h3>
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-gray-800 p-6 border border-gray-700">
+            <h3 className="text-lg font-bold text-white">Acceso y jornadas · {accessEmployee.firstName} {accessEmployee.lastName}</h3>
 
             <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
               <input
@@ -616,40 +616,40 @@ export function EmployeeManager() {
                 value={accessData.username}
                 onChange={(e) => setAccessData({ ...accessData, username: e.target.value })}
                 placeholder="Usuario login"
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                className="rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white placeholder-gray-400"
               />
               <input
                 type="password"
                 value={accessData.password}
                 onChange={(e) => setAccessData({ ...accessData, password: e.target.value })}
                 placeholder="Nueva contrasena (opcional)"
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                className="rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white placeholder-gray-400"
               />
               <input
                 type="text"
                 value={accessData.code}
                 onChange={(e) => setAccessData({ ...accessData, code: e.target.value.toUpperCase() })}
                 placeholder="Codigo acceso"
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                className="rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white placeholder-gray-400"
               />
             </div>
 
             <button
               onClick={handleSaveAccess}
               disabled={submitting}
-              className="mt-3 rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+              className="mt-3 rounded-lg bg-white px-4 py-2 text-sm font-medium text-black hover:bg-gray-100 disabled:opacity-50"
             >
               Guardar credenciales
             </button>
 
-            <div className="mt-6 rounded-lg border border-gray-200 p-4">
-              <h4 className="text-sm font-semibold text-gray-900">Registrar jornada</h4>
+            <div className="mt-6 rounded-lg border border-gray-700 bg-gray-700 p-4">
+              <h4 className="text-sm font-semibold text-white">Registrar jornada</h4>
               <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-4">
                 <input
                   type="date"
                   value={workLogData.date}
                   onChange={(e) => setWorkLogData({ ...workLogData, date: e.target.value })}
-                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                  className="rounded-lg border border-gray-600 bg-gray-600 px-3 py-2 text-sm text-white"
                 />
                 <input
                   type="number"
@@ -657,14 +657,14 @@ export function EmployeeManager() {
                   step="0.5"
                   value={workLogData.hours}
                   onChange={(e) => setWorkLogData({ ...workLogData, hours: e.target.value })}
-                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                  className="rounded-lg border border-gray-600 bg-gray-600 px-3 py-2 text-sm text-white placeholder-gray-400"
                   placeholder="Horas"
                 />
                 <input
                   type="text"
                   value={workLogData.note}
                   onChange={(e) => setWorkLogData({ ...workLogData, note: e.target.value })}
-                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm md:col-span-2"
+                  className="rounded-lg border border-gray-600 bg-gray-600 px-3 py-2 text-sm text-white placeholder-gray-400 md:col-span-2"
                   placeholder="Nota (turno noche, extra, etc.)"
                 />
               </div>
@@ -679,18 +679,18 @@ export function EmployeeManager() {
 
               <div className="mt-4 max-h-56 overflow-y-auto">
                 {(accessEmployee.workLogs || []).length === 0 ? (
-                  <p className="text-sm text-gray-500">Sin jornadas registradas.</p>
+                  <p className="text-sm text-gray-400">Sin jornadas registradas.</p>
                 ) : (
                   <div className="space-y-2">
                     {(accessEmployee.workLogs || []).map((log) => (
-                      <div key={log.id} className="flex items-center justify-between rounded border border-gray-200 px-3 py-2 text-sm">
+                      <div key={log.id} className="flex items-center justify-between rounded border border-gray-600 bg-gray-600 px-3 py-2 text-sm">
                         <div>
-                          <p className="font-medium text-gray-900">{new Date(log.date).toLocaleDateString('es-ES')} · {log.hours}h</p>
-                          {log.note ? <p className="text-xs text-gray-500">{log.note}</p> : null}
+                          <p className="font-medium text-white">{new Date(log.date).toLocaleDateString('es-ES')} · {log.hours}h</p>
+                          {log.note ? <p className="text-xs text-gray-300">{log.note}</p> : null}
                         </div>
                         <button
                           onClick={() => handleDeleteWorkLog(log.id)}
-                          className="text-red-600 hover:text-red-800"
+                          className="text-red-400 hover:text-red-300"
                         >
                           Eliminar
                         </button>
@@ -704,7 +704,7 @@ export function EmployeeManager() {
             <div className="mt-6 flex justify-end">
               <button
                 onClick={() => setShowAccessModal(false)}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                className="rounded-lg border border-gray-600 px-4 py-2 text-sm text-white hover:bg-gray-700"
               >
                 Cerrar
               </button>
