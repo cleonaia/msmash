@@ -227,14 +227,27 @@ export async function getAllInvoices() {
 }
 
 /**
- * Obtiene órdenes pagadas que aún no tienen factura
+ * Obtiene órdenes sin factura listas para facturar
  */
 export async function getPaidOrdersWithoutInvoice() {
   try {
     return await prisma.order.findMany({
       where: {
-        paymentStatus: 'COMPLETED',
-        invoice: null
+        invoice: null,
+        status: {
+          notIn: ['CANCELED', 'REFUNDED']
+        },
+        OR: [
+          {
+            paymentStatus: 'COMPLETED'
+          },
+          {
+            paymentMethod: 'LOCAL',
+            status: {
+              in: ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'COMPLETED']
+            }
+          }
+        ]
       },
       include: {
         items: {
