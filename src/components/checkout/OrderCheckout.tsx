@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { ShoppingBag, Check, AlertCircle, Loader } from 'lucide-react'
+import { ShoppingBag, Check, AlertCircle, Loader, CreditCard, Banknote } from 'lucide-react'
 import StripeCheckout from '@/components/stripe/StripeCheckout'
-import { createOrder } from '@/actions/orders'
+import { createOrder, confirmCashOrder } from '@/actions/orders'
 
 interface OrderFormStepProps {
   title: string
@@ -70,6 +70,7 @@ export default function OrderCheckout({
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [orderId, setOrderId] = useState<string | null>(null)
+  const [paymentMethod, setPaymentMethod] = useState<'CARD' | 'CASH'>('CARD')
 
   const [formData, setFormData] = useState({
     name: '',
@@ -137,6 +138,32 @@ export default function OrderCheckout({
     setCurrentStep('complete')
     if (orderId && onOrderComplete) {
       onOrderComplete(orderId)
+    }
+  }
+
+  const handleCashPayment = async () => {
+    if (!orderId) return
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const result = await confirmCashOrder(orderId)
+
+      if (!result.success) {
+        throw new Error(result.error)
+      }
+
+      setCurrentStep('complete')
+      if (onOrderComplete) {
+        onOrderComplete(orderId)
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'No se pudo confirmar el pedido en efectivo'
+      setError(message)
+      console.error('Error confirming cash order:', err)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -276,30 +303,101 @@ export default function OrderCheckout({
         <OrderFormStep
           stepNumber={2}
           title="Pago seguro"
-          description="Paga con tarjeta de crédito/débito"
+          description="Elige cómo quieres pagar tu pedido"
           isActive={currentStep === 'payment'}
           isCompleted={currentStep === 'complete'}
         >
-          {orderId && (
-            <StripeCheckout
-              orderId={orderId}
-              onSuccess={handlePaymentSuccess}
-            />
-          )}
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setPaymentMethod('CARD')}
+                className={`rounded-lg border px-4 py-3 text-left transition-all ${
+                  paymentMethod === 'CARD'
+                    ? 'border-smash-fire bg-smash-fire/10 text-smash-cream'
+                    : 'border-smash-border bg-smash-black text-smash-cream/80 hover:border-smash-fire/50'
+                }`}
+              >
+                <div className="flex items-center gap-2 font-semibold">
+                  <CreditCard className="w-4 h-4" />
+                  Tarjeta
+                </div>
+                <p className="mt-1 text-xs text-smash-cream/60">Visa, Mastercard, débito o crédito</p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPaymentMethod('CASH')}
+                className={`rounded-lg border px-4 py-3 text-left transition-all ${
+                  paymentMethod === 'CASH'
+                    ? 'border-smash-fire bg-smash-fire/10 text-smash-cream'
+                    : 'border-smash-border bg-smash-black text-smash-cream/80 hover:border-smash-fire/50'
+                }`}
+              >
+                <div className="flex items-center gap-2 font-semibold">
+                  <Banknote className="w-4 h-4" />
+                  Efectivo
+                </div>
+                <p className="mt-1 text-xs text-smash-cream/60">Pagas al retirar o al recibir tu pedido</p>
+              </button>
+            </div>
+
+            {paymentMethod === 'CARD' && orderId && (
+              <StripeCheckout
+                orderId={orderId}
+                onSuccess={handlePaymentSuccess}
+              />
+            )}
+
+            {paymentMethod === 'CASH' && (
+              <div className="rounded-lg border border-smash-border bg-smash-black p-4 space-y-3">
+                <p className="text-sm text-smash-cream/80">
+                  Has elegido pago en efectivo. Confirmaremos el pedido para que puedas pagarlo cuando lo recibas.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleCashPayment}
+                  disabled={isLoading}
+                  className="w-full py-3 bg-smash-fire text-white font-semibold rounded-lg hover:bg-smash-fire/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader className="w-4 h-4 animate-spin" />
+                      Confirmando pedido...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4" />
+                      Confirmar pedido en efectivo
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+
+            {error && (
+              <div className="flex items-center gap-2 p-4 bg-smash-fire/10 border border-smash-fire/30 rounded-lg">
+                <AlertCircle className="w-5 h-5 text-smash-fire flex-shrink-0 mt-0.5" />
+                <p className="text-smash-fire text-sm">{error}</p>
+              </div>
+            )}
+          </div>
         </OrderFormStep>
 
         {/* Step 3: Complete */}
         <OrderFormStep
           stepNumber={3}
           title="¡Pedido confirmado!"
-          description={`Tu pedido #${orderId?.slice(-8)} ha sido confirmado y pagado`}
+          description={`Tu pedido #${orderId?.slice(-8)} ha sido confirmado${paymentMethod === 'CARD' ? ' y pagado' : ''}`}
           isActive={currentStep === 'complete'}
           isCompleted={currentStep === 'complete'}
         >
           <div className="p-6 bg-smash-black border border-smash-sky/30 rounded-lg space-y-4">
             <div className="flex items-center gap-3 text-smash-sky">
               <Check className="w-6 h-6" />
-              <span className="font-semibold">Pago procesado exitosamente</span>
+              <span className="font-semibold">
+                {paymentMethod === 'CARD' ? 'Pago procesado exitosamente' : 'Pago en efectivo seleccionado'}
+              </span>
             </div>
 
             <p className="text-smash-cream/70 text-sm">

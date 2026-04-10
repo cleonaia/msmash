@@ -186,7 +186,10 @@ export default function PedidosPage() {
         setSent(false);
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Error al crear la orden";
+      const rawMessage = error instanceof Error ? error.message : "Error al crear la orden";
+      const message = rawMessage.includes('Server Components render')
+        ? 'Error temporal al crear el pedido. Intenta de nuevo en unos segundos. Si persiste, recarga la pagina.'
+        : rawMessage;
       setOrderError(message);
       console.error("Error creating order:", error);
     } finally {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { getDeliveryOrders } from '@/actions/delivery'
+import { getAllOrders } from '@/actions/orders'
 
 interface DeliveryOrder {
   id: string
@@ -23,6 +24,18 @@ interface DeliveryOrder {
   cancelledAt?: Date | string | null
 }
 
+interface LocalOrder {
+  id: string
+  status: string
+  customerName: string
+  customerPhone: string
+  paymentMethod: string
+  paymentStatus: string
+  totalAmount: number
+  createdAt: Date | string
+  items: Array<{ product?: { name: string }; quantity: number; unitPrice: number }>
+}
+
 type SortField = 'date' | 'price' | 'status' | 'platform'
 type SortOrder = 'asc' | 'desc'
 
@@ -32,13 +45,29 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; icon: string }> 
   prepared: { bg: 'bg-amber-50', text: 'text-amber-700', icon: '👨‍🍳' },
   collected: { bg: 'bg-purple-50', text: 'text-purple-700', icon: '📦' },
   delivered: { bg: 'bg-green-50', text: 'text-green-700', icon: '✓' },
-  cancelled: { bg: 'bg-red-50', text: 'text-red-700', icon: '✗' }
+  cancelled: { bg: 'bg-red-50', text: 'text-red-700', icon: '✗' },
+  PENDING: { bg: 'bg-yellow-50', text: 'text-yellow-700', icon: '⏳' },
+  CONFIRMED: { bg: 'bg-blue-50', text: 'text-blue-700', icon: '✅' },
+  PREPARING: { bg: 'bg-amber-50', text: 'text-amber-700', icon: '👨‍🍳' },
+  READY: { bg: 'bg-indigo-50', text: 'text-indigo-700', icon: '📦' },
+  COMPLETED: { bg: 'bg-green-50', text: 'text-green-700', icon: '✓' },
+  CANCELED: { bg: 'bg-red-50', text: 'text-red-700', icon: '✗' },
+  REFUNDED: { bg: 'bg-gray-100', text: 'text-gray-700', icon: '↩' }
 }
 
 const PLATFORM_COLORS: Record<string, string> = {
   UBEREATS: 'bg-black text-white',
   GLOVO: 'bg-yellow-400 text-black',
-  DELIVEROO: 'bg-cyan-400 text-black'
+  DELIVEROO: 'bg-cyan-400 text-black',
+  WEB: 'bg-emerald-600 text-white'
+}
+
+function isCompletedStatus(status: string) {
+  return status === 'delivered' || status === 'COMPLETED'
+}
+
+function isClosedStatus(status: string) {
+  return ['delivered', 'cancelled', 'COMPLETED', 'CANCELED', 'REFUNDED'].includes(status)
 }
 
 export function OrderManagement() {
@@ -64,8 +93,37 @@ export function OrderManagement() {
   const loadOrders = useCallback(async () => {
     try {
       setLoading(true)
-      const data = await getDeliveryOrders(30)
-      const nextOrders = (data as DeliveryOrder[]) || []
+      const [deliveryData, localData] = await Promise.all([
+        getDeliveryOrders(30),
+        getAllOrders()
+      ])
+
+      const deliveryOrders = (deliveryData as DeliveryOrder[]) || []
+      const websiteOrders: DeliveryOrder[] = ((localData as LocalOrder[]) || []).map((order) => ({
+        id: order.id,
+        platform: 'WEB',
+        externalOrderId: `WEB-${order.id.slice(-8).toUpperCase()}`,
+        merchantId: 'WEB',
+        status: order.status,
+        customerName: order.customerName,
+        customerPhone: order.customerPhone,
+        deliveryAddress: null,
+        items: order.items.map((item) => ({
+          name: item.product?.name || 'Producto',
+          quantity: item.quantity,
+          price: (item.unitPrice || 0) / 100
+        })),
+        totalPrice: order.totalAmount / 100,
+        currency: 'EUR',
+        receivedAt: order.createdAt,
+        acceptedAt: null,
+        preparedAt: null,
+        collectedAt: null,
+        deliveredAt: null,
+        cancelledAt: null
+      }))
+
+      const nextOrders = [...websiteOrders, ...deliveryOrders]
       const currentIds = new Set(nextOrders.map((o) => o.id))
 
       if (initializedOrdersRef.current && autoPrintEnabledRef.current) {
@@ -183,10 +241,17 @@ export function OrderManagement() {
 
   const stats = {
     total: orders.length,
-    active: orders.filter((o) => !['delivered', 'cancelled'].includes(o.status)).length,
-    completed: orders.filter((o) => o.status === 'delivered').length,
+    active: orders.filter((o) => !isClosedStatus(o.status)).length,
+    completed: orders.filter((o) => isCompletedStatus(o.status)).length,
     revenue: orders.reduce((sum, o) => sum + o.totalPrice, 0)
   }
+
+  const activePrintOrder = orders.find((o) => o.id === activePrintOrderId)
+  const activePrintSrc = activePrintOrderId
+    ? activePrintOrder?.platform === 'WEB'
+      ? `/admin/orders/print/${activePrintOrderId}?autoprint=1&ts=${Date.now()}`
+      : `/admin/delivery/print/${activePrintOrderId}?autoprint=1&ts=${Date.now()}`
+    : null
 
   if (loading) {
     return <div className="animate-pulse bg-gray-200 h-96 rounded-lg" />
@@ -238,6 +303,7 @@ export function OrderManagement() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
             >
               <option value="all">Todas</option>
+              <option value="WEB">Web</option>
               <option value="UBEREATS">UberEats</option>
               <option value="GLOVO">Glovo</option>
               <option value="DELIVEROO">Deliveroo</option>
@@ -253,6 +319,12 @@ export function OrderManagement() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
             >
               <option value="all">Todos</option>
+              <option value="PENDING">⏳ Pendiente</option>
+              <option value="CONFIRMED">✅ Confirmado</option>
+              <option value="PREPARING">👨‍🍳 Preparando</option>
+              <option value="READY">📦 Listo</option>
+              <option value="COMPLETED">✓ Completado</option>
+              <option value="CANCELED">✗ Cancelado</option>
               <option value="received">📥 Recibida</option>
               <option value="accepted">✅ Aceptada</option>
               <option value="prepared">👨‍🍳 Preparando</option>
@@ -418,7 +490,13 @@ export function OrderManagement() {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
                       <button
-                        onClick={() => window.open(`/admin/delivery/print/${order.id}`, '_blank', 'noopener,noreferrer')}
+                        onClick={() => {
+                          const printUrl =
+                            order.platform === 'WEB'
+                              ? `/admin/orders/print/${order.id}`
+                              : `/admin/delivery/print/${order.id}`
+                          window.open(printUrl, '_blank', 'noopener,noreferrer')
+                        }}
                         className="rounded bg-black px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800"
                       >
                         Imprimir
@@ -469,7 +547,13 @@ export function OrderManagement() {
                   </div>
 
                   <button
-                    onClick={() => window.open(`/admin/delivery/print/${order.id}`, '_blank', 'noopener,noreferrer')}
+                    onClick={() => {
+                      const printUrl =
+                        order.platform === 'WEB'
+                          ? `/admin/orders/print/${order.id}`
+                          : `/admin/delivery/print/${order.id}`
+                      window.open(printUrl, '_blank', 'noopener,noreferrer')
+                    }}
                     className="w-full rounded bg-black px-3 py-2 text-xs font-semibold text-white hover:bg-gray-800"
                   >
                     Imprimir ticket
@@ -490,7 +574,7 @@ export function OrderManagement() {
       {activePrintOrderId && (
         <iframe
           title="auto-print-delivery-ticket"
-          src={`/admin/delivery/print/${activePrintOrderId}?autoprint=1&ts=${Date.now()}`}
+          src={activePrintSrc ?? ''}
           className="hidden"
         />
       )}

@@ -201,3 +201,33 @@ export async function updateOrderStatus(
     throw error
   }
 }
+
+/**
+ * Confirma una orden con pago en efectivo
+ */
+export async function confirmCashOrder(orderId: string): Promise<CreateOrderResult> {
+  try {
+    const order = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        paymentMethod: 'LOCAL',
+        paymentStatus: 'PENDING',
+        status: 'CONFIRMED'
+      }
+    })
+
+    revalidatePath('/pedidos')
+    return {
+      success: true,
+      order: {
+        id: order.id
+      }
+    }
+  } catch (error) {
+    console.error('Error confirming cash order:', error)
+    return {
+      success: false,
+      error: 'No se pudo confirmar el pago en efectivo. Intentalo de nuevo.'
+    }
+  }
+}
