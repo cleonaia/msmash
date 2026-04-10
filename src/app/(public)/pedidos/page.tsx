@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus, ShoppingBag, Trash2, ArrowRight, CheckCircle, Clock, User, MessageSquare, Flame, Mail, Loader, CreditCard, Banknote } from "lucide-react";
@@ -76,9 +76,39 @@ export default function PedidosPage() {
   const [sent, setSent]   = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<"STRIPE" | "LOCAL">("STRIPE");
+  const [isCardPaymentAvailable, setIsCardPaymentAvailable] = useState(true);
   const [cashOrderConfirmed, setCashOrderConfirmed] = useState(false);
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [orderError, setOrderError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadStripeStatus = async () => {
+      try {
+        const response = await fetch('/api/stripe/status', { cache: 'no-store' });
+        const data = await response.json();
+        const enabled = !!data?.enabled;
+
+        if (cancelled) return;
+
+        setIsCardPaymentAvailable(enabled);
+        if (!enabled) {
+          setPaymentMethod('LOCAL');
+        }
+      } catch {
+        if (cancelled) return;
+        setIsCardPaymentAvailable(false);
+        setPaymentMethod('LOCAL');
+      }
+    };
+
+    void loadStripeStatus();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   /* Cart helpers */
   const getQty = useCallback((id: string) => cart.find((c) => c.id === id)?.qty ?? 0, [cart]);
@@ -117,6 +147,12 @@ export default function PedidosPage() {
   /* Create order and proceed to payment */
   const handleCreateOrder = async () => {
     if (!canSend || isCreatingOrder) return;
+
+    if (paymentMethod === 'STRIPE' && !isCardPaymentAvailable) {
+      setOrderError('Pago con tarjeta no disponible ahora. Selecciona Efectivo para continuar.');
+      setPaymentMethod('LOCAL');
+      return;
+    }
     
     setIsCreatingOrder(true);
     setOrderError(null);
@@ -433,9 +469,16 @@ export default function PedidosPage() {
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
-                      onClick={() => setPaymentMethod("STRIPE")}
+                      onClick={() => {
+                        if (isCardPaymentAvailable) {
+                          setPaymentMethod("STRIPE");
+                        }
+                      }}
+                      disabled={!isCardPaymentAvailable}
                       className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-[10px] font-black uppercase tracking-[0.15em] transition-all ${
-                        paymentMethod === "STRIPE"
+                        !isCardPaymentAvailable
+                          ? "cursor-not-allowed border-slate-700 bg-slate-800/70 text-slate-500"
+                          : paymentMethod === "STRIPE"
                           ? "border-smash-fire bg-smash-fire/15 text-smash-fire"
                           : "border-smash-border bg-smash-smoke text-smash-cream/50 hover:border-smash-fire/40"
                       }`}
@@ -457,7 +500,9 @@ export default function PedidosPage() {
                     </button>
                   </div>
                   <p className="mt-2 text-[11px] leading-relaxed text-smash-cream/45">
-                    {paymentMethod === "STRIPE"
+                    {!isCardPaymentAvailable
+                      ? "Pago con tarjeta temporalmente no disponible. Puedes finalizar en efectivo sin problema."
+                      : paymentMethod === "STRIPE"
                       ? "Pago online seguro con tarjeta antes de confirmar el pedido."
                       : "Pagas en efectivo al recoger tu pedido en el local."}
                   </p>
@@ -494,7 +539,7 @@ export default function PedidosPage() {
                       setSent(false);
                       setOrderId(null);
                       setCashOrderConfirmed(false);
-                      setPaymentMethod("STRIPE");
+                      setPaymentMethod(isCardPaymentAvailable ? "STRIPE" : "LOCAL");
                     }}
                     onCancel={() => {
                       setSent(false);
@@ -521,7 +566,7 @@ export default function PedidosPage() {
                         setNotes("");
                         setOrderId(null);
                         setCashOrderConfirmed(false);
-                        setPaymentMethod("STRIPE");
+                        setPaymentMethod(isCardPaymentAvailable ? "STRIPE" : "LOCAL");
                       }}
                       className="w-full rounded-xl bg-green-600 py-3 text-xs font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-green-700"
                     >
