@@ -5,9 +5,9 @@ import AutoPrint from './AutoPrint'
 export const dynamic = 'force-dynamic'
 
 type PrintDeliveryOrderPageProps = {
-  params: {
+  params: Promise<{
     deliveryOrderId: string
-  }
+  }>
 }
 
 function formatMoney(cents: number) {
@@ -25,8 +25,9 @@ function formatDate(date: Date | string) {
 }
 
 export default async function PrintDeliveryOrderPage({ params }: PrintDeliveryOrderPageProps) {
+  const { deliveryOrderId } = await params
   const order = await prisma.deliveryOrder.findUnique({
-    where: { id: params.deliveryOrderId }
+    where: { id: deliveryOrderId }
   })
 
   if (!order) {
@@ -80,19 +81,8 @@ export default async function PrintDeliveryOrderPage({ params }: PrintDeliveryOr
         }
       `}</style>
 
-      <div className="no-print mb-4 flex gap-2">
-        <button
-          onClick={() => window.print()}
-          className="rounded bg-black px-4 py-2 text-sm font-semibold text-white"
-        >
-          Imprimir ahora
-        </button>
-        <button
-          onClick={() => window.close()}
-          className="rounded border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700"
-        >
-          Cerrar
-        </button>
+      <div className="no-print mb-4 rounded border border-gray-300 px-4 py-2 text-sm text-gray-700">
+        Esta vista se imprime automaticamente. Usa el dialogo de impresion del navegador.
       </div>
 
       <section className="ticket mx-auto w-[360px] max-w-full border border-dashed border-gray-400 p-3 font-mono text-[12px]">
