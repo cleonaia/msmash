@@ -29,6 +29,22 @@ type TicketOrder = {
   }>
 }
 
+function getFallbackOrder(orderId: string): TicketOrder {
+  return {
+    id: orderId,
+    createdAt: new Date(),
+    customerName: 'Cliente',
+    customerPhone: '-',
+    deliveryMethod: 'Retiro en local',
+    paymentStatus: 'PENDING',
+    paymentMethod: 'LOCAL',
+    status: 'PENDING',
+    totalAmount: 0,
+    notes: 'No se pudieron cargar todos los datos del ticket. Imprime este comprobante y revisa el pedido en admin.',
+    items: []
+  }
+}
+
 function getTestOrder(): TicketOrder {
   return {
     id: 'test-ticket-0001',
@@ -82,40 +98,51 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
   const { orderId } = await params
   const isTestTicket = orderId === 'test-ticket'
 
-  const order = isTestTicket
-    ? getTestOrder()
-    : await prisma.order.findUnique({
-        where: { id: orderId },
-        include: {
-          items: true
-        }
-      })
+  let order: TicketOrder
+  let printableItems: Array<{ id: string; quantity: number; subtotal: number; productName: string }> = []
 
-  if (!order) {
-    notFound()
+  try {
+    const baseOrder = isTestTicket
+      ? getTestOrder()
+      : await prisma.order.findUnique({
+          where: { id: orderId },
+          include: {
+            items: true
+          }
+        })
+
+    if (!baseOrder) {
+      notFound()
+    }
+
+    order = baseOrder as TicketOrder
+
+    const productIds = Array.from(
+      new Set((baseOrder.items || []).map((item: any) => item.productId).filter(Boolean))
+    )
+    const products = productIds.length
+      ? await prisma.product.findMany({
+          where: { id: { in: productIds } },
+          select: { id: true, name: true }
+        })
+      : []
+
+    const productNames = new Map(products.map((product) => [product.id, product.name]))
+
+    printableItems = (baseOrder.items || []).map((item: any) => ({
+      id: item.id,
+      quantity: item.quantity,
+      subtotal: item.subtotal,
+      productName:
+        item.productName ||
+        productNames.get(item.productId) ||
+        (item.productId ? `Producto ${String(item.productId).slice(-6)}` : 'Producto')
+    }))
+  } catch (error) {
+    console.error('Print order page failed, using fallback ticket:', error)
+    order = getFallbackOrder(orderId)
+    printableItems = order.items
   }
-
-  const productIds = Array.from(
-    new Set(order.items.map((item: any) => item.productId).filter(Boolean))
-  )
-  const products = productIds.length
-    ? await prisma.product.findMany({
-        where: { id: { in: productIds } },
-        select: { id: true, name: true }
-      })
-    : []
-
-  const productNames = new Map(products.map((product) => [product.id, product.name]))
-
-  const printableItems = order.items.map((item: any) => ({
-    id: item.id,
-    quantity: item.quantity,
-    subtotal: item.subtotal,
-    productName:
-      item.productName ||
-      productNames.get(item.productId) ||
-      (item.productId ? `Producto ${String(item.productId).slice(-6)}` : 'Producto')
-  }))
 
   const itemCount = printableItems.reduce((acc, item) => acc + item.quantity, 0)
 
