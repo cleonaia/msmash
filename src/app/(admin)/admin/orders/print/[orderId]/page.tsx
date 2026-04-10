@@ -99,6 +99,17 @@ function getReviewsQrUrl() {
   return `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(siteConfig.googleReviewsUrl)}&color=111111&bgcolor=ffffff&qzone=1`
 }
 
+function getPaymentMethodLabel(method: string) {
+  const normalized = String(method || '').toUpperCase()
+
+  if (normalized === 'STRIPE') return 'Tarjeta online'
+  if (normalized === 'DATAPHONE' || normalized === 'TPV' || normalized === 'CARD_PRESENT') return 'Datáfono'
+  if (normalized === 'CASH') return 'Efectivo'
+  if (normalized === 'LOCAL') return 'Pago local'
+
+  return normalized || 'Sin definir'
+}
+
 export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
   const { orderId } = await params
   const isTestTicket = orderId === 'test-ticket'
@@ -201,7 +212,7 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
           <p>Cliente: {order.customerName}</p>
           <p>Telefono: {order.customerPhone}</p>
           <p>Entrega: {order.deliveryMethod}</p>
-          <p>Pago: {order.paymentStatus} ({order.paymentMethod === 'STRIPE' ? 'Tarjeta' : 'Efectivo'})</p>
+          <p>Pago: {order.paymentStatus} ({getPaymentMethodLabel(order.paymentMethod)})</p>
           <p>Estado: {order.status}</p>
         </div>
 

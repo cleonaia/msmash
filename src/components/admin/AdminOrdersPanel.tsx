@@ -306,16 +306,39 @@ export default function AdminOrdersPanel() {
   }
 
   const getPaymentMethodLabel = (method: string) => {
-    if (method === 'STRIPE') {
+    const normalized = String(method || '').toUpperCase()
+
+    if (normalized === 'STRIPE') {
       return {
-        label: 'Tarjeta',
+        label: 'Tarjeta online',
         classes: 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/30'
       }
     }
 
+    if (normalized === 'DATAPHONE' || normalized === 'TPV' || normalized === 'CARD_PRESENT') {
+      return {
+        label: 'Datáfono',
+        classes: 'bg-blue-500/10 text-blue-300 border border-blue-500/30'
+      }
+    }
+
+    if (normalized === 'CASH') {
+      return {
+        label: 'Efectivo',
+        classes: 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+      }
+    }
+
+    if (normalized === 'LOCAL') {
+      return {
+        label: 'Pago local',
+        classes: 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
+      }
+    }
+
     return {
-      label: 'Efectivo',
-      classes: 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+      label: normalized || 'Sin definir',
+      classes: 'bg-slate-500/10 text-slate-300 border border-slate-500/30'
     }
   }
 
