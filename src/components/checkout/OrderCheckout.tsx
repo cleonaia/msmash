@@ -104,7 +104,7 @@ export default function OrderCheckout({
       }
 
       // Crear orden
-      const order = await createOrder({
+      const result = await createOrder({
         customerName: formData.name,
         customerEmail: formData.email,
         customerPhone: formData.phone,
@@ -118,7 +118,11 @@ export default function OrderCheckout({
         totalAmount
       })
 
-      setOrderId(order.id)
+      if (!result.success) {
+        throw new Error(result.error)
+      }
+
+      setOrderId(result.order.id)
       setCurrentStep('payment')
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Error al crear la orden'

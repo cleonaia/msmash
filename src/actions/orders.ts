@@ -18,21 +18,42 @@ export interface CreateOrderData {
   paymentMethod?: 'STRIPE' | 'LOCAL'
 }
 
+export type CreateOrderResult =
+  | {
+      success: true
+      order: {
+        id: string
+      }
+    }
+  | {
+      success: false
+      error: string
+    }
+
 /**
  * Crea una nueva orden en la base de datos
  */
-export async function createOrder(data: CreateOrderData) {
+export async function createOrder(data: CreateOrderData): Promise<CreateOrderResult> {
   try {
-      if (!data.customerName || !data.customerPhone) {
-      throw new Error('Customer information is required')
+    if (!data.customerName || !data.customerPhone) {
+      return {
+        success: false,
+        error: 'Faltan datos del cliente'
+      }
     }
 
     if (data.paymentMethod && !['STRIPE', 'LOCAL'].includes(data.paymentMethod)) {
-      throw new Error('Invalid payment method')
+      return {
+        success: false,
+        error: 'Metodo de pago no valido'
+      }
     }
 
     if (!data.items || data.items.length === 0) {
-      throw new Error('Order must have at least one item')
+      return {
+        success: false,
+        error: 'El pedido no tiene productos'
+      }
     }
 
     // Validar que los productos existan (id o slug) para soportar seeds antiguos
@@ -54,7 +75,10 @@ export async function createOrder(data: CreateOrderData) {
 
     const missingProducts = requestedProductIds.filter((id) => !productLookup.has(id))
     if (missingProducts.length > 0) {
-      throw new Error('One or more products not found')
+      return {
+        success: false,
+        error: 'Uno o mas productos no estan disponibles ahora'
+      }
     }
 
     const toMinorUnits = (value: number) => Math.round(value * 100)
@@ -92,10 +116,18 @@ export async function createOrder(data: CreateOrderData) {
     })
 
     revalidatePath('/pedidos')
-    return order
+    return {
+      success: true,
+      order: {
+        id: order.id
+      }
+    }
   } catch (error) {
     console.error('Error creating order:', error)
-    throw error
+    return {
+      success: false,
+      error: 'No se pudo crear el pedido. Intentalo de nuevo en unos segundos.'
+    }
   }
 }
 

@@ -158,7 +158,7 @@ export default function PedidosPage() {
     setOrderError(null);
 
     try {
-      const order = await createOrder({
+      const result = await createOrder({
         customerName: name,
         customerEmail: email,
         customerPhone: phone,
@@ -173,7 +173,11 @@ export default function PedidosPage() {
         totalAmount: total
       });
 
-      setOrderId(order.id);
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      setOrderId(result.order.id);
       if (paymentMethod === "STRIPE") {
         setSent(true);
         setCashOrderConfirmed(false);
