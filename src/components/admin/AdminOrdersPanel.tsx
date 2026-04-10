@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { getAllOrders, updateOrderStatus } from '@/actions/orders'
+import { deleteOrderByAdmin, getAllOrders, updateOrderStatus } from '@/actions/orders'
 import { processRefund } from '@/actions/refunds'
 import { createInvoiceFromOrder } from '@/actions/invoices'
 import {
@@ -285,6 +285,21 @@ export default function AdminOrdersPanel() {
     } catch (error) {
       console.error('Error creating invoice:', error)
       alert('No se pudo generar la factura')
+    }
+  }
+
+  const handleDeleteOrder = async (order: Order) => {
+    const confirmed = window.confirm(`¿Eliminar pedido #${order.id.slice(-8)} de ${order.customerName}? Esta acción no se puede deshacer.`)
+    if (!confirmed) return
+
+    try {
+      await deleteOrderByAdmin(order.id)
+      setOpenDropdown(null)
+      await fetchOrders()
+      alert('Pedido eliminado correctamente')
+    } catch (error) {
+      console.error('Error deleting order:', error)
+      alert('No se pudo eliminar el pedido')
     }
   }
 
@@ -652,6 +667,13 @@ export default function AdminOrdersPanel() {
                                   className="w-full px-4 py-2 text-sm text-blue-400 hover:bg-slate-600 text-left border-t border-slate-600"
                                 >
                                   📧 Enviar email
+                                </button>
+
+                                <button
+                                  onClick={() => handleDeleteOrder(order)}
+                                  className="w-full px-4 py-2 text-sm text-red-400 hover:bg-slate-600 text-left border-t border-slate-600"
+                                >
+                                  🗑 Eliminar pedido
                                 </button>
                               </div>
                             </div>

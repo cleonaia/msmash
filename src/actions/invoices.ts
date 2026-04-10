@@ -274,3 +274,17 @@ export async function getPaidOrdersWithoutInvoice() {
     throw error
   }
 }
+
+export async function deleteInvoiceByAdmin(invoiceId: string) {
+  try {
+    await prisma.invoice.delete({
+      where: { id: invoiceId }
+    })
+
+    revalidatePath('/admin')
+    return { success: true }
+  } catch (error) {
+    console.error('Error deleting invoice:', error)
+    throw error
+  }
+}

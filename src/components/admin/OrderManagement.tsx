@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { getDeliveryOrders } from '@/actions/delivery'
-import { getAllOrders } from '@/actions/orders'
+import { deleteOrderByAdmin, getAllOrders } from '@/actions/orders'
 
 interface DeliveryOrder {
   id: string
@@ -254,6 +254,20 @@ export function OrderManagement() {
     revenue: orders.reduce((sum, o) => sum + o.totalPrice, 0)
   }
 
+  const handleDeleteOrder = async (order: DeliveryOrder) => {
+    const confirmed = window.confirm(`¿Eliminar la orden ${order.externalOrderId} de ${order.customerName}?`)
+    if (!confirmed) return
+
+    try {
+      await deleteOrderByAdmin(order.id)
+      await loadOrders()
+      alert('Orden eliminada correctamente')
+    } catch (error) {
+      console.error('Error deleting order:', error)
+      alert('No se pudo eliminar la orden')
+    }
+  }
+
   if (loading) {
     return <div className="animate-pulse bg-gray-200 h-96 rounded-lg" />
   }
@@ -502,6 +516,12 @@ export function OrderManagement() {
                       >
                         Imprimir
                       </button>
+                      <button
+                        onClick={() => handleDeleteOrder(order)}
+                        className="ml-2 rounded bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700"
+                      >
+                        Eliminar
+                      </button>
                     </td>
                   </tr>
                 )
@@ -558,6 +578,12 @@ export function OrderManagement() {
                     className="w-full rounded bg-black px-3 py-2 text-xs font-semibold text-white hover:bg-gray-800"
                   >
                     Imprimir ticket
+                  </button>
+                  <button
+                    onClick={() => handleDeleteOrder(order)}
+                    className="w-full rounded bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700"
+                  >
+                    Eliminar pedido
                   </button>
                 </div>
               </div>

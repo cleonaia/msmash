@@ -465,3 +465,49 @@ export async function createCounterOrder(data: CreateCounterOrderData): Promise<
     }
   }
 }
+
+export async function deleteOrderByAdmin(orderId: string) {
+  try {
+    await prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id: orderId },
+        include: {
+          items: true,
+          invoice: { select: { id: true } }
+        }
+      })
+
+      if (!order) {
+        throw new Error('Orden no encontrada')
+      }
+
+      for (const item of order.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: {
+              increment: item.quantity
+            }
+          }
+        })
+      }
+
+      if (order.invoice?.id) {
+        await tx.invoice.delete({
+          where: { id: order.invoice.id }
+        })
+      }
+
+      await tx.order.delete({
+        where: { id: orderId }
+      })
+    })
+
+    revalidatePath('/admin')
+    revalidatePath('/pedidos')
+    return { success: true }
+  } catch (error) {
+    console.error('Error deleting order:', error)
+    throw error
+  }
+}

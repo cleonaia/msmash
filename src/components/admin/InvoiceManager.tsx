@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
   createInvoiceFromOrder,
+  deleteInvoiceByAdmin,
   getAllInvoices,
   getPaidOrdersWithoutInvoice,
   markInvoiceAsPaid,
@@ -94,6 +95,23 @@ export function InvoiceManager() {
     } catch (error) {
       console.error('Error marking invoice as paid:', error)
       alert('No se pudo actualizar la factura')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDeleteInvoice = async (invoiceId: string, invoiceNumber: string) => {
+    const confirmed = window.confirm(`¿Eliminar la factura ${invoiceNumber}? Esta acción no se puede deshacer.`)
+    if (!confirmed) return
+
+    try {
+      setLoading(true)
+      await deleteInvoiceByAdmin(invoiceId)
+      await loadData()
+      alert('Factura eliminada')
+    } catch (error) {
+      console.error('Error deleting invoice:', error)
+      alert('No se pudo eliminar la factura')
     } finally {
       setLoading(false)
     }
@@ -230,6 +248,13 @@ export function InvoiceManager() {
                             Marcar pagada
                           </button>
                         )}
+                        <button
+                          onClick={() => handleDeleteInvoice(invoice.id, invoice.invoiceNumber)}
+                          disabled={loading}
+                          className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs hover:bg-red-700 disabled:opacity-50"
+                        >
+                          Eliminar
+                        </button>
                       </div>
                     </td>
                   </tr>
