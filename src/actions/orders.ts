@@ -414,7 +414,7 @@ export async function createCounterOrder(data: CreateCounterOrderData): Promise<
     })
 
     const notes = data.notes?.trim()
-    const counterNotes = notes ? `[COMANDERO] ${notes}` : '[COMANDERO] Pedido creado desde admin'
+    const counterNotes = notes ? `[COMANDERO] ${notes}` : '[COMANDERO] Pedido creado en el local'
 
     const order = await prisma.$transaction(async (tx) => {
       const createdOrder = await tx.order.create({
