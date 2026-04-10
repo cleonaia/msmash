@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { siteConfig } from '@/config/site'
 import AutoPrint from './AutoPrint'
 
 export const dynamic = 'force-dynamic'
@@ -22,6 +23,10 @@ function formatDate(date: Date | string) {
     hour: '2-digit',
     minute: '2-digit'
   })
+}
+
+function getReviewsQrUrl() {
+  return `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(siteConfig.googleReviewsUrl)}&color=111111&bgcolor=ffffff&qzone=1`
 }
 
 export default async function PrintDeliveryOrderPage({ params }: PrintDeliveryOrderPageProps) {
@@ -134,6 +139,16 @@ export default async function PrintDeliveryOrderPage({ params }: PrintDeliveryOr
 
         <footer className="text-center">
           <p>Gracias por tu compra</p>
+          <p className="mt-1 text-[11px]">Haznos una reseña en Google</p>
+          <div className="mt-2 flex justify-center">
+            <img
+              src={getReviewsQrUrl()}
+              alt="QR reseñas Google"
+              width={70}
+              height={70}
+              className="border border-dashed border-black p-1"
+            />
+          </div>
           <p>www.msmashburger.page</p>
         </footer>
       </section>

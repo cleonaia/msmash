@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { getAllOrders, updateOrderStatus } from '@/actions/orders'
 import { processRefund } from '@/actions/refunds'
+import { createInvoiceFromOrder } from '@/actions/invoices'
 import {
   ShoppingBag,
   Clock,
@@ -27,6 +28,7 @@ interface Order {
   paymentMethod: string
   totalAmount: number
   items: Array<{ product: { name: string }; quantity: number }>
+  invoice?: { id: string } | null
   createdAt: Date
   deliveryMethod: string
 }
@@ -267,6 +269,19 @@ export default function AdminOrdersPanel() {
       alert('Error al procesar el reembolso')
     } finally {
       setRefundLoading(false)
+    }
+  }
+
+  const handleGenerateInvoice = async (order: Order) => {
+    try {
+      const invoice = await createInvoiceFromOrder(order.id)
+      alert('Factura generada correctamente')
+      window.open(`/api/invoices/${invoice.id}/download`, '_blank', 'noopener,noreferrer')
+      setOpenDropdown(null)
+      fetchOrders()
+    } catch (error) {
+      console.error('Error creating invoice:', error)
+      alert('No se pudo generar la factura')
     }
   }
 
@@ -593,6 +608,15 @@ export default function AdminOrdersPanel() {
                                   <Printer className="w-4 h-4" />
                                   Imprimir ticket
                                 </button>
+
+                                {!order.invoice && order.status !== 'CANCELED' && order.status !== 'REFUNDED' && (
+                                  <button
+                                    onClick={() => handleGenerateInvoice(order)}
+                                    className="w-full px-4 py-2 text-sm text-amber-300 hover:bg-slate-600 text-left border-t border-slate-600"
+                                  >
+                                    🧾 Generar factura
+                                  </button>
+                                )}
 
                                 <button
                                   onClick={() => {

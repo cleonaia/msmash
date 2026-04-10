@@ -14,6 +14,15 @@ export async function createInvoiceFromOrder(
   customerTaxId?: string
 ) {
   try {
+    const existingInvoice = await prisma.invoice.findUnique({
+      where: { orderId },
+      include: { items: true }
+    })
+
+    if (existingInvoice) {
+      return existingInvoice
+    }
+
     const order = await prisma.order.findUnique({
       where: { id: orderId },
       include: {
@@ -29,6 +38,10 @@ export async function createInvoiceFromOrder(
 
     if (!order) {
       throw new Error(`Orden ${orderId} no encontrada`)
+    }
+
+    if (order.status === 'CANCELED' || order.status === 'REFUNDED') {
+      throw new Error('No se puede generar factura para una orden cancelada o reembolsada')
     }
 
     // Calcular impuestos con IVA incluido en precio:

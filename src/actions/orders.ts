@@ -263,7 +263,10 @@ export async function getAllOrders(filter?: {
 
     const orders = await prisma.order.findMany({
       where,
-      include: { items: { include: { product: true } } },
+      include: {
+        items: { include: { product: true } },
+        invoice: { select: { id: true } }
+      },
       orderBy: { createdAt: 'desc' }
     })
 
