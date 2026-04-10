@@ -15,6 +15,7 @@ function formatPrice(value: number) {
 
 export function AdminComandero() {
   const [activeCategory, setActiveCategory] = useState<string>('all')
+  const [search, setSearch] = useState('')
   const [cart, setCart] = useState<CartMap>({})
   const [customerName, setCustomerName] = useState('Cliente local')
   const [customerPhone, setCustomerPhone] = useState('000000000')
@@ -24,9 +25,17 @@ export function AdminComandero() {
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
 
   const filteredItems = useMemo(() => {
-    if (activeCategory === 'all') return menuItems
-    return menuItems.filter((item) => item.category === activeCategory)
-  }, [activeCategory])
+    const byCategory = activeCategory === 'all'
+      ? menuItems
+      : menuItems.filter((item) => item.category === activeCategory)
+
+    const normalizedSearch = search.trim().toLowerCase()
+    if (!normalizedSearch) return byCategory
+
+    return byCategory.filter((item) => {
+      return item.name.toLowerCase().includes(normalizedSearch) || item.description.toLowerCase().includes(normalizedSearch)
+    })
+  }, [activeCategory, search])
 
   const cartItems = useMemo(() => {
     return Object.entries(cart)
@@ -46,6 +55,15 @@ export function AdminComandero() {
   }, [cart])
 
   const total = useMemo(() => cartItems.reduce((sum, item) => sum + item.subtotal, 0), [cartItems])
+  const totalItems = useMemo(() => cartItems.reduce((sum, item) => sum + item.qty, 0), [cartItems])
+
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: menuItems.length }
+    for (const category of categories) {
+      counts[category.id] = menuItems.filter((item) => item.category === category.id).length
+    }
+    return counts
+  }, [])
 
   const setQty = (id: string, qty: number) => {
     setCart((prev) => {
@@ -98,7 +116,7 @@ export function AdminComandero() {
       <div className="rounded-lg border border-gray-200 bg-white p-5">
         <h3 className="text-lg font-bold text-gray-900">Comandero de Mostrador</h3>
         <p className="mt-1 text-sm text-gray-600">
-          Crea pedidos manuales para clientes en local y lanza ticket al instante.
+          Catálogo completo con precios actualizados. Crea pedidos de mostrador y lanza ticket al instante.
         </p>
       </div>
 
@@ -111,7 +129,7 @@ export function AdminComandero() {
                 activeCategory === 'all' ? 'bg-black text-white' : 'bg-gray-100 text-gray-700'
               }`}
             >
-              Todo
+              Todo ({categoryCounts.all})
             </button>
             {categories.map((category) => (
               <button
@@ -121,19 +139,29 @@ export function AdminComandero() {
                   activeCategory === category.id ? 'bg-black text-white' : 'bg-gray-100 text-gray-700'
                 }`}
               >
-                {category.label}
+                {category.label} ({categoryCounts[category.id]})
               </button>
             ))}
           </div>
 
-          <div className="space-y-2">
+          <div className="mb-4">
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar producto por nombre o descripción"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div className="max-h-[620px] space-y-2 overflow-y-auto pr-1">
             {filteredItems.map((item) => {
               const qty = cart[item.id] || 0
               return (
                 <div key={item.id} className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
-                  <div>
+                  <div className="min-w-0 pr-4">
                     <p className="font-medium text-gray-900">{item.name}</p>
-                    <p className="text-sm text-gray-500">{formatPrice(item.price)}</p>
+                    <p className="line-clamp-1 text-xs text-gray-500">{item.description}</p>
+                    <p className="mt-1 text-sm text-gray-600">{formatPrice(item.price)}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
@@ -153,6 +181,12 @@ export function AdminComandero() {
                 </div>
               )
             })}
+
+            {filteredItems.length === 0 && (
+              <div className="rounded-lg border border-dashed border-gray-300 p-5 text-center text-sm text-gray-500">
+                No hay productos para ese filtro.
+              </div>
+            )}
           </div>
         </div>
 
@@ -203,7 +237,7 @@ export function AdminComandero() {
           </div>
 
           <div className="mt-4 flex items-center justify-between">
-            <span className="text-sm text-gray-600">Total</span>
+            <span className="text-sm text-gray-600">Total ({totalItems} uds)</span>
             <span className="text-xl font-bold text-gray-900">{formatPrice(total)}</span>
           </div>
 

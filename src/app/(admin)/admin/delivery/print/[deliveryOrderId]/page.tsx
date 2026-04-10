@@ -138,8 +138,8 @@ export default async function PrintDeliveryOrderPage({ params }: PrintDeliveryOr
         <hr className="my-2 border-t border-dashed border-black" />
 
         <footer className="text-center">
-          <p>Gracias por tu compra</p>
-          <p className="mt-1 text-[11px]">Haznos una reseña en Google</p>
+          <p>!Gracias por tu compra!</p>
+          <p className="mt-1 text-[11px]">¿Te gustó? Déjanos tu reseña</p>
           <div className="mt-2 flex justify-center">
             <img
               src={getReviewsQrUrl()}
