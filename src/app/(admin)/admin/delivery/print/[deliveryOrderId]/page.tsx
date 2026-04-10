@@ -26,7 +26,8 @@ function formatDate(date: Date | string) {
 }
 
 function getReviewsQrUrl() {
-  return `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(siteConfig.googleMapsUrl)}&color=111111&bgcolor=ffffff&qzone=1`
+  const shortLocationUrl = 'https://www.msmashburger.page/go/maps'
+  return `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(shortLocationUrl)}&color=000000&bgcolor=ffffff&qzone=3`
 }
 
 export default async function PrintDeliveryOrderPage({ params }: PrintDeliveryOrderPageProps) {
@@ -144,9 +145,9 @@ export default async function PrintDeliveryOrderPage({ params }: PrintDeliveryOr
             <img
               src={getReviewsQrUrl()}
               alt="QR reseñas Google"
-              width={70}
-              height={70}
-              className="border border-dashed border-black p-1"
+              width={110}
+              height={110}
+              className="bg-white p-1"
             />
           </div>
           <p>www.msmashburger.page</p>
