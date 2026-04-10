@@ -57,7 +57,7 @@ export function AdminComandero() {
   const total = useMemo(() => cartItems.reduce((sum, item) => sum + item.subtotal, 0), [cartItems])
   const totalItems = useMemo(() => cartItems.reduce((sum, item) => sum + item.qty, 0), [cartItems])
   const normalizedPhone = customerPhone.replace(/\D/g, '')
-  const isCustomerDataValid = customerName.trim().length >= 2 && normalizedPhone.length >= 9
+  const isCustomerDataValid = customerName.trim().length >= 2
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = { all: menuItems.length }
@@ -119,21 +119,21 @@ export function AdminComandero() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-lg border border-gray-200 bg-white p-5">
-        <h3 className="text-lg font-bold text-gray-900">Comandero de Mostrador</h3>
-        <p className="mt-1 text-sm text-gray-600">
+    <div className="space-y-6 bg-gray-900 p-6 rounded-lg">
+      <div className="rounded-lg bg-gray-800 border border-gray-700 p-5">
+        <h3 className="text-lg font-bold text-white">Comandero de Mostrador</h3>
+        <p className="mt-1 text-sm text-gray-300">
           Catálogo completo con precios actualizados. Crea pedidos de mostrador y lanza ticket al instante.
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
-        <div className="rounded-lg border border-gray-200 bg-white p-5">
+        <div className="rounded-lg bg-gray-800 border border-gray-700 p-5">
           <div className="mb-4 flex flex-wrap gap-2">
             <button
               onClick={() => setActiveCategory('all')}
               className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-                activeCategory === 'all' ? 'bg-black text-white' : 'bg-gray-100 text-gray-700'
+                activeCategory === 'all' ? 'bg-white text-black' : 'bg-gray-700 text-gray-200'
               }`}
             >
               Todo ({categoryCounts.all})
@@ -143,7 +143,7 @@ export function AdminComandero() {
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
                 className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-                  activeCategory === category.id ? 'bg-black text-white' : 'bg-gray-100 text-gray-700'
+                  activeCategory === category.id ? 'bg-white text-black' : 'bg-gray-700 text-gray-200'
                 }`}
               >
                 {category.label} ({categoryCounts[category.id]})
@@ -156,7 +156,7 @@ export function AdminComandero() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar producto por nombre o descripción"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white placeholder-gray-400"
             />
           </div>
 
@@ -164,23 +164,23 @@ export function AdminComandero() {
             {filteredItems.map((item) => {
               const qty = cart[item.id] || 0
               return (
-                <div key={item.id} className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
+                <div key={item.id} className="flex items-center justify-between rounded-lg border border-gray-700 bg-gray-700 p-3">
                   <div className="min-w-0 pr-4">
-                    <p className="font-medium text-gray-900">{item.name}</p>
-                    <p className="line-clamp-1 text-xs text-gray-500">{item.description}</p>
-                    <p className="mt-1 text-sm text-gray-600">{formatPrice(item.price)}</p>
+                    <p className="font-medium text-white">{item.name}</p>
+                    <p className="line-clamp-1 text-xs text-gray-400">{item.description}</p>
+                    <p className="mt-1 text-sm text-gray-300">{formatPrice(item.price)}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setQty(item.id, qty - 1)}
-                      className="h-7 w-7 rounded-full border border-gray-300 text-gray-700"
+                      className="h-7 w-7 rounded-full border border-gray-600 text-white hover:bg-gray-600"
                     >
                       -
                     </button>
-                    <span className="w-6 text-center text-sm font-semibold">{qty}</span>
+                    <span className="w-6 text-center text-sm font-semibold text-white">{qty}</span>
                     <button
                       onClick={() => setQty(item.id, qty + 1)}
-                      className="h-7 w-7 rounded-full border border-gray-300 text-gray-700"
+                      className="h-7 w-7 rounded-full border border-gray-600 text-white hover:bg-gray-600"
                     >
                       +
                     </button>
@@ -190,80 +190,80 @@ export function AdminComandero() {
             })}
 
             {filteredItems.length === 0 && (
-              <div className="rounded-lg border border-dashed border-gray-300 p-5 text-center text-sm text-gray-500">
+              <div className="rounded-lg border border-dashed border-gray-600 p-5 text-center text-sm text-gray-400">
                 No hay productos para ese filtro.
               </div>
             )}
           </div>
         </div>
 
-        <div className="rounded-lg border border-gray-200 bg-white p-5">
-          <h4 className="text-base font-bold text-gray-900">Pedido actual</h4>
+        <div className="rounded-lg bg-gray-800 border border-gray-700 p-5">
+          <h4 className="text-base font-bold text-white">Pedido actual</h4>
 
           <div className="mt-4 space-y-3">
             <input
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
               placeholder="Nombre del cliente"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white placeholder-gray-400"
             />
             <input
               value={customerPhone}
               onChange={(e) => setCustomerPhone(e.target.value)}
-              placeholder="Teléfono (ej: 612598899)"
+              placeholder="Teléfono (opcional)"
               inputMode="tel"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white placeholder-gray-400"
             />
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Notas (sin cebolla, etc.)"
               rows={3}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white placeholder-gray-400"
             />
             <select
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value as 'DATAPHONE' | 'CASH')}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white"
             >
               <option value="DATAPHONE">Datáfono</option>
               <option value="CASH">Efectivo</option>
             </select>
-            <p className={`text-xs ${isCustomerDataValid ? 'text-green-700' : 'text-amber-700'}`}>
+            <p className={`text-xs ${isCustomerDataValid ? 'text-green-400' : 'text-amber-400'}`}>
               {isCustomerDataValid
-                ? 'Datos del cliente correctos'
-                : 'Nombre (min 2 caracteres) y teléfono válido (min 9 dígitos)'}
+                ? 'Nombre del cliente válido'
+                : 'Nombre requerido (mín 2 caracteres)'}
             </p>
           </div>
 
-          <div className="mt-4 max-h-48 space-y-2 overflow-y-auto border-y border-gray-200 py-3">
+          <div className="mt-4 max-h-48 space-y-2 overflow-y-auto border-y border-gray-700 py-3">
             {cartItems.length === 0 ? (
-              <p className="text-sm text-gray-500">Sin productos añadidos.</p>
+              <p className="text-sm text-gray-400">Sin productos añadidos.</p>
             ) : (
               cartItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between text-sm">
+                <div key={item.id} className="flex items-center justify-between text-sm text-gray-200">
                   <span>{item.qty}x {item.name}</span>
-                  <span className="font-semibold">{formatPrice(item.subtotal)}</span>
+                  <span className="font-semibold text-white">{formatPrice(item.subtotal)}</span>
                 </div>
               ))
             )}
           </div>
 
           <div className="mt-4 flex items-center justify-between">
-            <span className="text-sm text-gray-600">Total ({totalItems} uds)</span>
-            <span className="text-xl font-bold text-gray-900">{formatPrice(total)}</span>
+            <span className="text-sm text-gray-300">Total ({totalItems} uds)</span>
+            <span className="text-xl font-bold text-white">{formatPrice(total)}</span>
           </div>
 
           <button
             onClick={submitOrder}
             disabled={isSubmitting || cartItems.length === 0 || !isCustomerDataValid}
-            className="mt-4 w-full rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-4 w-full rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-black disabled:cursor-not-allowed disabled:opacity-50 hover:bg-gray-100"
           >
             {isSubmitting ? 'Creando pedido...' : 'Crear pedido e imprimir ticket'}
           </button>
 
           {createdOrderId && (
-            <p className="mt-3 rounded bg-green-50 px-3 py-2 text-xs text-green-700">
+            <p className="mt-3 rounded bg-green-900 px-3 py-2 text-xs text-green-300">
               Pedido creado: #{createdOrderId.slice(-8)}
             </p>
           )}
