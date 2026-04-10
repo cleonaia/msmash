@@ -25,9 +25,7 @@ type TicketOrder = {
     id: string
     quantity: number
     subtotal: number
-    product: {
-      name: string
-    }
+    productName: string
   }>
 }
 
@@ -48,19 +46,19 @@ function getTestOrder(): TicketOrder {
         id: 'item-test-1',
         quantity: 1,
         subtotal: 1290,
-        product: { name: 'The M Smash' }
+        productName: 'The M Smash'
       },
       {
         id: 'item-test-2',
         quantity: 1,
         subtotal: 400,
-        product: { name: 'Patatas' }
+        productName: 'Patatas'
       },
       {
         id: 'item-test-3',
         quantity: 1,
         subtotal: 1200,
-        product: { name: 'Combo bebida' }
+        productName: 'Combo bebida'
       }
     ]
   }
@@ -83,14 +81,12 @@ function formatDate(date: Date | string) {
 export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
   const isTestTicket = params.orderId === 'test-ticket'
 
-  const order: TicketOrder | null = isTestTicket
+  const order = isTestTicket
     ? getTestOrder()
     : await prisma.order.findUnique({
         where: { id: params.orderId },
         include: {
-          items: {
-            include: { product: true }
-          }
+          items: true
         }
       })
 
@@ -98,7 +94,29 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
     notFound()
   }
 
-  const itemCount = order.items.reduce((acc, item) => acc + item.quantity, 0)
+  const productIds = Array.from(
+    new Set(order.items.map((item: any) => item.productId).filter(Boolean))
+  )
+  const products = productIds.length
+    ? await prisma.product.findMany({
+        where: { id: { in: productIds } },
+        select: { id: true, name: true }
+      })
+    : []
+
+  const productNames = new Map(products.map((product) => [product.id, product.name]))
+
+  const printableItems = order.items.map((item: any) => ({
+    id: item.id,
+    quantity: item.quantity,
+    subtotal: item.subtotal,
+    productName:
+      item.productName ||
+      productNames.get(item.productId) ||
+      (item.productId ? `Producto ${String(item.productId).slice(-6)}` : 'Producto')
+  }))
+
+  const itemCount = printableItems.reduce((acc, item) => acc + item.quantity, 0)
 
   return (
     <main className="min-h-screen bg-white text-black p-4 print:p-0">
@@ -166,10 +184,10 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
         <hr className="my-2 border-t border-dashed border-black" />
 
         <div>
-          {order.items.map((item) => (
+          {printableItems.map((item) => (
             <div key={item.id} className="mb-1">
               <div className="flex items-start justify-between gap-2">
-                <p className="flex-1">{item.quantity}x {item.product.name}</p>
+                <p className="flex-1">{item.quantity}x {item.productName}</p>
                 <p>{formatMoney(item.subtotal)}</p>
               </div>
             </div>
