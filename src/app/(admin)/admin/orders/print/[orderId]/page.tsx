@@ -95,11 +95,6 @@ function formatDate(date: Date | string) {
   })
 }
 
-function getReviewsQrUrl() {
-  const shortLocationUrl = 'https://www.msmashburger.page/go/maps'
-  return `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(shortLocationUrl)}&color=000000&bgcolor=ffffff&qzone=3`
-}
-
 function getPaymentMethodLabel(method: string) {
   const normalized = String(method || '').toUpperCase()
 
@@ -260,7 +255,7 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
           <p className="mt-1 text-[11px]">¿Te gustó? Déjanos tu reseña</p>
           <div className="mt-2 flex justify-center">
             <img
-              src={getReviewsQrUrl()}
+              src="/images/brand/qr-maps-ticket.png"
               alt="QR reseñas Google"
               width={110}
               height={110}
