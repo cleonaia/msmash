@@ -17,8 +17,8 @@ export function AdminComandero() {
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [search, setSearch] = useState('')
   const [cart, setCart] = useState<CartMap>({})
-  const [customerName, setCustomerName] = useState('Cliente local')
-  const [customerPhone, setCustomerPhone] = useState('000000000')
+  const [customerName, setCustomerName] = useState('')
+  const [customerPhone, setCustomerPhone] = useState('')
   const [notes, setNotes] = useState('')
   const [paymentMethod, setPaymentMethod] = useState<'DATAPHONE' | 'CASH'>('DATAPHONE')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -56,6 +56,8 @@ export function AdminComandero() {
 
   const total = useMemo(() => cartItems.reduce((sum, item) => sum + item.subtotal, 0), [cartItems])
   const totalItems = useMemo(() => cartItems.reduce((sum, item) => sum + item.qty, 0), [cartItems])
+  const normalizedPhone = customerPhone.replace(/\D/g, '')
+  const isCustomerDataValid = customerName.trim().length >= 2 && normalizedPhone.length >= 9
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = { all: menuItems.length }
@@ -79,13 +81,18 @@ export function AdminComandero() {
   const submitOrder = async () => {
     if (cartItems.length === 0 || isSubmitting) return
 
+    if (!isCustomerDataValid) {
+      alert('Introduce un nombre y teléfono válidos para crear el pedido.')
+      return
+    }
+
     setIsSubmitting(true)
     setCreatedOrderId(null)
 
     try {
       const result = await createCounterOrder({
-        customerName: customerName.trim() || 'Cliente local',
-        customerPhone: customerPhone.trim() || '000000000',
+        customerName: customerName.trim(),
+        customerPhone: normalizedPhone,
         notes: notes.trim(),
         paymentMethod,
         items: cartItems.map((item) => ({
@@ -197,13 +204,14 @@ export function AdminComandero() {
             <input
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
-              placeholder="Nombre cliente"
+              placeholder="Nombre del cliente"
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
             />
             <input
               value={customerPhone}
               onChange={(e) => setCustomerPhone(e.target.value)}
-              placeholder="Telefono"
+              placeholder="Teléfono (ej: 612598899)"
+              inputMode="tel"
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
             />
             <textarea
@@ -221,6 +229,11 @@ export function AdminComandero() {
               <option value="DATAPHONE">Datáfono</option>
               <option value="CASH">Efectivo</option>
             </select>
+            <p className={`text-xs ${isCustomerDataValid ? 'text-green-700' : 'text-amber-700'}`}>
+              {isCustomerDataValid
+                ? 'Datos del cliente correctos'
+                : 'Nombre (min 2 caracteres) y teléfono válido (min 9 dígitos)'}
+            </p>
           </div>
 
           <div className="mt-4 max-h-48 space-y-2 overflow-y-auto border-y border-gray-200 py-3">
@@ -243,7 +256,7 @@ export function AdminComandero() {
 
           <button
             onClick={submitOrder}
-            disabled={isSubmitting || cartItems.length === 0}
+            disabled={isSubmitting || cartItems.length === 0 || !isCustomerDataValid}
             className="mt-4 w-full rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting ? 'Creando pedido...' : 'Crear pedido e imprimir ticket'}
