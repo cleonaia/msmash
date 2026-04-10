@@ -57,7 +57,7 @@ export default async function PrintDeliveryOrderPage({ params }: PrintDeliveryOr
         @media print {
           @page {
             size: 80mm auto;
-            margin: 2mm;
+            margin: 0;
           }
 
           body {
@@ -72,11 +72,13 @@ export default async function PrintDeliveryOrderPage({ params }: PrintDeliveryOr
           }
 
           .ticket {
-            width: 76mm;
+            width: 72mm;
             margin: 0;
             padding: 0;
             font-size: 12px;
             line-height: 1.3;
+            break-inside: avoid;
+            page-break-inside: avoid;
           }
         }
       `}</style>

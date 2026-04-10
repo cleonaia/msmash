@@ -68,11 +68,15 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>
             <div className="flex min-h-screen flex-col">
-              <Navbar />
+              <div className="site-shell">
+                <Navbar />
+              </div>
               <main className="flex-1">{children}</main>
-              <Footer />
-              <ChatbotWidget />
-              <CookieBanner />
+              <div className="site-shell">
+                <Footer />
+                <ChatbotWidget />
+                <CookieBanner />
+              </div>
             </div>
           </CartProvider>
         </AuthProvider>

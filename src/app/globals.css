@@ -24,6 +24,22 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  body::after {
+    display: none !important;
+  }
+
+  .site-shell {
+    display: none !important;
+  }
+}
+
 /* ─── Grain overlay ─── */
 body::after {
   content: "";
