@@ -327,3 +327,141 @@ export async function confirmCashOrder(orderId: string): Promise<CreateOrderResu
     }
   }
 }
+
+export interface CreateCounterOrderData {
+  customerName: string
+  customerPhone: string
+  customerEmail?: string
+  notes?: string
+  paymentMethod: 'DATAPHONE' | 'CASH'
+  items: Array<{
+    productId: string
+    quantity: number
+  }>
+  totalAmount: number
+}
+
+export async function createCounterOrder(data: CreateCounterOrderData): Promise<CreateOrderResult> {
+  try {
+    if (!data.customerName || !data.customerPhone) {
+      return {
+        success: false,
+        error: 'Faltan datos del cliente'
+      }
+    }
+
+    if (!data.items || data.items.length === 0) {
+      return {
+        success: false,
+        error: 'El pedido no tiene productos'
+      }
+    }
+
+    const requestedProductIds = Array.from(new Set(data.items.map((item) => item.productId)))
+    const products = await prisma.product.findMany({
+      where: {
+        OR: [
+          { id: { in: requestedProductIds } },
+          { slug: { in: requestedProductIds } },
+        ],
+      },
+    })
+
+    const productLookup = new Map<string, (typeof products)[number]>()
+    for (const product of products) {
+      productLookup.set(product.id, product)
+      productLookup.set(product.slug, product)
+    }
+
+    let missingProducts = requestedProductIds.filter((id) => !productLookup.has(id))
+    if (missingProducts.length > 0) {
+      await ensureMenuBackedProducts(missingProducts)
+
+      const recoveredProducts = await prisma.product.findMany({
+        where: {
+          OR: [{ id: { in: missingProducts } }, { slug: { in: missingProducts } }]
+        }
+      })
+
+      for (const product of recoveredProducts) {
+        productLookup.set(product.id, product)
+        productLookup.set(product.slug, product)
+      }
+
+      missingProducts = requestedProductIds.filter((id) => !productLookup.has(id))
+    }
+
+    if (missingProducts.length > 0) {
+      return {
+        success: false,
+        error: 'Uno o mas productos no estan disponibles ahora'
+      }
+    }
+
+    const normalizedItems = data.items.map((item) => {
+      const product = productLookup.get(item.productId)
+      if (!product) {
+        throw new Error('One or more products not found')
+      }
+
+      const unitPrice = product.price
+      return {
+        productId: product.id,
+        quantity: item.quantity,
+        unitPrice,
+        subtotal: unitPrice * item.quantity
+      }
+    })
+
+    const notes = data.notes?.trim()
+    const counterNotes = notes ? `[COMANDERO] ${notes}` : '[COMANDERO] Pedido creado desde admin'
+
+    const order = await prisma.$transaction(async (tx) => {
+      const createdOrder = await tx.order.create({
+        data: {
+          customerName: data.customerName,
+          customerEmail: data.customerEmail || '',
+          customerPhone: data.customerPhone,
+          totalAmount: Math.round(data.totalAmount * 100),
+          deliveryMethod: 'Retiro en local',
+          notes: counterNotes,
+          status: 'CONFIRMED',
+          paymentStatus: 'COMPLETED',
+          paymentMethod: data.paymentMethod,
+          items: {
+            create: normalizedItems
+          }
+        }
+      })
+
+      for (const item of normalizedItems) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: {
+              decrement: item.quantity
+            }
+          }
+        })
+      }
+
+      return createdOrder
+    })
+
+    revalidatePath('/admin')
+    revalidatePath('/pedidos')
+
+    return {
+      success: true,
+      order: {
+        id: order.id
+      }
+    }
+  } catch (error) {
+    console.error('Error creating counter order:', error)
+    return {
+      success: false,
+      error: 'No se pudo crear el pedido desde comandero. Intentalo de nuevo.'
+    }
+  }
+}

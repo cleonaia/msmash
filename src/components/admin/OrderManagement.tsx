@@ -76,6 +76,7 @@ export function OrderManagement() {
   const [autoPrintEnabled, setAutoPrintEnabled] = useState(false)
   const [printQueue, setPrintQueue] = useState<string[]>([])
   const [activePrintOrderId, setActivePrintOrderId] = useState<string | null>(null)
+  const [activePrintSrc, setActivePrintSrc] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all')
   const [selectedStatus, setSelectedStatus] = useState<string>('all')
@@ -186,17 +187,24 @@ export function OrderManagement() {
     if (activePrintOrderId || printQueue.length === 0) return
 
     const [nextOrderId, ...rest] = printQueue
+    const nextOrder = orders.find((o) => o.id === nextOrderId)
+    const printSrc = nextOrder?.platform === 'WEB'
+      ? `/admin/orders/print/${nextOrderId}?autoprint=1&ts=${Date.now()}`
+      : `/admin/delivery/print/${nextOrderId}?autoprint=1&ts=${Date.now()}`
+
     setActivePrintOrderId(nextOrderId)
+    setActivePrintSrc(printSrc)
     setPrintQueue(rest)
 
     const releaseTimer = window.setTimeout(() => {
       setActivePrintOrderId(null)
+      setActivePrintSrc(null)
     }, 2500)
 
     return () => {
       window.clearTimeout(releaseTimer)
     }
-  }, [activePrintOrderId, printQueue])
+  }, [activePrintOrderId, printQueue, orders])
 
   // Filtrar órdenes
   const filteredOrders = useMemo(() => {
@@ -245,13 +253,6 @@ export function OrderManagement() {
     completed: orders.filter((o) => isCompletedStatus(o.status)).length,
     revenue: orders.reduce((sum, o) => sum + o.totalPrice, 0)
   }
-
-  const activePrintOrder = orders.find((o) => o.id === activePrintOrderId)
-  const activePrintSrc = activePrintOrderId
-    ? activePrintOrder?.platform === 'WEB'
-      ? `/admin/orders/print/${activePrintOrderId}?autoprint=1&ts=${Date.now()}`
-      : `/admin/delivery/print/${activePrintOrderId}?autoprint=1&ts=${Date.now()}`
-    : null
 
   if (loading) {
     return <div className="animate-pulse bg-gray-200 h-96 rounded-lg" />
@@ -571,10 +572,10 @@ export function OrderManagement() {
         </div>
       )}
 
-      {activePrintOrderId && (
+      {activePrintOrderId && activePrintSrc && (
         <iframe
           title="auto-print-delivery-ticket"
-          src={activePrintSrc ?? ''}
+          src={activePrintSrc}
           className="hidden"
         />
       )}

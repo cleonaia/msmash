@@ -87,6 +87,7 @@ export default function AdminOrdersPanel() {
   const [autoPrintMode, setAutoPrintMode] = useState<'ALL' | 'PAID'>('PAID')
   const [printQueue, setPrintQueue] = useState<string[]>([])
   const [activePrintOrderId, setActivePrintOrderId] = useState<string | null>(null)
+  const [activePrintSrc, setActivePrintSrc] = useState<string | null>(null)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [showRefundModal, setShowRefundModal] = useState(false)
   const [refundReason, setRefundReason] = useState('')
@@ -223,11 +224,13 @@ export default function AdminOrdersPanel() {
 
     const [nextOrderId, ...rest] = printQueue
     setActivePrintOrderId(nextOrderId)
+    setActivePrintSrc(`/admin/orders/print/${nextOrderId}?autoprint=1&ts=${Date.now()}`)
     setPrintQueue(rest)
 
     const releaseTimer = window.setTimeout(() => {
       markOrderPrinted(nextOrderId)
       setActivePrintOrderId(null)
+      setActivePrintSrc(null)
     }, 2500)
 
     return () => {
@@ -726,10 +729,10 @@ export default function AdminOrdersPanel() {
         </div>
       )}
 
-      {activePrintOrderId && (
+      {activePrintOrderId && activePrintSrc && (
         <iframe
           title="auto-print-ticket"
-          src={`/admin/orders/print/${activePrintOrderId}?autoprint=1&ts=${Date.now()}`}
+          src={activePrintSrc}
           className="hidden"
         />
       )}

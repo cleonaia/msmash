@@ -8,10 +8,11 @@ import { OrderManagement } from './OrderManagement'
 import { AdvancedAnalyticsDashboard } from './AdvancedAnalytics'
 import { InvoiceManager } from './InvoiceManager'
 import { QRManager } from './QRManager'
+import { AdminComandero } from './AdminComandero'
 import { executeSyncCycle, getSyncHistory, getSyncStats, setSyncInterval } from '@/actions/scheduler'
 import { getDeliveryIntegrations } from '@/actions/delivery'
 
-type TabType = 'dashboard' | 'orders' | 'advanced-analytics' | 'delivery' | 'invoices' | 'employees' | 'scheduler' | 'qr'
+type TabType = 'dashboard' | 'orders' | 'comandero' | 'advanced-analytics' | 'delivery' | 'invoices' | 'employees' | 'scheduler' | 'qr'
 
 export function DashboardOverview() {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard')
@@ -19,6 +20,7 @@ export function DashboardOverview() {
   const tabs: Array<{ id: TabType; label: string; icon: string; badge?: string }> = [
     { id: 'dashboard', label: 'Panel Principal', icon: '📊' },
     { id: 'orders', label: 'Órdenes', icon: '📦' },
+    { id: 'comandero', label: 'Comandero', icon: '🧑‍🍳' },
     { id: 'invoices', label: 'Facturas', icon: '🧾' },
     { id: 'advanced-analytics', label: 'Análitica', icon: '📈', badge: 'PRO' },
     { id: 'delivery', label: 'Integraciones', icon: '🚗' },
@@ -83,6 +85,14 @@ export function DashboardOverview() {
               <div className="space-y-6">
                 <h2 className="text-2xl font-bold text-gray-900">📦 Gestión de Órdenes</h2>
                 <OrderManagement />
+              </div>
+            )}
+
+            {activeTab === 'comandero' && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-gray-900">🧑‍🍳 Comandero</h2>
+                <p className="text-gray-600">Crea pedidos en local para clientes de mostrador y dispara ticket automático.</p>
+                <AdminComandero />
               </div>
             )}
 
