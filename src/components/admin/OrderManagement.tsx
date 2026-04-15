@@ -285,10 +285,10 @@ export function OrderManagement() {
           <div key={stat.label} className={`${stat.color} rounded-lg p-4 border border-gray-200`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm">{stat.label}</p>
-                <p className="text-2xl font-bold mt-1">{stat.value}</p>
+                <p className="text-gray-700 text-sm font-medium">{stat.label}</p>
+                <p className="mt-1 text-3xl font-extrabold text-gray-900 leading-none">{stat.value}</p>
               </div>
-              <div className="text-3xl">{stat.icon}</div>
+              <div className="text-3xl text-gray-700">{stat.icon}</div>
             </div>
           </div>
         ))}
@@ -296,7 +296,7 @@ export function OrderManagement() {
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow p-6 space-y-4">
-        <div className="flex flex-col md:flex-row gap-4 md:items-end">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
           {/* Search */}
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
@@ -305,7 +305,7 @@ export function OrderManagement() {
               placeholder="Nombre, ID de orden, teléfono..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full rounded-lg border border-gray-300 px-3 py-3 text-sm text-gray-900 focus:border-transparent focus:ring-2 focus:ring-black"
             />
           </div>
 
@@ -315,7 +315,7 @@ export function OrderManagement() {
             <select
               value={selectedPlatform}
               onChange={(e) => setSelectedPlatform(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full rounded-lg border border-gray-300 px-3 py-3 text-sm text-gray-900 focus:border-transparent focus:ring-2 focus:ring-black"
             >
               <option value="all">Todas</option>
               <option value="WEB">Web</option>
@@ -331,7 +331,7 @@ export function OrderManagement() {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full rounded-lg border border-gray-300 px-3 py-3 text-sm text-gray-900 focus:border-transparent focus:ring-2 focus:ring-black"
             >
               <option value="all">Todos</option>
               <option value="PENDING">⏳ Pendiente</option>
@@ -350,19 +350,19 @@ export function OrderManagement() {
           </div>
 
           {/* Date Range */}
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <input
               type="date"
               value={dateRange.start}
               onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+              className="rounded-lg border border-gray-300 px-3 py-3 text-sm text-gray-900 focus:border-transparent focus:ring-2 focus:ring-black"
             />
             <span className="text-gray-400">-</span>
             <input
               type="date"
               value={dateRange.end}
               onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+              className="rounded-lg border border-gray-300 px-3 py-3 text-sm text-gray-900 focus:border-transparent focus:ring-2 focus:ring-black"
             />
           </div>
 
@@ -372,7 +372,7 @@ export function OrderManagement() {
               <button
                 key={mode}
                 onClick={() => setViewMode(mode)}
-                className={`px-3 py-2 rounded-lg font-medium text-sm ${
+                className={`min-h-[44px] px-4 py-2 rounded-lg font-medium text-sm ${
                   viewMode === mode
                     ? 'bg-black text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -395,7 +395,7 @@ export function OrderManagement() {
 
             <button
               onClick={() => setAutoPrintEnabled((prev) => !prev)}
-              className={`px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
+              className={`min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
                 autoPrintEnabled
                   ? 'bg-emerald-600 text-white hover:bg-emerald-700'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -512,13 +512,13 @@ export function OrderManagement() {
                               : `/admin/delivery/print/${order.id}`
                           window.open(printUrl, '_blank', 'noopener,noreferrer')
                         }}
-                        className="rounded bg-black px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-800"
+                        className="min-h-[40px] rounded bg-black px-3 py-2 text-xs font-semibold text-white hover:bg-gray-800"
                       >
                         Imprimir
                       </button>
                       <button
                         onClick={() => handleDeleteOrder(order)}
-                        className="ml-2 rounded bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700"
+                        className="ml-2 min-h-[40px] rounded bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700"
                       >
                         Eliminar
                       </button>

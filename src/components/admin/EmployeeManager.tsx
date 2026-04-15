@@ -299,11 +299,17 @@ export function EmployeeManager() {
       })
 
       if (result.success && result.employee) {
+        const allowedRoles = ['OWNER', 'MANAGER']
+        if (!allowedRoles.includes(result.employee.role)) {
+          setError('Acceso denegado: solo OWNER o MANAGER pueden abrir el area de empleados.')
+          return
+        }
+
         if (typeof window !== 'undefined') {
           window.sessionStorage.setItem('employee-manager-unlocked', 'true')
         }
         setIsUnlocked(true)
-        setSuccess(`Acceso concedido: ${result.employee.name}`)
+        setSuccess(`Acceso concedido: ${result.employee.name} (${result.employee.role})`)
         setTimeout(() => setSuccess(null), 3000)
       } else {
         setError('Acceso invalido. Revisa las credenciales del trabajador autorizado.')

@@ -52,13 +52,13 @@ export function DashboardOverview() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Tabs Navigation */}
-        <div className="bg-white rounded-lg shadow mb-8 overflow-x-auto">
-          <div className="flex border-b border-gray-200 min-w-full">
+        <div className="bg-white rounded-lg shadow mb-8">
+          <div className="flex flex-wrap border-b border-gray-200">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 py-4 px-6 font-medium transition-all whitespace-nowrap ${
+                className={`flex min-h-[48px] items-center gap-2 px-4 py-3 text-sm font-medium transition-all sm:px-5 sm:text-base ${
                   activeTab === tab.id
                     ? 'border-b-2 border-black text-black bg-gray-50'
                     : 'text-gray-600 hover:text-gray-900'
