@@ -329,6 +329,8 @@ export async function GET(
 
     const searchParams = new URL(request.url).searchParams
     const layout = searchParams.get('layout')
+    const channel = searchParams.get('channel')
+    const useTicketLayout = layout === 'ticket' && channel === 'tpv'
 
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -336,7 +338,7 @@ export async function GET(
       format: 'a4',
     })
 
-    if (layout === 'ticket') {
+    if (useTicketLayout) {
       renderTicketInvoice(pdf, invoice, paidAt, customerAddress)
     } else {
       renderA4Invoice(pdf, invoice, paidAt, customerAddress)
