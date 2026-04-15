@@ -11,6 +11,9 @@ import { QRManager } from './QRManager'
 import { AdminComandero } from './AdminComandero'
 import { executeSyncCycle, getSyncHistory, getSyncStats, setSyncInterval } from '@/actions/scheduler'
 import { getDeliveryIntegrations } from '@/actions/delivery'
+import { getAllOrders } from '@/actions/orders'
+import { getAllInvoices } from '@/actions/invoices'
+import { getAllEmployees } from '@/actions/employees'
 
 type TabType = 'dashboard' | 'orders' | 'comandero' | 'advanced-analytics' | 'delivery' | 'invoices' | 'employees' | 'scheduler' | 'qr'
 
@@ -78,6 +81,7 @@ export function DashboardOverview() {
               <div className="space-y-6">
                 <h2 className="text-2xl font-bold text-gray-900">📊 Resumen General</h2>
                 <AnalyticsDashboard />
+                <AdminRecordsPanel />
               </div>
             )}
 
@@ -154,6 +158,129 @@ export function DashboardOverview() {
             <p className="text-3xl">✅</p>
             <p className="text-xs text-gray-600 mt-1">Todos los sistemas activos</p>
           </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function AdminRecordsPanel() {
+  const [isLoading, setIsLoading] = useState(true)
+  const [orders, setOrders] = useState<Array<any>>([])
+  const [invoices, setInvoices] = useState<Array<any>>([])
+  const [employees, setEmployees] = useState<Array<any>>([])
+
+  const loadRecords = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const [ordersData, invoicesData, employeesData] = await Promise.all([
+        getAllOrders(),
+        getAllInvoices(),
+        getAllEmployees()
+      ])
+
+      setOrders(Array.isArray(ordersData) ? ordersData : [])
+      setInvoices(Array.isArray(invoicesData) ? invoicesData : [])
+      setEmployees(Array.isArray(employeesData) ? employeesData : [])
+    } catch (error) {
+      console.error('Error loading admin records:', error)
+      setOrders([])
+      setInvoices([])
+      setEmployees([])
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadRecords()
+  }, [loadRecords])
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-lg border border-gray-200 bg-white p-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">Registros globales</h3>
+            <p className="text-sm text-gray-600">Vista unificada de ordenes, facturas y empleados para control diario.</p>
+          </div>
+          <button
+            onClick={loadRecords}
+            className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Actualizar
+          </button>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <p className="text-xs text-gray-600">Ordenes registradas</p>
+            <p className="mt-1 text-2xl font-bold text-gray-900">{orders.length}</p>
+          </div>
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <p className="text-xs text-gray-600">Facturas registradas</p>
+            <p className="mt-1 text-2xl font-bold text-gray-900">{invoices.length}</p>
+          </div>
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <p className="text-xs text-gray-600">Empleados registrados</p>
+            <p className="mt-1 text-2xl font-bold text-gray-900">{employees.length}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <h4 className="text-sm font-semibold text-gray-900">Ultimas ordenes ({orders.length})</h4>
+          {isLoading ? (
+            <p className="mt-3 text-sm text-gray-500">Cargando...</p>
+          ) : orders.length === 0 ? (
+            <p className="mt-3 text-sm text-gray-500">Sin registros.</p>
+          ) : (
+            <div className="mt-3 max-h-64 space-y-2 overflow-y-auto pr-1">
+              {orders.slice(0, 20).map((order) => (
+                <div key={order.id} className="rounded border border-gray-200 bg-gray-50 p-2 text-xs">
+                  <p className="font-semibold text-gray-900">#{String(order.id).slice(-8)} · {order.customerName}</p>
+                  <p className="text-gray-600">{order.status} · {(Number(order.totalAmount || 0) / 100).toFixed(2)} EUR</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <h4 className="text-sm font-semibold text-gray-900">Ultimas facturas ({invoices.length})</h4>
+          {isLoading ? (
+            <p className="mt-3 text-sm text-gray-500">Cargando...</p>
+          ) : invoices.length === 0 ? (
+            <p className="mt-3 text-sm text-gray-500">Sin registros.</p>
+          ) : (
+            <div className="mt-3 max-h-64 space-y-2 overflow-y-auto pr-1">
+              {invoices.slice(0, 20).map((invoice) => (
+                <div key={invoice.id} className="rounded border border-gray-200 bg-gray-50 p-2 text-xs">
+                  <p className="font-semibold text-gray-900">{invoice.invoiceNumber} · {invoice.customerName}</p>
+                  <p className="text-gray-600">{invoice.status} · {(Number(invoice.totalAmount || 0) / 100).toFixed(2)} EUR</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <h4 className="text-sm font-semibold text-gray-900">Empleados ({employees.length})</h4>
+          {isLoading ? (
+            <p className="mt-3 text-sm text-gray-500">Cargando...</p>
+          ) : employees.length === 0 ? (
+            <p className="mt-3 text-sm text-gray-500">Sin registros.</p>
+          ) : (
+            <div className="mt-3 max-h-64 space-y-2 overflow-y-auto pr-1">
+              {employees.map((employee) => (
+                <div key={employee.id} className="rounded border border-gray-200 bg-gray-50 p-2 text-xs">
+                  <p className="font-semibold text-gray-900">{employee.firstName} {employee.lastName}</p>
+                  <p className="text-gray-600">{employee.role} · {employee.isActive ? 'Activo' : 'Inactivo'}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

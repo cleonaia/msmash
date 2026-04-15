@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   addEmployeeWorkLog,
   createEmployee,
@@ -53,9 +53,15 @@ const ROLES = [
 export function EmployeeManager() {
   const [employees, setEmployees] = useState<Employee[]>([])
   const [stats, setStats] = useState<EmployeeStats | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [authReady, setAuthReady] = useState(false)
+  const [isUnlocked, setIsUnlocked] = useState(false)
+  const [unlocking, setUnlocking] = useState(false)
+  const [authForm, setAuthForm] = useState({ username: '', password: '', code: '' })
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
 
   // Form states
   const [showForm, setShowForm] = useState(false)
@@ -70,7 +76,6 @@ export function EmployeeManager() {
     hours: '8',
     note: ''
   })
-  const [verifier, setVerifier] = useState({ username: '', password: '', code: '', result: '' })
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -83,10 +88,17 @@ export function EmployeeManager() {
     password: ''
   })
 
-  // Load employees
   useEffect(() => {
-    loadEmployees()
+    if (typeof window !== 'undefined') {
+      setIsUnlocked(window.sessionStorage.getItem('employee-manager-unlocked') === 'true')
+    }
+    setAuthReady(true)
   }, [])
+
+  useEffect(() => {
+    if (!authReady || !isUnlocked) return
+    loadEmployees()
+  }, [authReady, isUnlocked])
 
   const loadEmployees = async () => {
     try {
@@ -271,28 +283,45 @@ export function EmployeeManager() {
     }
   }
 
-  const handleVerifyAccess = async () => {
+  const handleUnlock = async () => {
+    if (!authForm.username.trim() || !authForm.password.trim() || !authForm.code.trim()) {
+      setError('Completa usuario, contrasena y codigo para acceder a empleados.')
+      return
+    }
+
     try {
-      setSubmitting(true)
+      setUnlocking(true)
+      setError(null)
       const result = await verifyEmployeeAccess({
-        username: verifier.username,
-        password: verifier.password,
-        code: verifier.code
+        username: authForm.username,
+        password: authForm.password,
+        code: authForm.code
       })
 
       if (result.success && result.employee) {
-        setVerifier((prev) => ({
-          ...prev,
-          result: `Acceso valido: ${result.employee.name} (${result.employee.role})`
-        }))
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.setItem('employee-manager-unlocked', 'true')
+        }
+        setIsUnlocked(true)
+        setSuccess(`Acceso concedido: ${result.employee.name}`)
+        setTimeout(() => setSuccess(null), 3000)
       } else {
-        setVerifier((prev) => ({ ...prev, result: 'Acceso invalido' }))
+        setError('Acceso invalido. Revisa las credenciales del trabajador autorizado.')
       }
-    } catch {
-      setVerifier((prev) => ({ ...prev, result: 'Error validando acceso' }))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error validando acceso')
     } finally {
-      setSubmitting(false)
+      setUnlocking(false)
     }
+  }
+
+  const handleLock = () => {
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.removeItem('employee-manager-unlocked')
+    }
+    setIsUnlocked(false)
+    setEmployees([])
+    setStats(null)
   }
 
   const getRoleColor = (role: string) => {
@@ -305,6 +334,80 @@ export function EmployeeManager() {
       VIEWER: 'bg-purple-100 text-purple-800'
     }
     return colors[role] || colors.STAFF
+  }
+
+  const filteredEmployees = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return employees.filter((employee) => {
+      const statusMatch = statusFilter === 'all'
+        ? true
+        : statusFilter === 'active'
+          ? employee.isActive
+          : !employee.isActive
+
+      if (!statusMatch) return false
+      if (!q) return true
+
+      const fullName = `${employee.firstName} ${employee.lastName}`.toLowerCase()
+      return (
+        fullName.includes(q) ||
+        employee.email.toLowerCase().includes(q) ||
+        employee.role.toLowerCase().includes(q) ||
+        (employee.access?.username || '').toLowerCase().includes(q)
+      )
+    })
+  }, [employees, search, statusFilter])
+
+  if (!authReady) {
+    return <div className="animate-pulse bg-gray-200 h-64 rounded-lg" />
+  }
+
+  if (!isUnlocked) {
+    return (
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        {error && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
+        <h2 className="text-xl font-bold text-gray-900">Area privada de empleados</h2>
+        <p className="mt-1 text-sm text-gray-600">
+          Introduce credenciales de personal autorizado para ver y gestionar registros de empleados.
+        </p>
+
+        <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-4">
+          <input
+            type="text"
+            value={authForm.username}
+            onChange={(e) => setAuthForm((prev) => ({ ...prev, username: e.target.value }))}
+            placeholder="Usuario"
+            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900"
+          />
+          <input
+            type="password"
+            value={authForm.password}
+            onChange={(e) => setAuthForm((prev) => ({ ...prev, password: e.target.value }))}
+            placeholder="Contrasena"
+            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900"
+          />
+          <input
+            type="text"
+            value={authForm.code}
+            onChange={(e) => setAuthForm((prev) => ({ ...prev, code: e.target.value }))}
+            placeholder="Codigo"
+            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900"
+          />
+          <button
+            onClick={handleUnlock}
+            disabled={unlocking}
+            className="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+          >
+            {unlocking ? 'Validando...' : 'Acceder'}
+          </button>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {
@@ -331,48 +434,41 @@ export function EmployeeManager() {
           <h2 className="text-2xl font-bold text-gray-900">Empleados</h2>
           <p className="text-gray-600 text-sm mt-1">Total: {employees.length}</p>
         </div>
-        <button
-          onClick={handleOpenCreateForm}
-          className="bg-black text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800"
-        >
-          + Nuevo Empleado
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleOpenCreateForm}
+            className="bg-black text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800"
+          >
+            + Nuevo Empleado
+          </button>
+          <button
+            onClick={handleLock}
+            className="border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Bloquear area
+          </button>
+        </div>
       </div>
 
       <div className="rounded-lg border border-gray-200 bg-white p-4">
-        <h3 className="text-sm font-semibold text-gray-900">Verificador rapido de login trabajador</h3>
-        <p className="mt-1 text-xs text-gray-600">Comprueba usuario + contrasena + codigo antes de entregar credenciales.</p>
-        <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_220px]">
           <input
-            type="text"
-            value={verifier.username}
-            onChange={(e) => setVerifier({ ...verifier, username: e.target.value })}
-            placeholder="Usuario"
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar por nombre, email, rol o usuario"
+            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900"
           />
-          <input
-            type="password"
-            value={verifier.password}
-            onChange={(e) => setVerifier({ ...verifier, password: e.target.value })}
-            placeholder="Contrasena"
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
-          />
-          <input
-            type="text"
-            value={verifier.code}
-            onChange={(e) => setVerifier({ ...verifier, code: e.target.value })}
-            placeholder="Codigo acceso"
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
-          />
-          <button
-            onClick={handleVerifyAccess}
-            disabled={submitting}
-            className="rounded-lg bg-black px-3 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
+            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900"
           >
-            Verificar
-          </button>
+            <option value="all">Todos los estados</option>
+            <option value="active">Solo activos</option>
+            <option value="inactive">Solo inactivos</option>
+          </select>
         </div>
-        {verifier.result && <p className="mt-2 text-xs text-gray-700">{verifier.result}</p>}
+        <p className="mt-2 text-xs text-gray-500">Mostrando {filteredEmployees.length} registros.</p>
       </div>
 
       {/* Stats */}
@@ -390,51 +486,51 @@ export function EmployeeManager() {
       {/* Modal/Form */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-gray-800 rounded-lg max-w-md w-full p-6 border border-gray-700">
-            <h3 className="text-lg font-bold mb-4 text-white">
+          <div className="bg-white rounded-lg max-w-md w-full p-6 border border-gray-200">
+            <h3 className="text-lg font-bold mb-4 text-gray-900">
               {formType === 'create' ? 'Nuevo Empleado' : 'Editar Empleado'}
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300">Nombre</label>
+                <label className="block text-sm font-medium text-gray-700">Nombre</label>
                 <input
                   type="text"
                   value={formData.firstName}
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border border-gray-600 bg-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-white focus:border-transparent"
+                  className="w-full mt-1 px-3 py-2 border border-gray-300 bg-white rounded-lg text-black placeholder-gray-400 focus:ring-2 focus:ring-black focus:border-transparent"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300">Apellido</label>
+                <label className="block text-sm font-medium text-gray-700">Apellido</label>
                 <input
                   type="text"
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border border-gray-600 bg-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-white focus:border-transparent"
+                  className="w-full mt-1 px-3 py-2 border border-gray-300 bg-white rounded-lg text-black placeholder-gray-400 focus:ring-2 focus:ring-black focus:border-transparent"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300">Email</label>
+                <label className="block text-sm font-medium text-gray-700">Email</label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border border-gray-600 bg-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-white focus:border-transparent"
+                  className="w-full mt-1 px-3 py-2 border border-gray-300 bg-white rounded-lg text-black placeholder-gray-400 focus:ring-2 focus:ring-black focus:border-transparent"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300">Rol</label>
+                <label className="block text-sm font-medium text-gray-700">Rol</label>
                 <select
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border border-gray-600 bg-gray-700 rounded-lg text-white focus:ring-2 focus:ring-white focus:border-transparent"
+                  className="w-full mt-1 px-3 py-2 border border-gray-300 bg-white rounded-lg text-black focus:ring-2 focus:ring-black focus:border-transparent"
                 >
                   {ROLES.map((role) => (
                     <option key={role.value} value={role.value}>
@@ -445,51 +541,51 @@ export function EmployeeManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300">Salario Mensual</label>
+                <label className="block text-sm font-medium text-gray-700">Salario Mensual</label>
                 <div className="flex items-center mt-1">
-                  <span className="text-gray-400">€</span>
+                  <span className="text-gray-600">€</span>
                   <input
                     type="number"
                     value={formData.salary}
                     onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
-                    className="flex-1 ml-2 px-3 py-2 border border-gray-600 bg-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-white focus:border-transparent"
+                    className="flex-1 ml-2 px-3 py-2 border border-gray-300 bg-white rounded-lg text-black placeholder-gray-400 focus:ring-2 focus:ring-black focus:border-transparent"
                     min="0"
                   />
                 </div>
               </div>
 
-              <div className="rounded-lg border border-gray-700 bg-gray-700 p-3">
-                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-300">Acceso trabajador</p>
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-700">Acceso trabajador</p>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-300">Usuario login</label>
+                    <label className="block text-sm font-medium text-gray-700">Usuario login</label>
                     <input
                       type="text"
                       value={formData.loginUsername}
                       onChange={(e) => setFormData({ ...formData, loginUsername: e.target.value })}
-                      className="w-full mt-1 px-3 py-2 border border-gray-600 bg-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-white focus:border-transparent"
+                      className="w-full mt-1 px-3 py-2 border border-gray-300 bg-white rounded-lg text-black placeholder-gray-400 focus:ring-2 focus:ring-black focus:border-transparent"
                       placeholder="ej: juan.caja"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300">Codigo de acceso</label>
+                    <label className="block text-sm font-medium text-gray-700">Codigo de acceso</label>
                     <input
                       type="text"
                       value={formData.accessCode}
                       onChange={(e) => setFormData({ ...formData, accessCode: e.target.value.toUpperCase() })}
-                      className="w-full mt-1 px-3 py-2 border border-gray-600 bg-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-white focus:border-transparent"
+                      className="w-full mt-1 px-3 py-2 border border-gray-300 bg-white rounded-lg text-black placeholder-gray-400 focus:ring-2 focus:ring-black focus:border-transparent"
                       placeholder="ej: MSM-1024"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300">Contrasena</label>
+                    <label className="block text-sm font-medium text-gray-700">Contrasena</label>
                     <input
                       type="password"
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="w-full mt-1 px-3 py-2 border border-gray-600 bg-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-white focus:border-transparent"
+                      className="w-full mt-1 px-3 py-2 border border-gray-300 bg-white rounded-lg text-black placeholder-gray-400 focus:ring-2 focus:ring-black focus:border-transparent"
                       placeholder={formType === 'edit' ? 'Dejar vacio para mantener actual' : 'Contrasena inicial'}
                     />
                   </div>
@@ -534,7 +630,7 @@ export function EmployeeManager() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {employees.map((employee) => (
+              {filteredEmployees.map((employee) => (
                 <tr key={employee.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">
                     {employee.firstName} {employee.lastName}
@@ -598,17 +694,17 @@ export function EmployeeManager() {
           </table>
         </div>
 
-        {employees.length === 0 && (
+        {filteredEmployees.length === 0 && (
           <div className="p-12 text-center">
-            <p className="text-gray-600">No employees yet. Create one to get started!</p>
+            <p className="text-gray-600">No hay empleados para ese filtro.</p>
           </div>
         )}
       </div>
 
       {showAccessModal && accessEmployee && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-gray-800 p-6 border border-gray-700">
-            <h3 className="text-lg font-bold text-white">Acceso y jornadas · {accessEmployee.firstName} {accessEmployee.lastName}</h3>
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-6 border border-gray-200">
+            <h3 className="text-lg font-bold text-gray-900">Acceso y jornadas · {accessEmployee.firstName} {accessEmployee.lastName}</h3>
 
             <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
               <input
@@ -616,40 +712,40 @@ export function EmployeeManager() {
                 value={accessData.username}
                 onChange={(e) => setAccessData({ ...accessData, username: e.target.value })}
                 placeholder="Usuario login"
-                className="rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white placeholder-gray-400"
+                className="rounded-lg border border-gray-700 bg-black/80 px-3 py-2 text-sm text-white placeholder-gray-400"
               />
               <input
                 type="password"
                 value={accessData.password}
                 onChange={(e) => setAccessData({ ...accessData, password: e.target.value })}
                 placeholder="Nueva contrasena (opcional)"
-                className="rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white placeholder-gray-400"
+                className="rounded-lg border border-gray-700 bg-black/80 px-3 py-2 text-sm text-white placeholder-gray-400"
               />
               <input
                 type="text"
                 value={accessData.code}
                 onChange={(e) => setAccessData({ ...accessData, code: e.target.value.toUpperCase() })}
                 placeholder="Codigo acceso"
-                className="rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white placeholder-gray-400"
+                className="rounded-lg border border-gray-700 bg-black/80 px-3 py-2 text-sm text-white placeholder-gray-400"
               />
             </div>
 
             <button
               onClick={handleSaveAccess}
               disabled={submitting}
-              className="mt-3 rounded-lg bg-white px-4 py-2 text-sm font-medium text-black hover:bg-gray-100 disabled:opacity-50"
+              className="mt-3 rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
             >
               Guardar credenciales
             </button>
 
-            <div className="mt-6 rounded-lg border border-gray-700 bg-gray-700 p-4">
-              <h4 className="text-sm font-semibold text-white">Registrar jornada</h4>
+            <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+              <h4 className="text-sm font-semibold text-gray-900">Registrar jornada</h4>
               <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-4">
                 <input
                   type="date"
                   value={workLogData.date}
                   onChange={(e) => setWorkLogData({ ...workLogData, date: e.target.value })}
-                  className="rounded-lg border border-gray-600 bg-gray-600 px-3 py-2 text-sm text-white"
+                  className="rounded-lg border border-gray-700 bg-black/80 px-3 py-2 text-sm text-white"
                 />
                 <input
                   type="number"
@@ -657,14 +753,14 @@ export function EmployeeManager() {
                   step="0.5"
                   value={workLogData.hours}
                   onChange={(e) => setWorkLogData({ ...workLogData, hours: e.target.value })}
-                  className="rounded-lg border border-gray-600 bg-gray-600 px-3 py-2 text-sm text-white placeholder-gray-400"
+                  className="rounded-lg border border-gray-700 bg-black/80 px-3 py-2 text-sm text-white placeholder-gray-400"
                   placeholder="Horas"
                 />
                 <input
                   type="text"
                   value={workLogData.note}
                   onChange={(e) => setWorkLogData({ ...workLogData, note: e.target.value })}
-                  className="rounded-lg border border-gray-600 bg-gray-600 px-3 py-2 text-sm text-white placeholder-gray-400 md:col-span-2"
+                  className="rounded-lg border border-gray-700 bg-black/80 px-3 py-2 text-sm text-white placeholder-gray-400 md:col-span-2"
                   placeholder="Nota (turno noche, extra, etc.)"
                 />
               </div>
@@ -679,18 +775,18 @@ export function EmployeeManager() {
 
               <div className="mt-4 max-h-56 overflow-y-auto">
                 {(accessEmployee.workLogs || []).length === 0 ? (
-                  <p className="text-sm text-gray-400">Sin jornadas registradas.</p>
+                  <p className="text-sm text-gray-500">Sin jornadas registradas.</p>
                 ) : (
                   <div className="space-y-2">
                     {(accessEmployee.workLogs || []).map((log) => (
-                      <div key={log.id} className="flex items-center justify-between rounded border border-gray-600 bg-gray-600 px-3 py-2 text-sm">
+                      <div key={log.id} className="flex items-center justify-between rounded border border-gray-200 bg-white px-3 py-2 text-sm">
                         <div>
-                          <p className="font-medium text-white">{new Date(log.date).toLocaleDateString('es-ES')} · {log.hours}h</p>
-                          {log.note ? <p className="text-xs text-gray-300">{log.note}</p> : null}
+                          <p className="font-medium text-gray-900">{new Date(log.date).toLocaleDateString('es-ES')} · {log.hours}h</p>
+                          {log.note ? <p className="text-xs text-gray-500">{log.note}</p> : null}
                         </div>
                         <button
                           onClick={() => handleDeleteWorkLog(log.id)}
-                          className="text-red-400 hover:text-red-300"
+                          className="text-red-600 hover:text-red-800"
                         >
                           Eliminar
                         </button>
@@ -704,7 +800,7 @@ export function EmployeeManager() {
             <div className="mt-6 flex justify-end">
               <button
                 onClick={() => setShowAccessModal(false)}
-                className="rounded-lg border border-gray-600 px-4 py-2 text-sm text-white hover:bg-gray-700"
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
               >
                 Cerrar
               </button>
