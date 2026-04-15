@@ -268,7 +268,7 @@ export function AdvancedAnalyticsDashboard() {
           <button
             key={tf}
             onClick={() => setTimeframe(tf)}
-            className={`px-4 py-2 rounded-lg font-medium text-sm transition ${
+            className={`min-h-[44px] px-4 py-2 rounded-lg font-medium text-sm transition ${
               timeframe === tf ? 'bg-black text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
             }`}
           >
@@ -282,7 +282,7 @@ export function AdvancedAnalyticsDashboard() {
           <button
             key={metric}
             onClick={() => setSelectedMetric(metric)}
-            className={`px-4 py-2 rounded-lg font-medium text-sm transition ${
+            className={`min-h-[44px] px-4 py-2 rounded-lg font-medium text-sm transition ${
               selectedMetric === metric ? 'bg-black text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
             }`}
           >
@@ -295,44 +295,44 @@ export function AdvancedAnalyticsDashboard() {
         <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border border-purple-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-purple-600 text-sm font-medium">Ingresos Totales</p>
-              <p className="text-3xl font-bold text-purple-900 mt-2">€{totalRevenue.toFixed(0)}</p>
-              <p className="text-xs text-purple-600 mt-1">Período seleccionado</p>
+              <p className="text-purple-700 text-sm font-semibold">Ingresos Totales</p>
+              <p className="text-3xl font-extrabold text-purple-950 mt-2">€{totalRevenue.toFixed(0)}</p>
+              <p className="text-xs text-purple-700 mt-1">Período seleccionado</p>
             </div>
-            <div className="text-5xl opacity-20">💰</div>
+            <div className="text-5xl opacity-60">💰</div>
           </div>
         </div>
 
         <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-600 text-sm font-medium">Total de Órdenes</p>
-              <p className="text-3xl font-bold text-blue-900 mt-2">{totalOrders}</p>
-              <p className="text-xs text-blue-600 mt-1">Período seleccionado</p>
+              <p className="text-blue-700 text-sm font-semibold">Total de Órdenes</p>
+              <p className="text-3xl font-extrabold text-blue-950 mt-2">{totalOrders}</p>
+              <p className="text-xs text-blue-700 mt-1">Período seleccionado</p>
             </div>
-            <div className="text-5xl opacity-20">📦</div>
+            <div className="text-5xl opacity-60">📦</div>
           </div>
         </div>
 
         <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border border-green-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-green-600 text-sm font-medium">Tasa de Finalización</p>
-              <p className="text-3xl font-bold text-green-900 mt-2">{avgCompletionRate.toFixed(1)}%</p>
-              <p className="text-xs text-green-600 mt-1">Datos reales</p>
+              <p className="text-green-700 text-sm font-semibold">Tasa de Finalización</p>
+              <p className="text-3xl font-extrabold text-green-950 mt-2">{avgCompletionRate.toFixed(1)}%</p>
+              <p className="text-xs text-green-700 mt-1">Datos reales</p>
             </div>
-            <div className="text-5xl opacity-20">✓</div>
+            <div className="text-5xl opacity-60">✓</div>
           </div>
         </div>
 
         <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-6 border border-amber-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-amber-600 text-sm font-medium">Ticket Promedio</p>
-              <p className="text-3xl font-bold text-amber-900 mt-2">€{(totalRevenue / Math.max(totalOrders, 1)).toFixed(2)}</p>
-              <p className="text-xs text-amber-600 mt-1">Por orden</p>
+              <p className="text-amber-700 text-sm font-semibold">Ticket Promedio</p>
+              <p className="text-3xl font-extrabold text-amber-950 mt-2">€{(totalRevenue / Math.max(totalOrders, 1)).toFixed(2)}</p>
+              <p className="text-xs text-amber-700 mt-1">Por orden</p>
             </div>
-            <div className="text-5xl opacity-20">📊</div>
+            <div className="text-5xl opacity-60">📊</div>
           </div>
         </div>
       </div>

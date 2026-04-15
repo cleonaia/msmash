@@ -129,16 +129,16 @@ export function InvoiceManager() {
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-lg p-5 border border-gray-200">
-          <p className="text-sm text-gray-600">Facturas totales</p>
-          <p className="text-3xl font-bold text-gray-900 mt-1">{invoices.length}</p>
+          <p className="text-sm font-medium text-gray-700">Facturas totales</p>
+          <p className="mt-1 text-3xl font-extrabold text-gray-900">{invoices.length}</p>
         </div>
         <div className="bg-white rounded-lg p-5 border border-gray-200">
-            <p className="text-sm text-gray-600">Pedidos sin factura</p>
-          <p className="text-3xl font-bold text-gray-900 mt-1">{pendingOrders.length}</p>
+          <p className="text-sm font-medium text-gray-700">Pedidos sin factura</p>
+          <p className="mt-1 text-3xl font-extrabold text-gray-900">{pendingOrders.length}</p>
         </div>
         <div className="bg-white rounded-lg p-5 border border-gray-200">
-          <p className="text-sm text-gray-600">Importe facturado</p>
-          <p className="text-3xl font-bold text-gray-900 mt-1">
+          <p className="text-sm font-medium text-gray-700">Importe facturado</p>
+          <p className="mt-1 text-3xl font-extrabold text-gray-900">
             {formatMoney(invoices.reduce((sum, inv) => sum + inv.totalAmount, 0))}
           </p>
         </div>
@@ -166,12 +166,12 @@ export function InvoiceManager() {
                     onChange={(e) =>
                       setTaxIdByOrder((prev) => ({ ...prev, [order.id]: e.target.value }))
                     }
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    className="min-h-[44px] rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900"
                   />
                   <button
                     onClick={() => handleCreateInvoice(order.id)}
                     disabled={loading}
-                    className="px-4 py-2 bg-black text-white rounded-lg text-sm hover:bg-gray-800 disabled:opacity-50"
+                    className="min-h-[44px] rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
                   >
                     Generar factura
                   </button>
@@ -221,12 +221,12 @@ export function InvoiceManager() {
                       {new Date(invoice.createdAt).toLocaleString('es-ES')}
                     </td>
                     <td className="py-3 pr-4">
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <a
                           href={`/api/invoices/${invoice.id}/download`}
                           target="_blank"
                           rel="noreferrer"
-                          className="px-3 py-1.5 rounded-lg bg-gray-900 text-white text-xs hover:bg-black"
+                          className="min-h-[40px] rounded-lg bg-gray-900 px-3 py-2 text-xs font-semibold text-white hover:bg-black"
                         >
                           Descargar PDF
                         </a>
@@ -234,7 +234,7 @@ export function InvoiceManager() {
                           <button
                             onClick={() => handleSendInvoice(invoice.id)}
                             disabled={loading}
-                            className="px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs hover:bg-blue-700 disabled:opacity-50"
+                            className="min-h-[40px] rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
                           >
                             Marcar enviada
                           </button>
@@ -243,7 +243,7 @@ export function InvoiceManager() {
                           <button
                             onClick={() => handleMarkPaid(invoice.id)}
                             disabled={loading}
-                            className="px-3 py-1.5 rounded-lg bg-green-600 text-white text-xs hover:bg-green-700 disabled:opacity-50"
+                            className="min-h-[40px] rounded-lg bg-green-600 px-3 py-2 text-xs font-semibold text-white hover:bg-green-700 disabled:opacity-50"
                           >
                             Marcar pagada
                           </button>
@@ -251,7 +251,7 @@ export function InvoiceManager() {
                         <button
                           onClick={() => handleDeleteInvoice(invoice.id, invoice.invoiceNumber)}
                           disabled={loading}
-                          className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs hover:bg-red-700 disabled:opacity-50"
+                          className="min-h-[40px] rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50"
                         >
                           Eliminar
                         </button>

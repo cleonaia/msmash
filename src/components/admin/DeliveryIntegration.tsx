@@ -44,11 +44,11 @@ interface PlatformStats {
 
 type PlatformType = 'UBEREATS' | 'GLOVO' | 'DELIVEROO' | 'JUSTEAT'
 
-const PLATFORMS: Array<{ id: PlatformType; name: string; color: string; bgColor: string }> = [
-  { id: 'UBEREATS', name: 'UberEats', color: 'black', bgColor: 'bg-black' },
-  { id: 'GLOVO', name: 'Glovo', color: '#FFD000', bgColor: 'bg-yellow-400' },
-  { id: 'DELIVEROO', name: 'Deliveroo', color: '#00C8DE', bgColor: 'bg-cyan-400' },
-  { id: 'JUSTEAT', name: 'Just Eat', color: '#ff6d00', bgColor: 'bg-orange-500' }
+const PLATFORMS: Array<{ id: PlatformType; name: string; color: string; bgColor: string; textClass: string; subtitleClass: string }> = [
+  { id: 'UBEREATS', name: 'UberEats', color: 'black', bgColor: 'bg-black', textClass: 'text-white', subtitleClass: 'text-gray-200' },
+  { id: 'GLOVO', name: 'Glovo', color: '#FFD000', bgColor: 'bg-yellow-400', textClass: 'text-gray-900', subtitleClass: 'text-gray-700' },
+  { id: 'DELIVEROO', name: 'Deliveroo', color: '#00C8DE', bgColor: 'bg-cyan-400', textClass: 'text-gray-900', subtitleClass: 'text-gray-700' },
+  { id: 'JUSTEAT', name: 'Just Eat', color: '#ff6d00', bgColor: 'bg-orange-500', textClass: 'text-white', subtitleClass: 'text-orange-100' }
 ]
 
 const PLATFORM_LABELS = {
@@ -216,10 +216,10 @@ export function DeliveryIntegration() {
           return (
             <div key={platform.id} className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
               {/* Header */}
-              <div className={`${platform.bgColor} text-white p-4 flex items-center justify-between`}>
+              <div className={`${platform.bgColor} p-4 flex items-center justify-between`}>
                 <div>
-                  <h3 className="font-bold">{platform.name}</h3>
-                  <p className="text-xs opacity-75 mt-1">Delivery Partner</p>
+                  <h3 className={`font-bold ${platform.textClass}`}>{platform.name}</h3>
+                  <p className={`mt-1 text-xs ${platform.subtitleClass}`}>Delivery Partner</p>
                 </div>
                 <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-green-300' : 'bg-gray-300'}`} />
               </div>
@@ -231,19 +231,19 @@ export function DeliveryIntegration() {
                   <div className="grid grid-cols-2 gap-2">
                     <div className="p-3 bg-gray-50 rounded text-center">
                       <p className="text-xs text-gray-600">Hoy</p>
-                      <p className="text-lg font-bold">{platformStats.todayOrders}</p>
+                      <p className="text-lg font-bold text-gray-900">{platformStats.todayOrders}</p>
                     </div>
                     <div className="p-3 bg-gray-50 rounded text-center">
                       <p className="text-xs text-gray-600">Mes</p>
-                      <p className="text-lg font-bold">{platformStats.monthOrders}</p>
+                      <p className="text-lg font-bold text-gray-900">{platformStats.monthOrders}</p>
                     </div>
                     <div className="p-3 bg-gray-50 rounded text-center">
                       <p className="text-xs text-gray-600">Ingresos</p>
-                      <p className="text-sm font-bold">€{platformStats.totalRevenue.toFixed(0)}</p>
+                      <p className="text-sm font-bold text-gray-900">€{platformStats.totalRevenue.toFixed(0)}</p>
                     </div>
                     <div className="p-3 bg-gray-50 rounded text-center">
                       <p className="text-xs text-gray-600">Ticket</p>
-                      <p className="text-sm font-bold">€{platformStats.avgTicket}</p>
+                      <p className="text-sm font-bold text-gray-900">€{platformStats.avgTicket}</p>
                     </div>
                   </div>
                 )}
@@ -284,7 +284,7 @@ export function DeliveryIntegration() {
                           [platform.id]: { ...prev[platform.id], apiKey: e.target.value }
                         }))
                       }
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-black focus:border-transparent"
+                      className="w-full rounded border border-gray-300 px-3 py-2.5 text-sm text-gray-900 focus:border-transparent focus:ring-2 focus:ring-black"
                       required
                     />
                     <input
@@ -297,21 +297,21 @@ export function DeliveryIntegration() {
                           [platform.id]: { ...prev[platform.id], merchantId: e.target.value }
                         }))
                       }
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-black focus:border-transparent"
+                      className="w-full rounded border border-gray-300 px-3 py-2.5 text-sm text-gray-900 focus:border-transparent focus:ring-2 focus:ring-black"
                       required
                     />
                     <div className="flex gap-2 pt-2">
                       <button
                         type="submit"
                         disabled={submitting}
-                        className="flex-1 bg-black text-white text-xs py-1 rounded font-medium hover:bg-gray-800 disabled:opacity-50"
+                        className="min-h-[44px] flex-1 rounded bg-black px-3 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
                       >
                         {submitting ? 'Registrando...' : 'Registrar'}
                       </button>
                       <button
                         type="button"
                         onClick={() => setShowForm(null)}
-                        className="flex-1 border border-gray-300 text-xs py-1 rounded hover:bg-gray-50"
+                        className="min-h-[44px] flex-1 rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
                       >
                         Cancelar
                       </button>
@@ -326,13 +326,13 @@ export function DeliveryIntegration() {
                       <button
                         onClick={() => handleSync(platform.id)}
                         disabled={syncing === platform.id}
-                        className="w-full bg-black text-white text-sm py-2 rounded font-medium hover:bg-gray-800 disabled:opacity-50"
+                        className="min-h-[44px] w-full rounded bg-black px-3 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
                       >
                         {syncing === platform.id ? 'Sincronizando...' : 'Sincronizar'}
                       </button>
                       <button
                         onClick={() => setShowForm(platform.id)}
-                        className="w-full border border-gray-300 text-sm py-2 rounded hover:bg-gray-50"
+                        className="min-h-[44px] w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
                       >
                         Actualizar Keys
                       </button>
@@ -340,7 +340,7 @@ export function DeliveryIntegration() {
                   ) : (
                     <button
                       onClick={() => setShowForm(platform.id)}
-                      className="w-full bg-black text-white text-sm py-2 rounded font-medium hover:bg-gray-800"
+                      className="min-h-[44px] w-full rounded bg-black px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
                     >
                       Conectar
                     </button>
