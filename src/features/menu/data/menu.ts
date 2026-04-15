@@ -318,7 +318,7 @@ export const menuItems: MenuItem[] = [
     id: "cafe",
     name: "Cafe",
     description: "Cafe solo",
-    price: 1.2,
+    price: 1.4,
     category: "bebidas",
     image: CAFE,
     allergens: [],

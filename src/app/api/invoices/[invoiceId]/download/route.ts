@@ -47,7 +47,7 @@ export async function GET(
     const maxDescriptionLines = 2
     const compactRows = invoice.items.map((item) => {
       const description = item.description || 'Producto'
-      const roughLines = Math.ceil(description.length / 24)
+      const roughLines = Math.ceil(description.length / 20)
       const visibleLines = Math.max(1, Math.min(maxDescriptionLines, roughLines))
       return {
         ...item,
@@ -55,7 +55,7 @@ export async function GET(
       }
     })
 
-    const estimatedHeight = 110 + compactRows.reduce((sum, item) => sum + 6 + item.visibleLines * 3.2, 0)
+    const estimatedHeight = 114 + compactRows.reduce((sum, item) => sum + 7 + item.visibleLines * 3.4, 0)
     const pageHeight = Math.max(140, Math.min(220, estimatedHeight))
 
     const pdf = new jsPDF({
@@ -121,38 +121,39 @@ export async function GET(
 
     // Table header
     const tableX = margin
-    const colDesc = tableX
-    const colQty = tableX + 43
-    const colUnit = tableX + 50
-    const colTotal = tableX + 64
+    const tableWidth = pageWidth - margin * 2
+    const colDesc = tableX + 1
+    const colQtyRight = tableX + 46
+    const colUnitRight = tableX + 58
+    const colTotalRight = tableX + tableWidth - 1
 
     pdf.setFont('helvetica', 'bold')
     pdf.setFillColor(245, 245, 245)
     pdf.setFontSize(7)
-    pdf.rect(tableX, y, pageWidth - margin * 2, 5.8, 'F')
-    pdf.text('Descripcion', colDesc + 1, y + 4)
-    pdf.text('Cant', colQty, y + 4)
-    pdf.text('P.Unit', colUnit, y + 4)
-    pdf.text('Subt', colTotal, y + 4)
+    pdf.rect(tableX, y, tableWidth, 6, 'F')
+    pdf.text('Descripcion', colDesc, y + 4.2)
+    pdf.text('Cant', colQtyRight, y + 4.2, { align: 'right' })
+    pdf.text('P.Unit', colUnitRight, y + 4.2, { align: 'right' })
+    pdf.text('Subt', colTotalRight, y + 4.2, { align: 'right' })
 
-    y += 7
+    y += 7.2
     pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(6.8)
+    pdf.setFontSize(6.9)
 
     for (const item of compactRows) {
       const descText = item.description || 'Producto'
-      const descriptionLines = pdf.splitTextToSize(descText, 40)
+      const descriptionLines = pdf.splitTextToSize(descText, 37)
       const trimmedLines = descriptionLines.slice(0, maxDescriptionLines)
-      const rowHeight = Math.max(5.8, trimmedLines.length * 3.2)
+      const rowHeight = Math.max(6.1, trimmedLines.length * 3.4)
 
-      pdf.text(trimmedLines, colDesc + 1, y + 2.8)
-      pdf.text(String(item.quantity), colQty + 0.8, y + 2.8)
-      pdf.text(formatMoneyFromCents(item.unitPrice), colUnit, y + 2.8, { align: 'right' })
-      pdf.text(formatMoneyFromCents(item.subtotal), colTotal, y + 2.8, { align: 'right' })
+      pdf.text(trimmedLines, colDesc, y + 3)
+      pdf.text(String(item.quantity), colQtyRight, y + 3, { align: 'right' })
+      pdf.text(formatMoneyFromCents(item.unitPrice), colUnitRight, y + 3, { align: 'right' })
+      pdf.text(formatMoneyFromCents(item.subtotal), colTotalRight, y + 3, { align: 'right' })
 
       y += rowHeight + 0.8
       pdf.setDrawColor(225, 225, 225)
-      pdf.line(tableX, y, pageWidth - margin, y)
+      pdf.line(tableX, y, tableX + tableWidth, y)
       y += 1.2
     }
 
