@@ -3,6 +3,24 @@
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 
+function extractCounterInvoiceFields(notes?: string | null) {
+  const lines = notes?.split('\n').map((line) => line.trim()) || []
+  const customerAddress = lines
+    .find((line) => line.startsWith('FACTURA_DIRECCION:'))
+    ?.replace('FACTURA_DIRECCION:', '')
+    .trim()
+
+  const customerTaxId = lines
+    .find((line) => line.startsWith('FACTURA_DNI_NIE:'))
+    ?.replace('FACTURA_DNI_NIE:', '')
+    .trim()
+
+  return {
+    customerAddress,
+    customerTaxId
+  }
+}
+
 /**
  * Crea una factura desde una orden existente
  * @param orderId - ID de la orden
@@ -39,6 +57,12 @@ export async function createInvoiceFromOrder(
     if (!order) {
       throw new Error(`Orden ${orderId} no encontrada`)
     }
+
+    const extractedCustomerFields = extractCounterInvoiceFields(order.notes)
+    const resolvedTaxId = customerTaxId?.trim() || extractedCustomerFields.customerTaxId || undefined
+    const invoiceNotes = extractedCustomerFields.customerAddress
+      ? `Direccion cliente: ${extractedCustomerFields.customerAddress}`
+      : undefined
 
     if (order.status === 'CANCELED' || order.status === 'REFUNDED') {
       throw new Error('No se puede generar factura para una orden cancelada o reembolsada')
@@ -81,7 +105,8 @@ export async function createInvoiceFromOrder(
         customerName: order.customerName,
         customerEmail: order.customerEmail,
         customerPhone: order.customerPhone,
-        customerTaxId,
+        customerTaxId: resolvedTaxId,
+        notes: invoiceNotes,
         subtotal,
         taxAmount: ivaTax,
         totalAmount: order.totalAmount,

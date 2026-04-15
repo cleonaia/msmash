@@ -13,6 +13,13 @@ function formatMoneyFromCents(cents: number) {
   })
 }
 
+function getCustomerAddressFromInvoiceNotes(notes?: string | null) {
+  if (!notes) return null
+  const prefix = 'Direccion cliente:'
+  if (!notes.startsWith(prefix)) return null
+  return notes.slice(prefix.length).trim() || null
+}
+
 export async function GET(
   _request: Request,
   { params }: { params: { invoiceId: string } }
@@ -34,6 +41,8 @@ export async function GET(
       invoice.order?.paymentStatus === 'COMPLETED'
         ? invoice.order.updatedAt
         : invoice.order?.createdAt || invoice.createdAt
+
+    const customerAddress = getCustomerAddressFromInvoiceNotes(invoice.notes)
 
     const maxDescriptionLines = 2
     const compactRows = invoice.items.map((item) => {
@@ -103,6 +112,10 @@ export async function GET(
     pdf.text(`Tel: ${invoice.customerPhone || '-'}`, margin, y)
     y += 3.4
     pdf.text(`NIF/CIF: ${invoice.customerTaxId || '-'}`, margin, y)
+    if (customerAddress) {
+      y += 3.4
+      pdf.text(`Calle: ${customerAddress}`, margin, y, { maxWidth: pageWidth - margin * 2 })
+    }
 
     y += 4.2
 

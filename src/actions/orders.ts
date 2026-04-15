@@ -330,23 +330,26 @@ export async function confirmCashOrder(orderId: string): Promise<CreateOrderResu
 
 export interface CreateCounterOrderData {
   customerName: string
-  customerPhone: string
+  customerPhone?: string
   customerEmail?: string
+  customerAddress?: string
+  customerTaxId?: string
   notes?: string
   paymentMethod: 'DATAPHONE' | 'CASH'
   items: Array<{
     productId: string
     quantity: number
+    unitPrice: number
   }>
   totalAmount: number
 }
 
 export async function createCounterOrder(data: CreateCounterOrderData): Promise<CreateOrderResult> {
   try {
-    if (!data.customerName || !data.customerPhone) {
+    if (!data.customerName) {
       return {
         success: false,
-        error: 'Faltan datos del cliente'
+        error: 'Falta el nombre del cliente'
       }
     }
 
@@ -404,7 +407,11 @@ export async function createCounterOrder(data: CreateCounterOrderData): Promise<
         throw new Error('One or more products not found')
       }
 
-      const unitPrice = product.price
+      const customUnitPrice = Number(item.unitPrice)
+      const unitPrice = Number.isFinite(customUnitPrice) && customUnitPrice >= 0
+        ? Math.round(customUnitPrice * 100)
+        : product.price
+
       return {
         productId: product.id,
         quantity: item.quantity,
@@ -414,14 +421,25 @@ export async function createCounterOrder(data: CreateCounterOrderData): Promise<
     })
 
     const notes = data.notes?.trim()
-    const counterNotes = notes ? `[COMANDERO] ${notes}` : '[COMANDERO] Pedido creado en el local'
+    const customerAddress = data.customerAddress?.trim()
+    const customerTaxId = data.customerTaxId?.trim()
+
+    const noteLines = [notes ? `[COMANDERO] ${notes}` : '[COMANDERO] Pedido creado en el local']
+    if (customerAddress) {
+      noteLines.push(`FACTURA_DIRECCION:${customerAddress}`)
+    }
+    if (customerTaxId) {
+      noteLines.push(`FACTURA_DNI_NIE:${customerTaxId}`)
+    }
+
+    const counterNotes = noteLines.join('\n')
 
     const order = await prisma.$transaction(async (tx) => {
       const createdOrder = await tx.order.create({
         data: {
           customerName: data.customerName,
-          customerEmail: data.customerEmail || '',
-          customerPhone: data.customerPhone,
+          customerEmail: data.customerEmail?.trim() || '',
+          customerPhone: data.customerPhone?.trim() || '',
           totalAmount: Math.round(data.totalAmount * 100),
           deliveryMethod: 'Retiro en local',
           notes: counterNotes,

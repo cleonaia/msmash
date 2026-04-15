@@ -61,6 +61,8 @@ const SCHWEPPES_NARANJA = "/images/products/schweppes-naranja.jpeg";
 const SCHWEPPES_LIMON = "/images/products/schweppes-limon.png";
 const AGUA_SOLAN = "/images/products/agua-solan-de-cabras.webp";
 const AGUA_GAS = "/images/products/agua-con-gas-solan.jpeg";
+const CAFE = "/images/products/placeholder.svg";
+const CAPUCCINO = "/images/products/placeholder.svg";
 const CERVEZA_RADLER = "/images/products/cerveza-radler-33cl.jpeg";
 const CERVEZA_ALAMBRE = "/images/products/cerveza-alambre-33cl.jpeg";
 const CERVEZA_TOSTADA_SIN_ALCOHOL = "/images/products/cerveza-tostada-sin-alcohol.jpeg";
@@ -311,6 +313,24 @@ export const menuItems: MenuItem[] = [
     category: "bebidas",
     image: AGUA_GAS,
     allergens: [],
+  },
+  {
+    id: "cafe",
+    name: "Cafe",
+    description: "Cafe solo",
+    price: 1.2,
+    category: "bebidas",
+    image: CAFE,
+    allergens: [],
+  },
+  {
+    id: "capuccino",
+    name: "Cafuccino",
+    description: "Cafe con leche cremada",
+    price: 3.0,
+    category: "bebidas",
+    image: CAPUCCINO,
+    allergens: ["lacteos"],
   },
 
   // ── POSTRES ───────────────────────────────────────────────────────────────
