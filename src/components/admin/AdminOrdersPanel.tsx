@@ -329,34 +329,34 @@ export default function AdminOrdersPanel() {
     if (normalized === 'STRIPE') {
       return {
         label: 'Tarjeta online',
-        classes: 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/30'
+        classes: 'bg-cyan-50 text-cyan-700 border border-cyan-200'
       }
     }
 
     if (normalized === 'DATAPHONE' || normalized === 'TPV' || normalized === 'CARD_PRESENT') {
       return {
         label: 'Datáfono',
-        classes: 'bg-blue-500/10 text-blue-300 border border-blue-500/30'
+        classes: 'bg-blue-50 text-blue-700 border border-blue-200'
       }
     }
 
     if (normalized === 'CASH') {
       return {
         label: 'Efectivo',
-        classes: 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+        classes: 'bg-emerald-50 text-emerald-700 border border-emerald-200'
       }
     }
 
     if (normalized === 'LOCAL') {
       return {
         label: 'Pago local',
-        classes: 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
+        classes: 'bg-amber-50 text-amber-700 border border-amber-200'
       }
     }
 
     return {
       label: normalized || 'Sin definir',
-      classes: 'bg-slate-500/10 text-slate-300 border border-slate-500/30'
+      classes: 'bg-gray-100 text-gray-700 border border-gray-200'
     }
   }
 
@@ -378,18 +378,18 @@ export default function AdminOrdersPanel() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">📊 Panel de Órdenes</h1>
-            <p className="text-slate-400">Gestiona y monitorea todos los pedidos</p>
+            <h1 className="mb-2 text-3xl font-bold text-gray-900 sm:text-4xl">📊 Panel de Órdenes</h1>
+            <p className="text-gray-600">Gestiona y monitorea todos los pedidos</p>
           </div>
           <button
             onClick={fetchOrders}
             disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+            className="min-h-[44px] rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             Actualizar
@@ -398,55 +398,55 @@ export default function AdminOrdersPanel() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white shadow-lg">
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-100 text-sm">Total de órdenes</p>
-                <p className="text-3xl font-bold">{stats.totalOrders}</p>
+                <p className="text-sm font-medium text-blue-700">Total de órdenes</p>
+                <p className="text-3xl font-extrabold text-blue-900">{stats.totalOrders}</p>
               </div>
-              <ShoppingBag className="w-12 h-12 opacity-20" />
+              <ShoppingBag className="w-12 h-12 text-blue-700 opacity-70" />
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-6 text-white shadow-lg">
+          <div className="rounded-lg border border-green-200 bg-green-50 p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-green-100 text-sm">Órdenes completadas</p>
-                <p className="text-3xl font-bold">{stats.completedOrders}</p>
+                <p className="text-sm font-medium text-green-700">Órdenes completadas</p>
+                <p className="text-3xl font-extrabold text-green-900">{stats.completedOrders}</p>
               </div>
-              <CheckCircle className="w-12 h-12 opacity-20" />
+              <CheckCircle className="w-12 h-12 text-green-700 opacity-70" />
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg p-6 text-white shadow-lg">
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-yellow-100 text-sm">Pendiente de pago</p>
-                <p className="text-3xl font-bold">{stats.pendingPayment}</p>
+                <p className="text-sm font-medium text-amber-700">Pendiente de pago</p>
+                <p className="text-3xl font-extrabold text-amber-900">{stats.pendingPayment}</p>
               </div>
-              <Clock className="w-12 h-12 opacity-20" />
+              <Clock className="w-12 h-12 text-amber-700 opacity-70" />
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-6 text-white shadow-lg">
+          <div className="rounded-lg border border-purple-200 bg-purple-50 p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-purple-100 text-sm">Revenue total</p>
-                <p className="text-3xl font-bold">€{(stats.totalRevenue / 100).toFixed(2)}</p>
+                <p className="text-sm font-medium text-purple-700">Revenue total</p>
+                <p className="text-3xl font-extrabold text-purple-900">€{(stats.totalRevenue / 100).toFixed(2)}</p>
               </div>
-              <DollarSign className="w-12 h-12 opacity-20" />
+              <DollarSign className="w-12 h-12 text-purple-700 opacity-70" />
             </div>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-          <h3 className="text-white font-semibold mb-4">Filtros</h3>
+        <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+          <h3 className="text-gray-900 font-semibold mb-4">Filtros</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <select
               value={filters.status}
               onChange={e => handleFilterChange('status', e.target.value)}
-              className="bg-slate-700 text-white rounded px-3 py-2 border border-slate-600 focus:ring-2 focus:ring-blue-500"
+              className="min-h-[44px] rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">Todos los estados</option>
               <option value="PENDING">Pendiente</option>
@@ -461,7 +461,7 @@ export default function AdminOrdersPanel() {
             <select
               value={filters.paymentStatus}
               onChange={e => handleFilterChange('paymentStatus', e.target.value)}
-              className="bg-slate-700 text-white rounded px-3 py-2 border border-slate-600 focus:ring-2 focus:ring-blue-500"
+              className="min-h-[44px] rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">Todos los pagos</option>
               <option value="PENDING">Pendiente de pago</option>
@@ -473,7 +473,7 @@ export default function AdminOrdersPanel() {
             <select
               value={filters.timeRange}
               onChange={e => handleFilterChange('timeRange', e.target.value)}
-              className="bg-slate-700 text-white rounded px-3 py-2 border border-slate-600 focus:ring-2 focus:ring-blue-500"
+              className="min-h-[44px] rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">Todo el tiempo</option>
               <option value="today">Hoy</option>
@@ -481,29 +481,29 @@ export default function AdminOrdersPanel() {
             </select>
           </div>
 
-          <div className="mt-4 rounded-lg border border-slate-600 bg-slate-900/40 p-4">
+          <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
-                <p className="text-sm font-semibold text-white">Impresión automática TPV</p>
-                <p className="text-xs text-slate-400">
+                <p className="text-sm font-semibold text-gray-900">Impresión automática TPV</p>
+                <p className="text-xs text-gray-600">
                   Detecta pedidos nuevos y lanza impresión en este equipo (debe estar abierto aquí).
                 </p>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <button
                   onClick={() => window.open('/admin/orders/print/test-ticket?autoprint=1', '_blank', 'noopener,noreferrer')}
-                  className="rounded-lg border border-emerald-500/50 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-300 transition-colors hover:bg-emerald-500/20"
+                  className="min-h-[44px] rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-100"
                 >
                   Ticket de prueba
                 </button>
 
-                <label className="text-xs text-slate-300">Modo</label>
+                <label className="text-sm text-gray-700">Modo</label>
                 <select
                   value={autoPrintMode}
                   onChange={(e) => setAutoPrintMode(e.target.value as 'ALL' | 'PAID')}
                   disabled={!autoPrintEnabled}
-                  className="bg-slate-700 text-white rounded px-3 py-2 border border-slate-600 text-xs disabled:opacity-50"
+                  className="min-h-[44px] rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 disabled:opacity-50"
                 >
                   <option value="PAID">Solo pagados</option>
                   <option value="ALL">Todos los pedidos</option>
@@ -511,10 +511,10 @@ export default function AdminOrdersPanel() {
 
                 <button
                   onClick={() => setAutoPrintEnabled((prev) => !prev)}
-                  className={`px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                  className={`min-h-[44px] px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                     autoPrintEnabled
                       ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                      : 'bg-slate-700 text-slate-200 hover:bg-slate-600'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                   }`}
                 >
                   {autoPrintEnabled ? 'ACTIVADO' : 'DESACTIVADO'}
@@ -523,7 +523,7 @@ export default function AdminOrdersPanel() {
             </div>
 
             {printQueue.length > 0 && (
-              <p className="mt-3 text-xs text-amber-300">
+              <p className="mt-3 text-xs text-amber-700">
                 Cola de impresión: {printQueue.length} pedido(s) pendiente(s).
               </p>
             )}
@@ -531,48 +531,48 @@ export default function AdminOrdersPanel() {
         </div>
 
         {/* Orders Table */}
-        <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden shadow-xl">
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-slate-900 border-b border-slate-700">
+              <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">ID</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Cliente</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Items</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Monto</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Estado</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Pago</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-300">Creado</th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-slate-300">Acciones</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">ID</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Cliente</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Items</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Monto</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Estado</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Pago</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Creado</th>
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700">
+              <tbody className="divide-y divide-gray-200">
                 {loading ? (
                   <tr>
                     <td colSpan={8} className="px-6 py-8 text-center">
-                      <Loader className="w-8 h-8 animate-spin mx-auto text-slate-400" />
+                      <Loader className="w-8 h-8 animate-spin mx-auto text-gray-400" />
                     </td>
                   </tr>
                 ) : filteredOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-6 py-8 text-center text-slate-400">
+                    <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
                       No se encontraron órdenes
                     </td>
                   </tr>
                 ) : (
                   filteredOrders.map(order => (
-                    <tr key={order.id} className="hover:bg-slate-700/50 transition-colors">
-                      <td className="px-6 py-4 text-sm text-slate-300 font-mono">
+                    <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 text-sm text-gray-700 font-mono">
                         {order.id.slice(-8)}
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-300">
+                      <td className="px-6 py-4 text-sm text-gray-700">
                         <div>{order.customerName}</div>
-                        <div className="text-xs text-slate-500">{order.customerPhone}</div>
+                        <div className="text-xs text-gray-500">{order.customerPhone}</div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-300">
+                      <td className="px-6 py-4 text-sm text-gray-700">
                         {order.items.reduce((sum, item) => sum + item.quantity, 0)} items
                       </td>
-                      <td className="px-6 py-4 text-sm font-semibold text-white">
+                      <td className="px-6 py-4 text-sm font-semibold text-gray-900">
                         €{(order.totalAmount / 100).toFixed(2)}
                       </td>
                       <td className="px-6 py-4">
@@ -591,11 +591,11 @@ export default function AdminOrdersPanel() {
 
                           <div className="flex items-center gap-2">
                           {getPaymentStatusIcon(order.paymentStatus)}
-                          <span className="text-sm text-slate-300">{order.paymentStatus}</span>
+                          <span className="text-sm text-gray-700">{order.paymentStatus}</span>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-400">
+                      <td className="px-6 py-4 text-sm text-gray-600">
                         {new Date(order.createdAt).toLocaleDateString('es-ES', {
                           month: 'short',
                           day: 'numeric',
@@ -607,17 +607,17 @@ export default function AdminOrdersPanel() {
                         <div className="relative inline-block">
                           <button
                             onClick={() => setOpenDropdown(openDropdown === order.id ? null : order.id)}
-                            className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                           >
-                            <MoreVertical className="w-4 h-4 text-slate-400" />
+                            <MoreVertical className="w-4 h-4 text-gray-500" />
                           </button>
 
                           {openDropdown === order.id && (
-                            <div className="absolute right-0 mt-2 w-48 bg-slate-700 rounded-lg border border-slate-600 shadow-lg z-50">
+                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg border border-gray-200 shadow-lg z-50">
                               <div className="py-2">
                                 <select
                                   onChange={e => handleStatusChange(order.id, e.target.value)}
-                                  className="w-full px-4 py-2 text-sm text-white bg-slate-700 border-b border-slate-600"
+                                  className="w-full px-4 py-2 text-sm text-gray-900 bg-white border-b border-gray-200"
                                 >
                                   <option value="">Cambiar estado...</option>
                                   <option value="PREPARING">Preparando</option>
@@ -632,7 +632,7 @@ export default function AdminOrdersPanel() {
                                       setShowRefundModal(true)
                                       setOpenDropdown(null)
                                     }}
-                                    className="w-full px-4 py-2 text-sm text-red-400 hover:bg-slate-600 text-left flex items-center gap-2 border-t border-slate-600"
+                                    className="w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-50 text-left flex items-center gap-2 border-t border-gray-200"
                                   >
                                     <RefreshCw className="w-4 h-4" />
                                     Reembolsar
@@ -644,7 +644,7 @@ export default function AdminOrdersPanel() {
                                     window.open(`/admin/orders/print/${order.id}`, '_blank', 'noopener,noreferrer')
                                     setOpenDropdown(null)
                                   }}
-                                  className="w-full px-4 py-2 text-sm text-emerald-400 hover:bg-slate-600 text-left flex items-center gap-2 border-t border-slate-600"
+                                  className="w-full px-4 py-2 text-sm text-emerald-700 hover:bg-gray-50 text-left flex items-center gap-2 border-t border-gray-200"
                                 >
                                   <Printer className="w-4 h-4" />
                                   Imprimir ticket
@@ -653,7 +653,7 @@ export default function AdminOrdersPanel() {
                                 {!order.invoice && order.status !== 'CANCELED' && order.status !== 'REFUNDED' && (
                                   <button
                                     onClick={() => handleGenerateInvoice(order)}
-                                    className="w-full px-4 py-2 text-sm text-amber-300 hover:bg-slate-600 text-left border-t border-slate-600"
+                                    className="w-full px-4 py-2 text-sm text-amber-700 hover:bg-gray-50 text-left border-t border-gray-200"
                                   >
                                     🧾 Generar factura
                                   </button>
@@ -664,14 +664,14 @@ export default function AdminOrdersPanel() {
                                     window.location.href = `mailto:${order.customerEmail}?subject=Tu pedido #${order.id.slice(-8)}`
                                     setOpenDropdown(null)
                                   }}
-                                  className="w-full px-4 py-2 text-sm text-blue-400 hover:bg-slate-600 text-left border-t border-slate-600"
+                                  className="w-full px-4 py-2 text-sm text-blue-700 hover:bg-gray-50 text-left border-t border-gray-200"
                                 >
                                   📧 Enviar email
                                 </button>
 
                                 <button
                                   onClick={() => handleDeleteOrder(order)}
-                                  className="w-full px-4 py-2 text-sm text-red-400 hover:bg-slate-600 text-left border-t border-slate-600"
+                                  className="w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-50 text-left border-t border-gray-200"
                                 >
                                   🗑 Eliminar pedido
                                 </button>
@@ -692,21 +692,21 @@ export default function AdminOrdersPanel() {
       {/* Refund Modal */}
       {showRefundModal && selectedOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-slate-800 rounded-lg p-6 max-w-md w-full border border-slate-700 shadow-xl">
-            <h2 className="text-xl font-bold text-white mb-4">🔄 Procesar Reembolso</h2>
+          <div className="bg-white rounded-lg p-6 max-w-md w-full border border-gray-200 shadow-xl">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">🔄 Procesar Reembolso</h2>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Orden: #{selectedOrder.id.slice(-8)}
                 </label>
-                <div className="bg-slate-700 px-4 py-2 rounded text-slate-300">
+                <div className="bg-gray-100 px-4 py-2 rounded text-gray-800">
                   €{(selectedOrder.totalAmount / 100).toFixed(2)}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Motivo (opcional)
                 </label>
                 <textarea
@@ -714,7 +714,7 @@ export default function AdminOrdersPanel() {
                   onChange={e => setRefundReason(e.target.value)}
                   placeholder="Ej: Cliente solicitó cancelación"
                   rows={3}
-                  className="w-full px-3 py-2 bg-slate-700 text-white rounded border border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  className="w-full px-3 py-2 bg-white text-gray-900 rounded border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 />
               </div>
 
@@ -724,7 +724,7 @@ export default function AdminOrdersPanel() {
                     setShowRefundModal(false)
                     setRefundReason('')
                   }}
-                  className="flex-1 px-4 py-2 bg-slate-700 text-slate-300 rounded-lg hover:bg-slate-600 transition-colors"
+                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                 >
                   Cancelar
                 </button>
