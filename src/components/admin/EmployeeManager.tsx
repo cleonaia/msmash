@@ -440,16 +440,22 @@ export function EmployeeManager() {
           <h2 className="text-2xl font-bold text-gray-900">Empleados</h2>
           <p className="text-gray-600 text-sm mt-1">Total: {employees.length}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={handleOpenCreateForm}
-            className="bg-black text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800"
+            className="min-h-[44px] bg-black text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800"
           >
             + Nuevo Empleado
           </button>
           <button
+            onClick={loadEmployees}
+            className="min-h-[44px] border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Actualizar lista
+          </button>
+          <button
             onClick={handleLock}
-            className="border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="min-h-[44px] border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             Bloquear area
           </button>
@@ -703,6 +709,12 @@ export function EmployeeManager() {
         {filteredEmployees.length === 0 && (
           <div className="p-12 text-center">
             <p className="text-gray-600">No hay empleados para ese filtro.</p>
+            <button
+              onClick={handleOpenCreateForm}
+              className="mt-4 inline-flex min-h-[44px] items-center rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
+            >
+              Crear nuevo empleado
+            </button>
           </div>
         )}
       </div>
@@ -718,21 +730,21 @@ export function EmployeeManager() {
                 value={accessData.username}
                 onChange={(e) => setAccessData({ ...accessData, username: e.target.value })}
                 placeholder="Usuario login"
-                className="rounded-lg border border-gray-700 bg-black/80 px-3 py-2 text-sm text-white placeholder-gray-400"
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400"
               />
               <input
                 type="password"
                 value={accessData.password}
                 onChange={(e) => setAccessData({ ...accessData, password: e.target.value })}
                 placeholder="Nueva contrasena (opcional)"
-                className="rounded-lg border border-gray-700 bg-black/80 px-3 py-2 text-sm text-white placeholder-gray-400"
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400"
               />
               <input
                 type="text"
                 value={accessData.code}
                 onChange={(e) => setAccessData({ ...accessData, code: e.target.value.toUpperCase() })}
                 placeholder="Codigo acceso"
-                className="rounded-lg border border-gray-700 bg-black/80 px-3 py-2 text-sm text-white placeholder-gray-400"
+                className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400"
               />
             </div>
 
@@ -751,7 +763,7 @@ export function EmployeeManager() {
                   type="date"
                   value={workLogData.date}
                   onChange={(e) => setWorkLogData({ ...workLogData, date: e.target.value })}
-                  className="rounded-lg border border-gray-700 bg-black/80 px-3 py-2 text-sm text-white"
+                  className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900"
                 />
                 <input
                   type="number"
@@ -759,14 +771,14 @@ export function EmployeeManager() {
                   step="0.5"
                   value={workLogData.hours}
                   onChange={(e) => setWorkLogData({ ...workLogData, hours: e.target.value })}
-                  className="rounded-lg border border-gray-700 bg-black/80 px-3 py-2 text-sm text-white placeholder-gray-400"
+                  className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400"
                   placeholder="Horas"
                 />
                 <input
                   type="text"
                   value={workLogData.note}
                   onChange={(e) => setWorkLogData({ ...workLogData, note: e.target.value })}
-                  className="rounded-lg border border-gray-700 bg-black/80 px-3 py-2 text-sm text-white placeholder-gray-400 md:col-span-2"
+                  className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 md:col-span-2"
                   placeholder="Nota (turno noche, extra, etc.)"
                 />
               </div>
