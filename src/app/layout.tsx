@@ -25,6 +25,10 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://msmashburger.page"),
+  icons: {
+    icon: "/icon.png",
+    apple: "/apple-icon.png",
+  },
   title: {
     default: "M SMASH — Smash Burger Terrassa",
     template: "%s | M SMASH",
