@@ -1,0 +1,32 @@
+# Robots.txt for M SMASH Burger
+# Allow all crawlers to index and follow
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api
+Disallow: /auth
+Disallow: /cliente
+Disallow: /_next
+
+# Google-specific
+User-agent: Googlebot
+Allow: /
+Allow: /api
+Allow: /auth
+
+# Rate limiting for aggressive crawlers
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+User-agent: DotBot
+Crawl-delay: 10
+
+# Sitemaps
+Sitemap: https://msmashburger.page/sitemap.xml
+
+# Host
+Host: https://msmashburger.page
