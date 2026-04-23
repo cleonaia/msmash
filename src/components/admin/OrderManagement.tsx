@@ -3,6 +3,8 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { getDeliveryOrders } from '@/actions/delivery'
 import { deleteOrderByAdmin, getAllOrders } from '@/actions/orders'
+import { epsonBluetoothPrinter, formatOrderReceipt } from '@/lib/epson-bluetooth-printer'
+import { BluetoothPrinterPanel } from './BluetoothPrinterPanel'
 
 interface DeliveryOrder {
   id: string
@@ -22,6 +24,23 @@ interface DeliveryOrder {
   collectedAt?: Date | string | null
   deliveredAt?: Date | string | null
   cancelledAt?: Date | string | null
+}
+
+function buildEpsonReceiptFromOrder(order: DeliveryOrder) {
+  return formatOrderReceipt({
+    id: order.id,
+    createdAt: order.receivedAt,
+    customerName: order.customerName,
+    customerPhone: order.customerPhone,
+    paymentStatus: order.platform === 'WEB' ? 'PAGADO' : 'DELIVERY',
+    paymentMethod: order.platform === 'WEB' ? 'LOCAL' : order.platform,
+    status: order.status,
+    totalAmount: Math.round(order.totalPrice * 100),
+    items: order.items.map((item) => ({
+      quantity: item.quantity,
+      product: { name: item.name || 'Producto' },
+    })),
+  })
 }
 
 interface LocalOrder {
@@ -74,6 +93,10 @@ export function OrderManagement() {
   const [orders, setOrders] = useState<DeliveryOrder[]>([])
   const [loading, setLoading] = useState(true)
   const [autoPrintEnabled, setAutoPrintEnabled] = useState(false)
+  const [autoBluetoothPrintEnabled, setAutoBluetoothPrintEnabled] = useState(false)
+  const [epsonConnected, setEpsonConnected] = useState(
+    epsonBluetoothPrinter.getState().status === 'connected'
+  )
   const [printQueue, setPrintQueue] = useState<string[]>([])
   const [activePrintOrderId, setActivePrintOrderId] = useState<string | null>(null)
   const [activePrintSrc, setActivePrintSrc] = useState<string | null>(null)
@@ -88,8 +111,11 @@ export function OrderManagement() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table')
   const autoPrintEnabledRef = useRef(false)
+  const autoBluetoothPrintEnabledRef = useRef(false)
   const knownOrderIdsRef = useRef<Set<string>>(new Set())
   const initializedOrdersRef = useRef(false)
+  const filterControlClass =
+    'admin-filter-control w-full min-h-[48px] rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-900 shadow-sm [color-scheme:light] transition focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 dark:border-slate-300 dark:bg-white dark:text-slate-900'
 
   const loadOrders = useCallback(async () => {
     try {
@@ -159,6 +185,10 @@ export function OrderManagement() {
   }, [autoPrintEnabled])
 
   useEffect(() => {
+    autoBluetoothPrintEnabledRef.current = autoBluetoothPrintEnabled
+  }, [autoBluetoothPrintEnabled])
+
+  useEffect(() => {
     if (typeof window === 'undefined') return
 
     const storedEnabled = window.localStorage.getItem('deliveryAutoPrintEnabled')
@@ -166,12 +196,29 @@ export function OrderManagement() {
       setAutoPrintEnabled(true)
       autoPrintEnabledRef.current = true
     }
+
+    const storedBluetoothEnabled = window.localStorage.getItem('deliveryAutoBluetoothPrintEnabled')
+    if (storedBluetoothEnabled === 'true') {
+      setAutoBluetoothPrintEnabled(true)
+      autoBluetoothPrintEnabledRef.current = true
+    }
   }, [])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
     window.localStorage.setItem('deliveryAutoPrintEnabled', String(autoPrintEnabled))
   }, [autoPrintEnabled])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem('deliveryAutoBluetoothPrintEnabled', String(autoBluetoothPrintEnabled))
+  }, [autoBluetoothPrintEnabled])
+
+  useEffect(() => {
+    return epsonBluetoothPrinter.subscribe((state) => {
+      setEpsonConnected(state.status === 'connected')
+    })
+  }, [])
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -188,6 +235,30 @@ export function OrderManagement() {
 
     const [nextOrderId, ...rest] = printQueue
     const nextOrder = orders.find((o) => o.id === nextOrderId)
+
+    if (nextOrder && autoBluetoothPrintEnabledRef.current && epsonBluetoothPrinter.getState().status === 'connected') {
+      setActivePrintOrderId(nextOrderId)
+
+      let cancelled = false
+
+      ;(async () => {
+        try {
+          await epsonBluetoothPrinter.printReceipt(buildEpsonReceiptFromOrder(nextOrder))
+        } catch (error) {
+          console.error('Error auto printing order on Epson Bluetooth:', error)
+        } finally {
+          if (!cancelled) {
+            setPrintQueue(rest)
+            setActivePrintOrderId(null)
+          }
+        }
+      })()
+
+      return () => {
+        cancelled = true
+      }
+    }
+
     const printSrc = nextOrder?.platform === 'WEB'
       ? `/admin/orders/print/${nextOrderId}?autoprint=1&ts=${Date.now()}`
       : `/admin/delivery/print/${nextOrderId}?autoprint=1&ts=${Date.now()}`
@@ -204,7 +275,7 @@ export function OrderManagement() {
     return () => {
       window.clearTimeout(releaseTimer)
     }
-  }, [activePrintOrderId, printQueue, orders])
+  }, [activePrintOrderId, printQueue, orders, epsonConnected])
 
   // Filtrar órdenes
   const filteredOrders = useMemo(() => {
@@ -268,12 +339,51 @@ export function OrderManagement() {
     }
   }
 
+  const handleBluetoothPrintOrder = async (order: DeliveryOrder) => {
+    try {
+      if (epsonBluetoothPrinter.getState().status !== 'connected') {
+        alert('Conecta primero la Epson Bluetooth')
+        return
+      }
+
+      await epsonBluetoothPrinter.printReceipt(buildEpsonReceiptFromOrder(order))
+    } catch (error) {
+      console.error('Error printing order on Epson Bluetooth:', error)
+      alert('No se pudo imprimir el ticket por Epson Bluetooth')
+    }
+  }
+
   if (loading) {
     return <div className="animate-pulse bg-gray-200 h-96 rounded-lg" />
   }
 
   return (
     <div className="space-y-6">
+      <BluetoothPrinterPanel
+        title="Epson Bluetooth TPV"
+        description="Conexion manual para imprimir tickets de pedidos directamente en Epson Bluetooth."
+        testLabel="Ticket de prueba TPV"
+        onTestPrint={async () => {
+          await epsonBluetoothPrinter.printReceipt(
+            formatOrderReceipt({
+              id: 'TPV-TEST-0001',
+              createdAt: new Date(),
+              customerName: 'Cliente TPV',
+              customerPhone: '600 000 000',
+              paymentStatus: 'PAGADO',
+              paymentMethod: 'TPV',
+              status: 'COMPLETED',
+              totalAmount: 1890,
+              items: [
+                { quantity: 1, product: { name: 'The M Smash' } },
+                { quantity: 1, product: { name: 'Patatas' } },
+                { quantity: 1, product: { name: 'Bebida' } },
+              ],
+            })
+          )
+        }}
+      />
+
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
@@ -305,7 +415,7 @@ export function OrderManagement() {
               placeholder="Nombre, ID de orden, teléfono..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-3 text-sm text-gray-900 focus:border-transparent focus:ring-2 focus:ring-black"
+              className={filterControlClass}
             />
           </div>
 
@@ -315,7 +425,7 @@ export function OrderManagement() {
             <select
               value={selectedPlatform}
               onChange={(e) => setSelectedPlatform(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-3 text-sm text-gray-900 focus:border-transparent focus:ring-2 focus:ring-black"
+              className={`${filterControlClass} pr-10`}
             >
               <option value="all">Todas</option>
               <option value="WEB">Web</option>
@@ -331,7 +441,7 @@ export function OrderManagement() {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-3 text-sm text-gray-900 focus:border-transparent focus:ring-2 focus:ring-black"
+              className={`${filterControlClass} pr-10`}
             >
               <option value="all">Todos</option>
               <option value="PENDING">⏳ Pendiente</option>
@@ -350,19 +460,19 @@ export function OrderManagement() {
           </div>
 
           {/* Date Range */}
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-2 md:min-w-[360px]">
             <input
               type="date"
               value={dateRange.start}
               onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-              className="rounded-lg border border-gray-300 px-3 py-3 text-sm text-gray-900 focus:border-transparent focus:ring-2 focus:ring-black"
+              className={filterControlClass}
             />
-            <span className="text-gray-400">-</span>
+            <span className="pb-3 text-gray-500">-</span>
             <input
               type="date"
               value={dateRange.end}
               onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-              className="rounded-lg border border-gray-300 px-3 py-3 text-sm text-gray-900 focus:border-transparent focus:ring-2 focus:ring-black"
+              className={filterControlClass}
             />
           </div>
 
@@ -385,24 +495,48 @@ export function OrderManagement() {
         </div>
 
         <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-gray-900">Impresión automática TPV</p>
-              <p className="text-xs text-gray-600">
-                Detecta pedidos nuevos y lanza impresión en este equipo.
-              </p>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-gray-900">Impresión automática TPV (navegador)</p>
+                <p className="text-xs text-gray-600">Detecta pedidos nuevos y abre ticket de impresión en este equipo.</p>
+              </div>
+
+              <button
+                onClick={() => setAutoPrintEnabled((prev) => !prev)}
+                className={`min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                  autoPrintEnabled
+                    ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                {autoPrintEnabled ? 'ACTIVADO' : 'DESACTIVADO'}
+              </button>
             </div>
 
-            <button
-              onClick={() => setAutoPrintEnabled((prev) => !prev)}
-              className={`min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                autoPrintEnabled
-                  ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              {autoPrintEnabled ? 'ACTIVADO' : 'DESACTIVADO'}
-            </button>
+            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-gray-900">Autoimpresión Epson Bluetooth</p>
+                <p className="text-xs text-gray-600">
+                  Imprime nuevos pedidos por Bluetooth cuando la Epson este conectada.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setAutoBluetoothPrintEnabled((prev) => !prev)}
+                className={`min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                  autoBluetoothPrintEnabled
+                    ? 'bg-sky-600 text-white hover:bg-sky-700'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                {autoBluetoothPrintEnabled ? 'ACTIVADO' : 'DESACTIVADO'}
+              </button>
+            </div>
+
+            {autoBluetoothPrintEnabled && !epsonConnected ? (
+              <p className="text-xs text-amber-700">Autoimpresión Bluetooth activa, pero Epson desconectada.</p>
+            ) : null}
           </div>
 
           {printQueue.length > 0 && (
@@ -517,6 +651,12 @@ export function OrderManagement() {
                         Imprimir
                       </button>
                       <button
+                        onClick={() => handleBluetoothPrintOrder(order)}
+                        className="ml-2 min-h-[40px] rounded border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-700 hover:bg-sky-100"
+                      >
+                        Epson BT
+                      </button>
+                      <button
                         onClick={() => handleDeleteOrder(order)}
                         className="ml-2 min-h-[40px] rounded bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700"
                       >
@@ -578,6 +718,12 @@ export function OrderManagement() {
                     className="w-full rounded bg-black px-3 py-2 text-xs font-semibold text-white hover:bg-gray-800"
                   >
                     Imprimir ticket
+                  </button>
+                  <button
+                    onClick={() => handleBluetoothPrintOrder(order)}
+                    className="w-full rounded border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-700 hover:bg-sky-100"
+                  >
+                    Epson Bluetooth
                   </button>
                   <button
                     onClick={() => handleDeleteOrder(order)}

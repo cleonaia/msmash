@@ -9,6 +9,8 @@ import {
   markInvoiceAsPaid,
   sendInvoiceEmail
 } from '@/actions/invoices'
+import { epsonBluetoothPrinter, formatInvoiceReceipt } from '@/lib/epson-bluetooth-printer'
+import { BluetoothPrinterPanel } from './BluetoothPrinterPanel'
 
 interface Invoice {
   id: string
@@ -20,6 +22,7 @@ interface Invoice {
   status: string
   createdAt: string | Date
   orderId?: string | null
+  items?: Array<{ description: string; quantity: number; subtotal: number }>
 }
 
 interface PaidOrder {
@@ -61,8 +64,11 @@ export function InvoiceManager() {
   const handleCreateInvoice = async (orderId: string) => {
     try {
       setLoading(true)
-      await createInvoiceFromOrder(orderId, taxIdByOrder[orderId] || undefined)
+      const createdInvoice = await createInvoiceFromOrder(orderId, taxIdByOrder[orderId] || undefined)
       await loadData()
+      if (epsonBluetoothPrinter.getState().status === 'connected') {
+        await epsonBluetoothPrinter.printReceipt(formatInvoiceReceipt(createdInvoice as any))
+      }
       alert('Factura creada correctamente')
     } catch (error) {
       console.error('Error creating invoice:', error)
@@ -125,8 +131,64 @@ export function InvoiceManager() {
     return 'bg-amber-100 text-amber-700'
   }
 
+  const handlePrintInvoice = async (invoice: Invoice) => {
+    try {
+      if (epsonBluetoothPrinter.getState().status !== 'connected') {
+        alert('Conecta primero la Epson Bluetooth')
+        return
+      }
+
+      const items = invoice.items || []
+      const subtotal = items.reduce((sum, item) => sum + item.subtotal, 0)
+      const taxAmount = Math.max(invoice.totalAmount - subtotal, 0)
+
+      await epsonBluetoothPrinter.printReceipt(
+        formatInvoiceReceipt({
+          invoiceNumber: invoice.invoiceNumber,
+          createdAt: invoice.createdAt,
+          customerName: invoice.customerName,
+          customerEmail: invoice.customerEmail,
+          customerTaxId: invoice.customerTaxId,
+          subtotal: subtotal || invoice.totalAmount,
+          taxAmount: subtotal ? taxAmount : 0,
+          totalAmount: invoice.totalAmount,
+          items,
+        })
+      )
+    } catch (error) {
+      console.error('Error printing invoice on Epson Bluetooth:', error)
+      alert('No se pudo imprimir la factura en la Epson Bluetooth')
+    }
+  }
+
   return (
     <div className="space-y-8">
+      <BluetoothPrinterPanel
+        title="Epson Bluetooth"
+        description="Conecta una Epson compatible por Bluetooth y manda facturas sin pasar por el dialogo del navegador."
+        testLabel="Factura de prueba"
+        onTestPrint={async () => {
+          await epsonBluetoothPrinter.printReceipt(
+            formatInvoiceReceipt({
+              invoiceNumber: 'TEST-BLUETOOTH',
+              createdAt: new Date(),
+              customerName: 'Cliente de prueba',
+              customerEmail: 'demo@msmashburger.page',
+              customerPhone: '600 000 000',
+              customerTaxId: 'X0000000X',
+              subtotal: 2890,
+              taxAmount: 290,
+              totalAmount: 3180,
+              items: [
+                { description: 'The M Smash', quantity: 1, subtotal: 1290 },
+                { description: 'Patatas', quantity: 1, subtotal: 400 },
+                { description: 'Combo bebida', quantity: 1, subtotal: 1200 },
+              ],
+            })
+          )
+        }}
+      />
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-lg p-5 border border-gray-200">
           <p className="text-sm font-medium text-gray-700">Facturas totales</p>
@@ -230,6 +292,13 @@ export function InvoiceManager() {
                         >
                           Descargar PDF
                         </a>
+                        <button
+                          onClick={() => handlePrintInvoice(invoice)}
+                          disabled={loading}
+                          className="min-h-[40px] rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-700 hover:bg-sky-100 disabled:opacity-50"
+                        >
+                          Epson Bluetooth
+                        </button>
                         {invoice.status === 'DRAFT' && (
                           <button
                             onClick={() => handleSendInvoice(invoice.id)}
