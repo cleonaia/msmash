@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { getDeliveryOrders } from '@/actions/delivery'
-import { deleteOrderByAdmin, getAllOrders } from '@/actions/orders'
+import { deleteOrderByAdmin, getAllOrders, updateOrderStatus } from '@/actions/orders'
 import { epsonBluetoothPrinter, formatOrderReceipt } from '@/lib/epson-bluetooth-printer'
 import { BluetoothPrinterPanel } from './BluetoothPrinterPanel'
 
@@ -353,6 +353,17 @@ export function OrderManagement() {
     }
   }
 
+  const handleMarkAsPaid = async (order: DeliveryOrder) => {
+    try {
+      await updateOrderStatus(order.id, 'CONFIRMED')
+      await loadOrders()
+      alert('Pedido marcado como pagado')
+    } catch (error) {
+      console.error('Error marking order as paid:', error)
+      alert('No se pudo marcar el pedido como pagado')
+    }
+  }
+
   if (loading) {
     return <div className="animate-pulse bg-gray-200 h-96 rounded-lg" />
   }
@@ -425,7 +436,7 @@ export function OrderManagement() {
             <select
               value={selectedPlatform}
               onChange={(e) => setSelectedPlatform(e.target.value)}
-              className={`${filterControlClass} pr-10`}
+              className={`${filterControlClass} pr-10 bg-white text-gray-900`}
             >
               <option value="all">Todas</option>
               <option value="WEB">Web</option>
@@ -441,7 +452,7 @@ export function OrderManagement() {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className={`${filterControlClass} pr-10`}
+              className={`${filterControlClass} pr-10 bg-white text-gray-900`}
             >
               <option value="all">Todos</option>
               <option value="PENDING">⏳ Pendiente</option>
@@ -656,6 +667,14 @@ export function OrderManagement() {
                       >
                         Epson BT
                       </button>
+                      {order.status === 'PENDING' && (
+                        <button
+                          onClick={() => handleMarkAsPaid(order)}
+                          className="ml-2 min-h-[40px] rounded border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"
+                        >
+                          Marcar pagado
+                        </button>
+                      )}
                       <button
                         onClick={() => handleDeleteOrder(order)}
                         className="ml-2 min-h-[40px] rounded bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700"
@@ -725,6 +744,14 @@ export function OrderManagement() {
                   >
                     Epson Bluetooth
                   </button>
+                  {order.status === 'PENDING' && (
+                    <button
+                      onClick={() => handleMarkAsPaid(order)}
+                      className="w-full rounded border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"
+                    >
+                      Marcar pagado
+                    </button>
+                  )}
                   <button
                     onClick={() => handleDeleteOrder(order)}
                     className="w-full rounded bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700"
