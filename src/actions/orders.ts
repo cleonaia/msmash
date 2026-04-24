@@ -299,6 +299,29 @@ export async function updateOrderStatus(
 }
 
 /**
+ * Marca una orden como pagada y confirmada.
+ */
+export async function markOrderAsPaid(orderId: string) {
+  try {
+    const order = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        paymentStatus: 'COMPLETED',
+        status: 'CONFIRMED'
+      }
+    })
+
+    revalidatePath('/pedidos')
+    revalidatePath('/admin')
+
+    return order
+  } catch (error) {
+    console.error('Error marking order as paid:', error)
+    throw error
+  }
+}
+
+/**
  * Confirma una orden con pago en efectivo
  */
 export async function confirmCashOrder(orderId: string): Promise<CreateOrderResult> {

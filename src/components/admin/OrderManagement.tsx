@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { getDeliveryOrders } from '@/actions/delivery'
-import { deleteOrderByAdmin, getAllOrders, updateOrderStatus } from '@/actions/orders'
+import { deleteOrderByAdmin, getAllOrders, markOrderAsPaid } from '@/actions/orders'
 import { epsonBluetoothPrinter, formatOrderReceipt } from '@/lib/epson-bluetooth-printer'
 import { BluetoothPrinterPanel } from './BluetoothPrinterPanel'
 
@@ -12,6 +12,7 @@ interface DeliveryOrder {
   externalOrderId: string
   merchantId: string
   status: string
+  paymentStatus?: string | null
   customerName: string
   customerPhone?: string | null
   deliveryAddress?: string | null
@@ -71,6 +72,7 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; icon: string }> 
   READY: { bg: 'bg-indigo-50', text: 'text-indigo-700', icon: '📦' },
   COMPLETED: { bg: 'bg-green-50', text: 'text-green-700', icon: '✓' },
   CANCELED: { bg: 'bg-red-50', text: 'text-red-700', icon: '✗' },
+  PAYMENT_FAILED: { bg: 'bg-rose-50', text: 'text-rose-700', icon: '⚠' },
   REFUNDED: { bg: 'bg-gray-100', text: 'text-gray-700', icon: '↩' }
 }
 
@@ -86,7 +88,20 @@ function isCompletedStatus(status: string) {
 }
 
 function isClosedStatus(status: string) {
-  return ['delivered', 'cancelled', 'COMPLETED', 'CANCELED', 'REFUNDED'].includes(status)
+  return ['delivered', 'cancelled', 'COMPLETED', 'CANCELED', 'REFUNDED', 'PAYMENT_FAILED'].includes(status)
+}
+
+function getDisplayedStatus(order: DeliveryOrder) {
+  if (order.paymentStatus === 'COMPLETED') return 'CONFIRMED'
+  return order.status
+}
+
+function getPaymentLabel(paymentStatus?: string | null) {
+  if (paymentStatus === 'COMPLETED') return 'Pagado'
+  if (paymentStatus === 'PENDING') return 'Pendiente'
+  if (paymentStatus === 'FAILED') return 'Fallido'
+  if (paymentStatus === 'REFUNDED') return 'Reembolsado'
+  return 'Sin estado'
 }
 
 export function OrderManagement() {
@@ -137,6 +152,7 @@ export function OrderManagement() {
         externalOrderId: `WEB-${order.id.slice(-8).toUpperCase()}`,
         merchantId: 'WEB',
         status: order.status,
+        paymentStatus: order.paymentStatus,
         customerName: order.customerName,
         customerPhone: order.customerPhone,
         deliveryAddress: null,
@@ -360,9 +376,9 @@ export function OrderManagement() {
 
   const handleMarkAsPaid = async (order: DeliveryOrder) => {
     try {
-      await updateOrderStatus(order.id, 'CONFIRMED')
+      await markOrderAsPaid(order.id)
       await loadOrders()
-      alert('Pedido marcado como pagado')
+      alert('Pedido marcado como pagado y confirmado')
     } catch (error) {
       console.error('Error marking order as paid:', error)
       alert('No se pudo marcar el pedido como pagado')
@@ -628,7 +644,10 @@ export function OrderManagement() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {sortedOrders.map((order) => {
-                const statusInfo = STATUS_COLORS[order.status]
+                const displayStatus = getDisplayedStatus(order)
+                const statusInfo = STATUS_COLORS[displayStatus]
+                const paymentLabel = getPaymentLabel(order.paymentStatus)
+                const isPaid = order.paymentStatus === 'COMPLETED'
                 return (
                   <tr key={order.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm font-mono text-gray-900">{order.externalOrderId}</td>
@@ -646,9 +665,16 @@ export function OrderManagement() {
                     </td>
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">€{order.totalPrice.toFixed(2)}</td>
                     <td className="px-6 py-4 text-sm">
-                      <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${statusInfo?.bg} ${statusInfo?.text}`}>
-                        {statusInfo?.icon} {order.status}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <span className={`inline-block w-fit px-2 py-1 rounded text-xs font-medium ${statusInfo?.bg} ${statusInfo?.text}`}>
+                          {statusInfo?.icon} {displayStatus}
+                        </span>
+                        <span className={`w-fit rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                          isPaid ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+                        }`}>
+                          Pago: {paymentLabel}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {new Date(order.receivedAt).toLocaleString('es-ES', {
@@ -677,7 +703,7 @@ export function OrderManagement() {
                       >
                         Epson BT
                       </button>
-                      {order.status === 'PENDING' && (
+                      {!isPaid && (
                         <button
                           onClick={() => handleMarkAsPaid(order)}
                           className="ml-2 min-h-[40px] rounded border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"
@@ -704,7 +730,10 @@ export function OrderManagement() {
       {viewMode === 'cards' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {sortedOrders.map((order) => {
-            const statusInfo = STATUS_COLORS[order.status]
+            const displayStatus = getDisplayedStatus(order)
+            const statusInfo = STATUS_COLORS[displayStatus]
+            const paymentLabel = getPaymentLabel(order.paymentStatus)
+            const isPaid = order.paymentStatus === 'COMPLETED'
             return (
               <div key={order.id} className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden hover:shadow-lg transition">
                 <div className="p-4 space-y-3">
@@ -731,9 +760,14 @@ export function OrderManagement() {
 
                   <div className="pt-3 border-t flex items-center justify-between">
                     <p className="font-bold text-lg">€{order.totalPrice.toFixed(2)}</p>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${statusInfo?.bg} ${statusInfo?.text}`}>
-                      {statusInfo?.icon} {order.status}
-                    </span>
+                    <div className="text-right">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${statusInfo?.bg} ${statusInfo?.text}`}>
+                        {statusInfo?.icon} {displayStatus}
+                      </span>
+                      <p className={`mt-1 text-[10px] font-semibold ${isPaid ? 'text-emerald-700' : 'text-amber-700'}`}>
+                        Pago: {paymentLabel}
+                      </p>
+                    </div>
                   </div>
 
                   <button
@@ -754,7 +788,7 @@ export function OrderManagement() {
                   >
                     Epson Bluetooth
                   </button>
-                  {order.status === 'PENDING' && (
+                  {!isPaid && (
                     <button
                       onClick={() => handleMarkAsPaid(order)}
                       className="w-full rounded border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"

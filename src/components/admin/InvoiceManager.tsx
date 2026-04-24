@@ -207,10 +207,10 @@ export function InvoiceManager() {
       </div>
 
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Pedidos listos para facturar</h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Pedidos confirmados sin factura</h3>
 
         {pendingOrders.length === 0 ? (
-          <p className="text-sm text-gray-600">No hay órdenes pendientes de facturación.</p>
+          <p className="text-sm text-gray-600">No hay pedidos confirmados pendientes de factura.</p>
         ) : (
           <div className="space-y-3">
             {pendingOrders.map((order) => (
