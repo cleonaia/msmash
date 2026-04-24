@@ -115,7 +115,12 @@ export function OrderManagement() {
   const knownOrderIdsRef = useRef<Set<string>>(new Set())
   const initializedOrdersRef = useRef(false)
   const filterControlClass =
-    'admin-filter-control w-full min-h-[48px] rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-900 shadow-sm [color-scheme:light] transition focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 dark:border-slate-300 dark:bg-white dark:text-slate-900'
+    'admin-filter-control w-full min-h-[48px] rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-900 shadow-sm appearance-none [color-scheme:light] transition focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 placeholder:text-slate-400'
+  const lightFieldStyle = {
+    backgroundColor: '#ffffff',
+    color: '#0f172a',
+    WebkitTextFillColor: '#0f172a',
+  } as const
 
   const loadOrders = useCallback(async () => {
     try {
@@ -427,6 +432,7 @@ export function OrderManagement() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={filterControlClass}
+              style={lightFieldStyle}
             />
           </div>
 
@@ -437,6 +443,7 @@ export function OrderManagement() {
               value={selectedPlatform}
               onChange={(e) => setSelectedPlatform(e.target.value)}
               className={`${filterControlClass} pr-10 bg-white text-gray-900`}
+              style={lightFieldStyle}
             >
               <option value="all">Todas</option>
               <option value="WEB">Web</option>
@@ -453,6 +460,7 @@ export function OrderManagement() {
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
               className={`${filterControlClass} pr-10 bg-white text-gray-900`}
+              style={lightFieldStyle}
             >
               <option value="all">Todos</option>
               <option value="PENDING">⏳ Pendiente</option>
@@ -477,6 +485,7 @@ export function OrderManagement() {
               value={dateRange.start}
               onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
               className={filterControlClass}
+              style={lightFieldStyle}
             />
             <span className="pb-3 text-gray-500">-</span>
             <input
@@ -484,6 +493,7 @@ export function OrderManagement() {
               value={dateRange.end}
               onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
               className={filterControlClass}
+              style={lightFieldStyle}
             />
           </div>
 
@@ -495,8 +505,8 @@ export function OrderManagement() {
                 onClick={() => setViewMode(mode)}
                 className={`min-h-[44px] px-4 py-2 rounded-lg font-medium text-sm ${
                   viewMode === mode
-                    ? 'bg-black text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'bg-sky-100 text-slate-900 border border-sky-300 shadow-sm'
+                      : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
                 }`}
               >
                 {mode === 'table' ? '📋' : '📇'}
@@ -657,13 +667,13 @@ export function OrderManagement() {
                               : `/admin/delivery/print/${order.id}`
                           window.open(printUrl, '_blank', 'noopener,noreferrer')
                         }}
-                        className="min-h-[40px] rounded bg-black px-3 py-2 text-xs font-semibold text-white hover:bg-gray-800"
+                        className="min-h-[40px] rounded border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50"
                       >
                         Imprimir
                       </button>
                       <button
                         onClick={() => handleBluetoothPrintOrder(order)}
-                        className="ml-2 min-h-[40px] rounded border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-700 hover:bg-sky-100"
+                        className="ml-2 min-h-[40px] rounded border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-800 hover:bg-sky-100"
                       >
                         Epson BT
                       </button>
@@ -734,13 +744,13 @@ export function OrderManagement() {
                           : `/admin/delivery/print/${order.id}`
                       window.open(printUrl, '_blank', 'noopener,noreferrer')
                     }}
-                    className="w-full rounded bg-black px-3 py-2 text-xs font-semibold text-white hover:bg-gray-800"
+                    className="w-full rounded border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50"
                   >
                     Imprimir ticket
                   </button>
                   <button
                     onClick={() => handleBluetoothPrintOrder(order)}
-                    className="w-full rounded border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-700 hover:bg-sky-100"
+                    className="w-full rounded border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-800 hover:bg-sky-100"
                   >
                     Epson Bluetooth
                   </button>
