@@ -50,7 +50,7 @@ const MENU_KIDS = "/images/products/menu-kids.jpeg";
 const FRANKFURT = "/images/products/frankfurt.jpeg";
 const TEQUENOS = "/images/products/tequenos.jpeg";
 const FRIES_M = "/images/products/fries-m.jpeg";
-const CRISPY_CHICKEN = "/images/products/crispy-chicken.jpeg";
+const CRISPY_FINGER = "/images/products/crispy-chicken.jpeg";
 const CHEESECAKE_NUTELLA = "/images/products/cheesecake-nutella.svg";
 const PRODUCT_CARD_PLACEHOLDER = "/images/products/placeholder.svg";
 const PEPSI_CLASICA = "/images/products/pepsi-cola.png";
@@ -104,11 +104,11 @@ export const menuItems: MenuItem[] = [
   },
   {
     id: "super-crispy-chicken",
-    name: "THE SÚPER CRISPY CHICKEN BURGER",
+    name: "THE SÚPER CHICKEN BURGER",
     description: "Pollo extra crujiente marinado con especias japonesas, queso cheddar, tomate Pera, Salsa M, salsa tártara koreana, cebolla caramelizada y su pan brioche",
     price: 11.9,
     category: "burguers",
-    image: THE_SUPER_CRISPY,
+    image: THE_SUPER_CHICKEN,
     allergens: ["gluten", "lacteos", "huevos"],
     featured: true,
   },
@@ -125,12 +125,34 @@ export const menuItems: MenuItem[] = [
   {
     id: "the-special",
     name: "THE SPECIAL🍔",
-    description: "Pan brioche,Smash Burguer, Queso cheddar, lechuga, tomate, Huevo, Patata palito, salsas de la casa,bacon.",
-    price: 11.5,
+    description: "Pan brioche, Smash Burguer, queso cheddar, lechuga, tomate, huevo, salsas de la casa y bacon.",
+    price: 12.5,
     category: "burguers",
     image: PRODUCT_CARD_PLACEHOLDER,
     allergens: ["gluten", "lacteos", "huevos"],
     featured: true,
+  },
+  {
+    id: "the-three-max",
+    name: "The Three Max",
+    description: "Pan brioche, triple Smash burguer, quesos cheddar y Edam, cebolla caramelizada y salsa de la casa",
+    price: 15.5,
+    category: "burguers",
+    image: PRODUCT_CARD_PLACEHOLDER,
+    allergens: ["gluten", "lacteos", "huevos"],
+    featured: true,
+    badge: "Nuevo",
+  },
+  {
+    id: "the-hawaian-burger",
+    name: "The Hawaian Burger",
+    description: "Pan brioche, doble Smash burguer, doble queso Edam, trozo de piña asada, costillar desmenuzado (Receta de la Abuela), salsas de la casa y miel",
+    price: 17.0,
+    category: "burguers",
+    image: PRODUCT_CARD_PLACEHOLDER,
+    allergens: ["gluten", "lacteos", "huevos"],
+    featured: true,
+    badge: "Nuevo",
   },
   {
     id: "menu-kids",
@@ -165,11 +187,11 @@ export const menuItems: MenuItem[] = [
   },
   {
     id: "crispy-chicken",
-    name: "CRISPY CHICKEN",
-    description: "6 Tiras de pollo rebozadas con especias japonesas y acompañada con una tártara koreana",
+    name: "CRISPY FINGER",
+    description: "6 tiras de pollo rebozadas con especias japonesas y acompañadas con una tártara koreana",
     price: 6.0,
     category: "entrantres",
-    image: CRISPY_CHICKEN,
+    image: CRISPY_FINGER,
     allergens: ["gluten", "huevos"],
   },
   {
@@ -336,11 +358,11 @@ export const menuItems: MenuItem[] = [
   // ── POSTRES ───────────────────────────────────────────────────────────────
   {
     id: "cheesecake-nutella",
-    name: "Cheesecake de Nutella",
-    description: "La clásica tarta de queso junto a una base de Nutella y lluvia de cacao en polvo. Es un buen final feliz",
+    name: "Cheesecake de Lottus",
+    description: "La clásica tarta de queso junto a una base de Lottus y lluvia de chocolate caliente.",
     price: 6.5,
     category: "postres",
-    image: CHEESECAKE_NUTELLA,
+    image: PRODUCT_CARD_PLACEHOLDER,
     allergens: ["gluten", "lacteos", "huevos"],
   },
   {

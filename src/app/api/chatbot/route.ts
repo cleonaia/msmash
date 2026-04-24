@@ -185,7 +185,8 @@ function findMenuItemInText(raw: string) {
       return true;
     }
 
-    if (item.id === "the-super-crispy" && /(super|súper|crispy chicken|pollo crujiente)/.test(text)) return true;
+    if (item.id === "super-crispy-chicken" && /(super|súper|super chicken|crispy chicken|pollo crujiente)/.test(text)) return true;
+    if (item.id === "crispy-chicken" && /(crispy finger|finger|tiras de pollo|pollo crujiente)/.test(text)) return true;
     if (item.id === "the-m-smash" && /(m smash|double smash|doble smash)/.test(text)) return true;
     if (item.id === "the-crispy" && /(the crispy|crispy|crujiente)/.test(text)) return true;
     if (item.id === "the-basic" && /(the basic|basic|burger basica|burger básica|la basica|la básica)/.test(text)) return true;

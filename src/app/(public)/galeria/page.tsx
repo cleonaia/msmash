@@ -28,11 +28,11 @@ const galleryItemsRaw = [
   { src: "/images/products/the-m-smash.jpeg", alt: "The M Smash Burger", caption: "The M Smash" },
   { src: "/images/products/burger-the-basic.jpeg", alt: "Burger The Basic", caption: "The Basic Blue" },
   { src: "/images/products/the-crispy.jpeg", alt: "The Crispy", caption: "The Crispy" },
-  { src: "/images/products/the-super-crispy.jpeg", alt: "The Super Crispy", caption: "Super Crispy" },
+  { src: "/images/products/the-super-crispy.jpeg", alt: "The Súper Chicken Burger", caption: "The Súper Chicken" },
   { src: "/images/products/menu-kids.jpeg", alt: "Menu Kids", caption: "Menu Kids" },
   { src: "/images/products/tequenos.jpeg", alt: "Tequenos", caption: "Tequenos" },
   { src: "/images/products/fries-m.jpeg", alt: "Fries M", caption: "Fries M" },
-  { src: "/images/products/crispy-chicken.jpeg", alt: "Crispy Chicken", caption: "Crispy Chicken" },
+  { src: "/images/products/crispy-chicken.jpeg", alt: "Crispy Finger", caption: "Crispy Finger" },
 ];
 
 const galleryItems = galleryItemsRaw.filter(
@@ -41,9 +41,9 @@ const galleryItems = galleryItemsRaw.filter(
 
 const tiktokReels = [
   { src: "/images/products/the-m-smash.jpeg", title: "The Smash", subtitle: "Plancha en vivo", length: "0:15" },
-  { src: "/images/products/the-super-crispy.jpeg", title: "Queso fundido", subtitle: "Costra dorada", length: "0:12" },
+  { src: "/images/products/the-super-crispy.jpeg", title: "The Súper Chicken", subtitle: "Costra dorada", length: "0:12" },
   { src: "/images/products/the-crispy.jpeg", title: "La costra dorada", subtitle: "Smash al punto", length: "0:18" },
-  { src: "/images/products/crispy-chicken.jpeg", title: "Crispy Chicken", subtitle: "Golden crunch", length: "0:14" },
+  { src: "/images/products/crispy-chicken.jpeg", title: "Crispy Finger", subtitle: "Golden crunch", length: "0:14" },
 ];
 
 const uniqueTikTokReels = tiktokReels.filter(
