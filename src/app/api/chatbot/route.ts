@@ -187,6 +187,9 @@ function findMenuItemInText(raw: string) {
 
     if (item.id === "super-crispy-chicken" && /(super|súper|super chicken|crispy chicken|pollo crujiente)/.test(text)) return true;
     if (item.id === "crispy-chicken" && /(crispy finger|finger|tiras de pollo|pollo crujiente)/.test(text)) return true;
+    if (item.id === "the-three-max" && /(three max|triple smash|triple burger)/.test(text)) return true;
+    if (item.id === "the-hawaian-burger" && /(hawaian|hawaiian|hawaiana|hamburguesa hawaiana|piña asada)/.test(text)) return true;
+    if (item.id === "cheesecake-nutella" && /(cheesecake lottus|cheesecake lotus|lottus|lotus)/.test(text)) return true;
     if (item.id === "the-m-smash" && /(m smash|double smash|doble smash)/.test(text)) return true;
     if (item.id === "the-crispy" && /(the crispy|crispy|crujiente)/.test(text)) return true;
     if (item.id === "the-basic" && /(the basic|basic|burger basica|burger básica|la basica|la básica)/.test(text)) return true;

@@ -43,6 +43,7 @@ const THE_CRISPY = "/images/products/the-crispy.jpeg";
 const THE_M_SMASH = "/images/products/the-m-smash.jpeg";
 const THE_BASIC = "/images/products/the-basic.jpeg";
 const THE_SUPER_CRISPY = "/images/products/the-super-crispy.jpeg";
+const THE_SUPER_CHICKEN = THE_SUPER_CRISPY;
 const THE_VEGANA = "/images/products/placeholder.svg";
 const THE_SPECIAL = "/images/products/placeholder.svg";
 const CHEESECAKE_OREO = "/images/products/placeholder.svg";
