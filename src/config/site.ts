@@ -33,9 +33,9 @@ export const legalInfo = {
   legalEmail: contactInfo.email,
   supportPhone: contactInfo.phonePretty,
 
-  iban: "ES55 2100 0087 6302 0212 1332",
+  iban: "ES65 2100 0087 6902 0210 0294",
   bic: "CAIXESBBXXX",
-  bankAccountHolder: "William Da Silva Ferrari",
+  bankAccountHolder: "Pablo Edelmer Marin Sierra",
 
   owner: {
     name: "William Da Silva Ferrari",

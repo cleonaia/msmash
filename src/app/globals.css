@@ -56,9 +56,32 @@ body::after {
 ::-webkit-scrollbar-thumb { background: #8A2BE255; border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: #8A2BE2; }
 
-/* ─── Dark date/select inputs ─── */
+/* Keep native date/select controls readable across admin surfaces. */
 input[type="date"], select {
-  color-scheme: dark;
+  color-scheme: light;
+}
+
+/* Force readable controls in admin filters even when dark color forcing is enabled. */
+.admin-filter-control {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+.admin-filter-control::placeholder {
+  color: #94a3b8 !important;
+}
+
+select.admin-filter-control option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+input[type="date"].admin-filter-control::-webkit-calendar-picker-indicator {
+  opacity: 0.85;
+  filter: none;
 }
 
 /* ─── Typography helpers ─── */

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { getDeliveryOrders } from '@/actions/delivery'
-import { deleteOrderByAdmin, getAllOrders, markOrderAsPaid } from '@/actions/orders'
+import { deleteOrderByAdmin, getAllOrders, markOrderAsPaid, updateOrderStatus } from '@/actions/orders'
 import { epsonBluetoothPrinter, formatOrderReceipt } from '@/lib/epson-bluetooth-printer'
 import { BluetoothPrinterPanel } from './BluetoothPrinterPanel'
 
@@ -83,6 +83,8 @@ const PLATFORM_COLORS: Record<string, string> = {
   WEB: 'bg-emerald-600 text-white'
 }
 
+const WEB_ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'COMPLETED', 'CANCELED'] as const
+
 function isCompletedStatus(status: string) {
   return status === 'delivered' || status === 'COMPLETED'
 }
@@ -133,8 +135,13 @@ export function OrderManagement() {
     'admin-filter-control w-full min-h-[48px] rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-900 shadow-sm appearance-none [color-scheme:light] transition focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 placeholder:text-slate-400'
   const lightFieldStyle = {
     backgroundColor: '#ffffff',
+    backgroundImage: 'none',
     color: '#0f172a',
     WebkitTextFillColor: '#0f172a',
+    WebkitAppearance: 'none',
+    appearance: 'none',
+    colorScheme: 'light',
+    boxShadow: '0 0 0 1000px #ffffff inset',
   } as const
 
   const loadOrders = useCallback(async () => {
@@ -308,7 +315,7 @@ export function OrderManagement() {
         order.customerPhone?.includes(searchTerm)
 
       const matchesPlatform = selectedPlatform === 'all' || order.platform === selectedPlatform
-      const matchesStatus = selectedStatus === 'all' || order.status === selectedStatus
+      const matchesStatus = selectedStatus === 'all' || getDisplayedStatus(order) === selectedStatus || order.status === selectedStatus
 
       const orderDate = new Date(order.receivedAt)
       const startDate = new Date(dateRange.start)
@@ -382,6 +389,20 @@ export function OrderManagement() {
     } catch (error) {
       console.error('Error marking order as paid:', error)
       alert('No se pudo marcar el pedido como pagado')
+    }
+  }
+
+  const handleWebStatusChange = async (order: DeliveryOrder, status: string) => {
+    if (order.platform !== 'WEB' || !WEB_ORDER_STATUSES.includes(status as (typeof WEB_ORDER_STATUSES)[number])) {
+      return
+    }
+
+    try {
+      await updateOrderStatus(order.id, status as 'PENDING' | 'CONFIRMED' | 'PREPARING' | 'READY' | 'COMPLETED' | 'CANCELED')
+      await loadOrders()
+    } catch (error) {
+      console.error('Error updating web order status:', error)
+      alert('No se pudo actualizar el estado del pedido')
     }
   }
 
@@ -685,6 +706,22 @@ export function OrderManagement() {
                       })}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
+                      {order.platform === 'WEB' ? (
+                        <select
+                          value={order.status}
+                          onChange={(e) => handleWebStatusChange(order, e.target.value)}
+                          className="mb-2 min-h-[40px] rounded border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-900"
+                          style={lightFieldStyle}
+                        >
+                          <option value="PENDING">⏳ Pendiente</option>
+                          <option value="CONFIRMED">✅ Confirmado</option>
+                          <option value="PREPARING">👨‍🍳 Preparando</option>
+                          <option value="READY">📦 Listo</option>
+                          <option value="COMPLETED">✓ Completado</option>
+                          <option value="CANCELED">✗ Cancelado</option>
+                        </select>
+                      ) : null}
+
                       <button
                         onClick={() => {
                           const printUrl =
@@ -694,6 +731,7 @@ export function OrderManagement() {
                           window.open(printUrl, '_blank', 'noopener,noreferrer')
                         }}
                         className="min-h-[40px] rounded border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50"
+                        style={lightFieldStyle}
                       >
                         Imprimir
                       </button>
@@ -779,9 +817,25 @@ export function OrderManagement() {
                       window.open(printUrl, '_blank', 'noopener,noreferrer')
                     }}
                     className="w-full rounded border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50"
+                    style={lightFieldStyle}
                   >
                     Imprimir ticket
                   </button>
+                  {order.platform === 'WEB' ? (
+                    <select
+                      value={order.status}
+                      onChange={(e) => handleWebStatusChange(order, e.target.value)}
+                      className="w-full rounded border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-900"
+                      style={lightFieldStyle}
+                    >
+                      <option value="PENDING">⏳ Pendiente</option>
+                      <option value="CONFIRMED">✅ Confirmado</option>
+                      <option value="PREPARING">👨‍🍳 Preparando</option>
+                      <option value="READY">📦 Listo</option>
+                      <option value="COMPLETED">✓ Completado</option>
+                      <option value="CANCELED">✗ Cancelado</option>
+                    </select>
+                  ) : null}
                   <button
                     onClick={() => handleBluetoothPrintOrder(order)}
                     className="w-full rounded border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-800 hover:bg-sky-100"
