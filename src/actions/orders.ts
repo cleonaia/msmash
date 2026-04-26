@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { menuItems } from '@/features/menu/data/menu'
+import { sendWhatsAppRestaurantOrderAlert } from '@/lib/whatsapp'
 
 const MENU_CATEGORY_TO_DB_SLUG: Record<string, string> = {
   burguers: 'smash-singles',
@@ -172,6 +173,7 @@ export async function createOrder(data: CreateOrderData): Promise<CreateOrderRes
       const unitPrice = product.price
       return {
         productId: product.id,
+        productName: product.name,
         quantity: item.quantity,
         unitPrice,
         subtotal: unitPrice * item.quantity
@@ -187,11 +189,16 @@ export async function createOrder(data: CreateOrderData): Promise<CreateOrderRes
         totalAmount: toMinorUnits(data.totalAmount),
         deliveryMethod: data.deliveryMethod || 'Retiro en local',
         notes: data.notes,
-        status: 'PENDING',
+        status: data.paymentMethod === 'LOCAL' ? 'CONFIRMED' : 'PENDING',
         paymentStatus: 'PENDING', // Pendiente de pago
         paymentMethod: data.paymentMethod || 'STRIPE',
         items: {
-          create: normalizedItems
+          create: normalizedItems.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            subtotal: item.subtotal
+          }))
         }
       },
       include: { items: true }
@@ -206,6 +213,23 @@ export async function createOrder(data: CreateOrderData): Promise<CreateOrderRes
           }
         }
       })
+    }
+
+    if (order.paymentMethod === 'LOCAL') {
+      try {
+        await sendWhatsAppRestaurantOrderAlert({
+          orderId: order.id,
+          customerName: order.customerName,
+          totalAmount: order.totalAmount,
+          items: normalizedItems.map((item) => ({
+            name: item.productName,
+            quantity: item.quantity
+          })),
+          deliveryMethod: order.deliveryMethod
+        })
+      } catch (error) {
+        console.error('Error sending WhatsApp restaurant alert for local web order:', error)
+      }
     }
 
     revalidatePath('/pedidos')
@@ -308,8 +332,28 @@ export async function markOrderAsPaid(orderId: string) {
       data: {
         paymentStatus: 'COMPLETED',
         status: 'CONFIRMED'
+      },
+      include: {
+        items: {
+          include: { product: true }
+        }
       }
     })
+
+    try {
+      await sendWhatsAppRestaurantOrderAlert({
+        orderId: order.id,
+        customerName: order.customerName,
+        totalAmount: order.totalAmount,
+        items: order.items.map((item) => ({
+          name: item.product.name,
+          quantity: item.quantity
+        })),
+        deliveryMethod: order.deliveryMethod
+      })
+    } catch (error) {
+      console.error('Error sending WhatsApp restaurant alert when marking order as paid:', error)
+    }
 
     revalidatePath('/pedidos')
     revalidatePath('/admin')
@@ -332,8 +376,28 @@ export async function confirmCashOrder(orderId: string): Promise<CreateOrderResu
         paymentMethod: 'LOCAL',
         paymentStatus: 'PENDING',
         status: 'CONFIRMED'
+      },
+      include: {
+        items: {
+          include: { product: true }
+        }
       }
     })
+
+    try {
+      await sendWhatsAppRestaurantOrderAlert({
+        orderId: order.id,
+        customerName: order.customerName,
+        totalAmount: order.totalAmount,
+        items: order.items.map((item) => ({
+          name: item.product.name,
+          quantity: item.quantity
+        })),
+        deliveryMethod: order.deliveryMethod
+      })
+    } catch (error) {
+      console.error('Error sending WhatsApp restaurant alert for cash confirmation:', error)
+    }
 
     revalidatePath('/pedidos')
     return {
@@ -437,6 +501,7 @@ export async function createCounterOrder(data: CreateCounterOrderData): Promise<
 
       return {
         productId: product.id,
+        productName: product.name,
         quantity: item.quantity,
         unitPrice,
         subtotal: unitPrice * item.quantity
@@ -470,7 +535,12 @@ export async function createCounterOrder(data: CreateCounterOrderData): Promise<
           paymentStatus: 'COMPLETED',
           paymentMethod: data.paymentMethod,
           items: {
-            create: normalizedItems
+            create: normalizedItems.map((item) => ({
+              productId: item.productId,
+              quantity: item.quantity,
+              unitPrice: item.unitPrice,
+              subtotal: item.subtotal
+            }))
           }
         }
       })
@@ -491,6 +561,21 @@ export async function createCounterOrder(data: CreateCounterOrderData): Promise<
 
     revalidatePath('/admin')
     revalidatePath('/pedidos')
+
+    try {
+      await sendWhatsAppRestaurantOrderAlert({
+        orderId: order.id,
+        customerName: order.customerName,
+        totalAmount: order.totalAmount,
+        items: normalizedItems.map((item) => ({
+          name: item.productName,
+          quantity: item.quantity
+        })),
+        deliveryMethod: order.deliveryMethod
+      })
+    } catch (error) {
+      console.error('Error sending WhatsApp restaurant alert for counter order:', error)
+    }
 
     return {
       success: true,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AlertTriangle, Flame, ShoppingBag } from 'lucide-react';
@@ -107,14 +107,46 @@ function ProductImage({
 }
 
 export function CarteProfessional() {
+  const [catalogItems, setCatalogItems] = useState(menuItems);
+  const [catalogCategories, setCatalogCategories] = useState(categories);
   const [activeCategory, setActiveCategory] = useState<string>('all');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadCatalog = async () => {
+      try {
+        const response = await fetch('/api/menu/catalog', { cache: 'no-store' });
+        if (!response.ok) return;
+
+        const payload = await response.json();
+        if (cancelled) return;
+
+        if (Array.isArray(payload?.items) && payload.items.length > 0) {
+          setCatalogItems(payload.items);
+        }
+
+        if (Array.isArray(payload?.categories) && payload.categories.length > 0) {
+          setCatalogCategories(payload.categories);
+        }
+      } catch (error) {
+        console.error('Error loading menu catalog for carta:', error);
+      }
+    };
+
+    void loadCatalog();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const filteredItems = useMemo(
     () =>
       activeCategory === 'all'
-        ? menuItems
-        : menuItems.filter((item) => item.category === activeCategory),
-    [activeCategory]
+        ? catalogItems
+        : catalogItems.filter((item) => item.category === activeCategory),
+    [activeCategory, catalogItems]
   );
 
   return (
@@ -167,8 +199,8 @@ export function CarteProfessional() {
             >
               Todo
             </button>
-            {categories.map(({ id, label }) => {
-              const count = menuItems.filter((item) => item.category === id).length;
+            {catalogCategories.map(({ id, label }) => {
+              const count = catalogItems.filter((item) => item.category === id).length;
               return (
                 <button
                   key={id}

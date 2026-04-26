@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { categories, menuItems } from '@/features/menu/data/menu'
 import { createCounterOrder } from '@/actions/orders'
 
@@ -14,6 +14,8 @@ function formatPrice(value: number) {
 }
 
 export function AdminComandero() {
+  const [catalogItems, setCatalogItems] = useState(menuItems)
+  const [catalogCategories, setCatalogCategories] = useState(categories)
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [search, setSearch] = useState('')
   const [cart, setCart] = useState<CartMap>({})
@@ -28,10 +30,40 @@ export function AdminComandero() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
 
+  useEffect(() => {
+    let cancelled = false
+
+    const loadCatalog = async () => {
+      try {
+        const response = await fetch('/api/menu/catalog', { cache: 'no-store' })
+        if (!response.ok) return
+
+        const payload = await response.json()
+        if (cancelled) return
+
+        if (Array.isArray(payload?.items) && payload.items.length > 0) {
+          setCatalogItems(payload.items)
+        }
+
+        if (Array.isArray(payload?.categories) && payload.categories.length > 0) {
+          setCatalogCategories(payload.categories)
+        }
+      } catch (error) {
+        console.error('Error loading menu catalog for comandero:', error)
+      }
+    }
+
+    void loadCatalog()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   const filteredItems = useMemo(() => {
     const byCategory = activeCategory === 'all'
-      ? menuItems
-      : menuItems.filter((item) => item.category === activeCategory)
+      ? catalogItems
+      : catalogItems.filter((item) => item.category === activeCategory)
 
     const normalizedSearch = search.trim().toLowerCase()
     if (!normalizedSearch) return byCategory
@@ -39,13 +71,13 @@ export function AdminComandero() {
     return byCategory.filter((item) => {
       return item.name.toLowerCase().includes(normalizedSearch) || item.description.toLowerCase().includes(normalizedSearch)
     })
-  }, [activeCategory, search])
+  }, [activeCategory, search, catalogItems])
 
   const cartItems = useMemo(() => {
     return Object.entries(cart)
       .filter(([, qty]) => qty > 0)
       .map(([id, qty]) => {
-        const product = menuItems.find((item) => item.id === id)
+        const product = catalogItems.find((item) => item.id === id)
         if (!product) return null
 
         const customPrice = customItemPrices[id]
@@ -62,7 +94,7 @@ export function AdminComandero() {
         }
       })
       .filter(Boolean) as Array<{ id: string; name: string; qty: number; price: number; subtotal: number }>
-  }, [cart, customItemPrices])
+  }, [cart, customItemPrices, catalogItems])
 
   const total = useMemo(() => cartItems.reduce((sum, item) => sum + item.subtotal, 0), [cartItems])
   const totalItems = useMemo(() => cartItems.reduce((sum, item) => sum + item.qty, 0), [cartItems])
@@ -70,12 +102,14 @@ export function AdminComandero() {
   const isCustomerDataValid = customerName.trim().length >= 2
 
   const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: menuItems.length }
-    for (const category of categories) {
-      counts[category.id] = menuItems.filter((item) => item.category === category.id).length
+    const counts: Record<string, number> = { all: catalogItems.length }
+    const allCount = catalogItems.length
+    counts.all = allCount
+    for (const category of catalogCategories) {
+      counts[category.id] = catalogItems.filter((item) => item.category === category.id).length
     }
     return counts
-  }, [])
+  }, [catalogItems, catalogCategories])
 
   const setQty = (id: string, qty: number) => {
     setCart((prev) => {
@@ -172,7 +206,7 @@ export function AdminComandero() {
             >
               Todo ({categoryCounts.all})
             </button>
-            {categories.map((category) => (
+            {catalogCategories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}

@@ -66,6 +66,8 @@ const TIME_SLOTS = [
 
 /* ─── Main page component ─── */
 export default function PedidosPage() {
+  const [catalogItems, setCatalogItems] = useState(menuItems);
+  const [catalogCategories, setCatalogCategories] = useState(categories);
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [name, setName]   = useState("");
@@ -80,6 +82,36 @@ export default function PedidosPage() {
   const [cashOrderConfirmed, setCashOrderConfirmed] = useState(false);
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [orderError, setOrderError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadCatalog = async () => {
+      try {
+        const response = await fetch('/api/menu/catalog', { cache: 'no-store' });
+        if (!response.ok) return;
+
+        const payload = await response.json();
+        if (cancelled) return;
+
+        if (Array.isArray(payload?.items) && payload.items.length > 0) {
+          setCatalogItems(payload.items);
+        }
+
+        if (Array.isArray(payload?.categories) && payload.categories.length > 0) {
+          setCatalogCategories(payload.categories);
+        }
+      } catch (error) {
+        console.error('Error loading menu catalog for pedidos:', error);
+      }
+    };
+
+    void loadCatalog();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -128,21 +160,24 @@ export default function PedidosPage() {
   /* Cart derived state */
   const cartItems = useMemo(() =>
     cart.map(({ id, qty }) => {
-      const item = menuItems.find((m) => m.id === id)!;
+      const item = catalogItems.find((m) => m.id === id);
+      if (!item) return null;
       return { ...item, qty, subtotal: item.price * qty };
     }),
-  [cart]);
+  [cart, catalogItems]);
 
-  const total     = useMemo(() => cartItems.reduce((s, i) => s + i.subtotal, 0), [cartItems]);
+  const safeCartItems = useMemo(() => cartItems.filter(Boolean) as Array<(typeof menuItems)[number] & { qty: number; subtotal: number }>, [cartItems]);
+
+  const total     = useMemo(() => safeCartItems.reduce((s, i) => s + i.subtotal, 0), [safeCartItems]);
   const totalItems = useMemo(() => cart.reduce((s, i) => s + i.qty, 0), [cart]);
-  const canSend   = cartItems.length > 0 && name.trim().length > 0 && phone.trim().length > 0 && time.length > 0;
+  const canSend   = safeCartItems.length > 0 && name.trim().length > 0 && phone.trim().length > 0 && time.length > 0;
 
   /* Filtered items */
   const filtered = useMemo(() =>
     activeCategory === "all"
-      ? menuItems
-      : menuItems.filter((m) => m.category === activeCategory),
-  [activeCategory]);
+      ? catalogItems
+      : catalogItems.filter((m) => m.category === activeCategory),
+  [activeCategory, catalogItems]);
 
   /* Create order and proceed to payment */
   const handleCreateOrder = async () => {
@@ -165,7 +200,7 @@ export default function PedidosPage() {
         notes: notes,
         deliveryMethod: "Retiro en local",
         paymentMethod,
-        items: cartItems.map(item => ({
+        items: safeCartItems.map(item => ({
           productId: item.id,
           quantity: item.qty,
           unitPrice: item.price // Price is already in EUR
@@ -246,7 +281,7 @@ export default function PedidosPage() {
                     ${activeCategory === "all" ? "bg-smash-fire text-white shadow-fire-sm" : "bg-smash-smoke border border-smash-border text-smash-cream/45 hover:border-smash-fire/50"}`}>
                   Todo
                 </button>
-                {categories.map(({ id, label }) => (
+                {catalogCategories.map(({ id, label }) => (
                   <button key={id} onClick={() => setActiveCategory(id)}
                     className={`text-[10px] font-black uppercase tracking-[0.3em] px-4 py-2 rounded-full transition-all duration-200
                       ${activeCategory === id ? "bg-smash-fire text-white shadow-fire-sm" : "bg-smash-smoke border border-smash-border text-smash-cream/45 hover:border-smash-fire/50"}`}>
@@ -342,7 +377,7 @@ export default function PedidosPage() {
                       </p>
                     </div>
                   </div>
-                  {cartItems.length > 0 && (
+                  {safeCartItems.length > 0 && (
                     <button onClick={() => setCart([])}
                       className="p-2 text-smash-cream/25 hover:text-smash-fire transition-colors"
                       aria-label="Vaciar carrito">
@@ -353,7 +388,7 @@ export default function PedidosPage() {
               </div>
 
               {/* Cart items */}
-              {cartItems.length === 0 ? (
+              {safeCartItems.length === 0 ? (
                 <div className="px-6 py-10 text-center">
                   <div className="w-14 h-14 rounded-full bg-smash-smoke border border-smash-border flex items-center justify-center mx-auto mb-4">
                     <ShoppingBag className="h-6 w-6 text-smash-cream/20" />
@@ -363,7 +398,7 @@ export default function PedidosPage() {
                 </div>
               ) : (
                 <div className="divide-y divide-smash-border max-h-72 sm:max-h-64 overflow-y-auto">
-                  {cartItems.map((item) => (
+                  {safeCartItems.map((item) => (
                     <div key={item.id} className="flex flex-col sm:flex-row sm:items-center gap-3 px-4 sm:px-5 py-3.5">
                       <div className="flex items-center gap-3 min-w-0">
                         {(() => {
@@ -403,7 +438,7 @@ export default function PedidosPage() {
               )}
 
               {/* Total */}
-              {cartItems.length > 0 && (
+              {safeCartItems.length > 0 && (
                 <div className="px-5 py-4 border-t border-smash-border bg-smash-smoke/50 flex items-center justify-between">
                   <span className="text-[10px] font-black uppercase tracking-[0.4em] text-smash-cream/40">Total</span>
                   <span className="font-display text-3xl text-smash-turquoise leading-none">{fmt(total)}</span>
@@ -583,7 +618,7 @@ export default function PedidosPage() {
                 ) : (
                     <>
                       {/* Mostrar Email opcional solo si hay items */}
-                      {cartItems.length > 0 && (
+                      {safeCartItems.length > 0 && (
                         <div>
                           <label className="text-[9px] font-black uppercase tracking-[0.3em] text-smash-cream/35 block mb-1.5">
                             Email (opcional)
@@ -630,7 +665,7 @@ export default function PedidosPage() {
                       )}
                     </button>
 
-                    {!canSend && cartItems.length > 0 && (
+                    {!canSend && safeCartItems.length > 0 && (
                       <p className="text-[10px] text-smash-cream/25 text-center leading-relaxed">
                         {!name.trim() && "• Añade tu nombre  "}
                         {!phone.trim() && "• Añade tu teléfono  "}
