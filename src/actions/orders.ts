@@ -215,23 +215,6 @@ export async function createOrder(data: CreateOrderData): Promise<CreateOrderRes
       })
     }
 
-    if (order.paymentMethod === 'LOCAL') {
-      try {
-        await sendWhatsAppRestaurantOrderAlert({
-          orderId: order.id,
-          customerName: order.customerName,
-          totalAmount: order.totalAmount,
-          items: normalizedItems.map((item) => ({
-            name: item.productName,
-            quantity: item.quantity
-          })),
-          deliveryMethod: order.deliveryMethod
-        })
-      } catch (error) {
-        console.error('Error sending WhatsApp restaurant alert for local web order:', error)
-      }
-    }
-
     revalidatePath('/pedidos')
     return {
       success: true,
@@ -383,21 +366,6 @@ export async function confirmCashOrder(orderId: string): Promise<CreateOrderResu
         }
       }
     })
-
-    try {
-      await sendWhatsAppRestaurantOrderAlert({
-        orderId: order.id,
-        customerName: order.customerName,
-        totalAmount: order.totalAmount,
-        items: order.items.map((item) => ({
-          name: item.product.name,
-          quantity: item.quantity
-        })),
-        deliveryMethod: order.deliveryMethod
-      })
-    } catch (error) {
-      console.error('Error sending WhatsApp restaurant alert for cash confirmation:', error)
-    }
 
     revalidatePath('/pedidos')
     return {

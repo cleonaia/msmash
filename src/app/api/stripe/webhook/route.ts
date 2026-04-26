@@ -1,6 +1,6 @@
 import { stripe } from '@/lib/stripe'
 import { prisma } from '@/lib/prisma'
-import { sendWhatsAppOrderConfirmation, sendWhatsAppPaymentFailed, sendWhatsAppRestaurantOrderAlert } from '@/lib/whatsapp'
+import { sendWhatsAppRestaurantOrderAlert } from '@/lib/whatsapp'
 import { sendOrderConfirmationEmail, sendPaymentFailedEmail } from '@/lib/email'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -141,18 +141,6 @@ export async function POST(request: NextRequest) {
               notes: order.notes || ''
             })
 
-            // 📱 Enviar confirmación por WhatsApp
-            await sendWhatsAppOrderConfirmation(order.customerPhone, {
-              orderId: order.id,
-              customerName: order.customerName,
-              totalAmount: order.totalAmount,
-              items: order.items.map((item: any) => ({
-                name: item.product.name,
-                quantity: item.quantity
-              })),
-              deliveryMethod: order.deliveryMethod
-            })
-
             // 📱 Aviso interno al restaurante
             await sendWhatsAppRestaurantOrderAlert({
               orderId: order.id,
@@ -192,12 +180,6 @@ export async function POST(request: NextRequest) {
 
             // 📧 Enviar email de error
             await sendPaymentFailedEmail(order.customerEmail, order.customerName, orderId)
-
-            // 📱 Enviar WhatsApp de error
-            await sendWhatsAppPaymentFailed(order.customerPhone, {
-              orderId: order.id,
-              customerName: order.customerName
-            })
 
             console.log(`❌ Pago fallido para orden: ${orderId}`)
           }
