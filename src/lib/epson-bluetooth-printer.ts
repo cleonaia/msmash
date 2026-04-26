@@ -206,7 +206,7 @@ function buildReceiptLines(receipt: ReceiptData, config: EpsonPrinterConfig) {
   if (receipt.customerLines?.length) {
     lines.push('CLIENTE')
     for (const line of receipt.customerLines) {
-      lines.push(...wrapLine(line))
+      lines.push(...wrapLine(line, lineWidth))
     }
     lines.push('-'.repeat(lineWidth))
   }
@@ -214,7 +214,7 @@ function buildReceiptLines(receipt: ReceiptData, config: EpsonPrinterConfig) {
   if (receipt.itemLines?.length) {
     lines.push('ARTICULOS')
     for (const item of receipt.itemLines) {
-      lines.push(...wrapLine(`${item.quantity}x ${item.label}`))
+      lines.push(...wrapLine(`${item.quantity}x ${item.label}`, lineWidth))
       if (typeof item.amount === 'number') {
         lines.push(`  ${moneyFromCents(item.amount)}`)
       }
@@ -224,14 +224,14 @@ function buildReceiptLines(receipt: ReceiptData, config: EpsonPrinterConfig) {
 
   if (receipt.summaryLines?.length) {
     for (const line of receipt.summaryLines) {
-      lines.push(...wrapLine(line))
+      lines.push(...wrapLine(line, lineWidth))
     }
     lines.push('-'.repeat(lineWidth))
   }
 
   if (receipt.footerLines?.length) {
     for (const line of receipt.footerLines) {
-      lines.push(...wrapLine(line))
+      lines.push(...wrapLine(line, lineWidth))
     }
   }
 
@@ -251,7 +251,37 @@ function concatBytes(...chunks: Uint8Array[]) {
   return output
 }
 
-async function findWritableCharacteristic(server: BluetoothRemoteGATTServer) {
+type BluetoothRemoteGATTCharacteristicLike = {
+  properties: {
+    write?: boolean
+    writeWithoutResponse?: boolean
+  }
+  writeValue(data: Uint8Array): Promise<void>
+  writeValueWithoutResponse?(data: Uint8Array): Promise<void>
+}
+
+type BluetoothRemoteGATTServiceLike = {
+  getCharacteristics(): Promise<BluetoothRemoteGATTCharacteristicLike[]>
+}
+
+type BluetoothRemoteGATTServerLike = {
+  getPrimaryServices(): Promise<BluetoothRemoteGATTServiceLike[]>
+  connect(): Promise<BluetoothRemoteGATTServerLike>
+  disconnect(): void
+}
+
+type BluetoothDeviceLike = {
+  name?: string | null
+  gatt?: BluetoothRemoteGATTServerLike | null
+  addEventListener(event: string, handler: () => void): void
+  removeEventListener(event: string, handler: () => void): void
+}
+
+type BluetoothAdapterLike = {
+  requestDevice(options: { acceptAllDevices?: boolean; optionalServices?: string[] }): Promise<BluetoothDeviceLike>
+}
+
+async function findWritableCharacteristic(server: BluetoothRemoteGATTServerLike) {
   const services = await server.getPrimaryServices()
 
   for (const service of services) {
@@ -271,8 +301,8 @@ async function findWritableCharacteristic(server: BluetoothRemoteGATTServer) {
 class EpsonBluetoothPrinter {
   private listeners = new Set<(state: PrinterState) => void>()
   private state: PrinterState = getInitialState()
-  private device: BluetoothDevice | null = null
-  private characteristic: BluetoothRemoteGATTCharacteristic | null = null
+  private device: BluetoothDeviceLike | null = null
+  private characteristic: BluetoothRemoteGATTCharacteristicLike | null = null
 
   subscribe(listener: (state: PrinterState) => void) {
     this.listeners.add(listener)
@@ -304,9 +334,9 @@ class EpsonBluetoothPrinter {
 
   private setState(next: Partial<PrinterState>) {
     this.state = { ...this.state, ...next }
-    for (const listener of this.listeners) {
+    this.listeners.forEach((listener) => {
       listener(this.state)
-    }
+    })
   }
 
   private resetConnectionState(status: EpsonPrinterStatus, lastError: string | null = null) {
@@ -335,7 +365,7 @@ class EpsonBluetoothPrinter {
     this.setState({ status: 'connecting', lastError: null })
 
     try {
-      const bluetooth = navigator.bluetooth as Bluetooth
+      const bluetooth = navigator.bluetooth as BluetoothAdapterLike
       const device = await bluetooth.requestDevice({
         acceptAllDevices: true,
         optionalServices: ['generic_access', 'device_information'],
@@ -402,7 +432,7 @@ class EpsonBluetoothPrinter {
     for (let index = 0; index < payload.length; index += chunkSize) {
       const chunk = payload.slice(index, index + chunkSize)
       if (this.characteristic.properties.writeWithoutResponse) {
-        await this.characteristic.writeValueWithoutResponse(chunk)
+        await this.characteristic.writeValueWithoutResponse?.(chunk)
       } else {
         await this.characteristic.writeValue(chunk)
       }
