@@ -12,7 +12,6 @@ function mapCategoryToMenu(categorySlug?: string | null, categoryName?: string |
   if (slug.includes('bebida') || name.includes('bebida')) return 'bebidas'
   if (slug.includes('postre') || name.includes('postre')) return 'postres'
 
-  // Extras/entrantes y cualquier categoría no mapeada cae aquí.
   return 'entrantres'
 }
 
@@ -32,28 +31,51 @@ export async function GET() {
       ]
     })
 
-    if (products.length === 0) {
-      return NextResponse.json({
-        source: 'fallback',
-        categories: fallbackCategories,
-        items: fallbackItems
-      })
+    const productByKey = new Map<string, (typeof products)[number]>()
+    for (const product of products) {
+      productByKey.set(product.id, product)
+      productByKey.set(product.slug, product)
     }
 
-    const items = products.map((product) => ({
-      id: product.slug || product.id,
-      name: product.name,
-      description: product.description || '',
-      price: Number((product.price / 100).toFixed(2)),
-      category: mapCategoryToMenu(product.category?.slug, product.category?.name),
-      image: product.images[0]?.url || '/images/products/placeholder.svg',
-      allergens: [],
-      featured: product.isFeatured,
-      badge: product.badges || undefined
-    }))
+    const mergedItems = fallbackItems.map((fallbackItem) => {
+      const product = productByKey.get(fallbackItem.id)
+
+      if (!product) {
+        return fallbackItem
+      }
+
+      return {
+        ...fallbackItem,
+        id: product.slug || fallbackItem.id,
+        name: product.name || fallbackItem.name,
+        description: product.description || fallbackItem.description,
+        price: Number((product.price / 100).toFixed(2)),
+        category: mapCategoryToMenu(product.category?.slug, product.category?.name),
+        image: product.images[0]?.url || fallbackItem.image,
+        featured: product.isFeatured || fallbackItem.featured,
+        badge: product.badges || fallbackItem.badge
+      }
+    })
+
+    const fallbackKeys = new Set(fallbackItems.map((item) => item.id))
+    const extraProducts = products
+      .filter((product) => !fallbackKeys.has(product.id) && !fallbackKeys.has(product.slug))
+      .map((product) => ({
+        id: product.slug || product.id,
+        name: product.name,
+        description: product.description || '',
+        price: Number((product.price / 100).toFixed(2)),
+        category: mapCategoryToMenu(product.category?.slug, product.category?.name),
+        image: product.images[0]?.url || '/images/products/placeholder.svg',
+        allergens: [],
+        featured: product.isFeatured,
+        badge: product.badges || undefined
+      }))
+
+    const items = [...mergedItems, ...extraProducts]
 
     return NextResponse.json({
-      source: 'database',
+      source: 'merged',
       categories: fallbackCategories,
       items
     })
