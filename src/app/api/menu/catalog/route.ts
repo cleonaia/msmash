@@ -2,6 +2,15 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { categories as fallbackCategories, menuItems as fallbackItems, type MenuCategory } from '@/features/menu/data/menu'
 
+function normalizeName(value: string) {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 function mapCategoryToMenu(categorySlug?: string | null, categoryName?: string | null): MenuCategory {
   const slug = String(categorySlug || '').toLowerCase()
   const name = String(categoryName || '').toLowerCase()
@@ -32,8 +41,16 @@ export async function GET() {
     })
 
     const fallbackKeys = new Set(fallbackItems.map((item) => item.id))
+    const fallbackNames = new Set(fallbackItems.map((item) => normalizeName(item.name)))
     const extraProducts = products
-      .filter((product) => !fallbackKeys.has(product.id) && !fallbackKeys.has(product.slug))
+      .filter((product) => {
+        if (fallbackKeys.has(product.id) || fallbackKeys.has(product.slug)) {
+          return false
+        }
+
+        // Evita mostrar variantes antiguas del mismo producto con slug distinto.
+        return !fallbackNames.has(normalizeName(product.name))
+      })
       .map((product) => ({
         id: product.slug || product.id,
         name: product.name,

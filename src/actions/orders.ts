@@ -49,8 +49,7 @@ async function ensureMenuBackedProducts(productIds: string[]) {
         description: menuItem.description,
         price: Math.round(menuItem.price * 100),
         categoryId: category.id,
-        // Recupera stock por defecto si estaba agotado para evitar bloqueos en web.
-        stock: { increment: 100 }
+        isFeatured: !!menuItem.featured
       },
       create: {
         id: menuItem.id,
@@ -122,6 +121,10 @@ export async function createOrder(data: CreateOrderData): Promise<CreateOrderRes
 
     // Validar que los productos existan (id o slug) para soportar seeds antiguos
     const requestedProductIds = Array.from(new Set(data.items.map((item) => item.productId)))
+
+    // Sincroniza los productos de la carta con DB para evitar nombres/precios obsoletos en pedidos.
+    await ensureMenuBackedProducts(requestedProductIds)
+
     const products = await prisma.product.findMany({
       where: {
         OR: [
@@ -416,6 +419,10 @@ export async function createCounterOrder(data: CreateCounterOrderData): Promise<
     }
 
     const requestedProductIds = Array.from(new Set(data.items.map((item) => item.productId)))
+
+    // Sincroniza los productos de la carta con DB para evitar nombres/precios obsoletos en comandero.
+    await ensureMenuBackedProducts(requestedProductIds)
+
     const products = await prisma.product.findMany({
       where: {
         OR: [
