@@ -31,32 +31,6 @@ export async function GET() {
       ]
     })
 
-    const productByKey = new Map<string, (typeof products)[number]>()
-    for (const product of products) {
-      productByKey.set(product.id, product)
-      productByKey.set(product.slug, product)
-    }
-
-    const mergedItems = fallbackItems.map((fallbackItem) => {
-      const product = productByKey.get(fallbackItem.id)
-
-      if (!product) {
-        return fallbackItem
-      }
-
-      return {
-        ...fallbackItem,
-        id: product.slug || fallbackItem.id,
-        name: product.name || fallbackItem.name,
-        description: product.description || fallbackItem.description,
-        price: Number((product.price / 100).toFixed(2)),
-        category: mapCategoryToMenu(product.category?.slug, product.category?.name),
-        image: product.images[0]?.url || fallbackItem.image,
-        featured: product.isFeatured || fallbackItem.featured,
-        badge: product.badges || fallbackItem.badge
-      }
-    })
-
     const fallbackKeys = new Set(fallbackItems.map((item) => item.id))
     const extraProducts = products
       .filter((product) => !fallbackKeys.has(product.id) && !fallbackKeys.has(product.slug))
@@ -72,12 +46,10 @@ export async function GET() {
         badge: product.badges || undefined
       }))
 
-    const items = [...mergedItems, ...extraProducts]
-
     return NextResponse.json({
-      source: 'merged',
+      source: 'fallback-plus-extras',
       categories: fallbackCategories,
-      items
+      items: [...fallbackItems, ...extraProducts]
     })
   } catch (error) {
     console.error('Error loading menu catalog:', error)
