@@ -136,7 +136,7 @@ export const menuItems: MenuItem[] = [
   {
     id: "the-three-max",
     name: "The Three Max",
-    description: "Pan brioche, triple Smash burguer, quesos cheddar y Edam, cebolla caramelizada y salsa de la casa",
+    description: "Pan brioche, tripé Smash burguer, quesos cheddar y Edam, cebolla caramelizada y salsa de la casa",
     price: 15.5,
     category: "burguers",
     image: PRODUCT_CARD_PLACEHOLDER,
@@ -147,7 +147,7 @@ export const menuItems: MenuItem[] = [
   {
     id: "the-hawaian-burger",
     name: "The Hawaian Burger",
-    description: "Pan brioche, doble Smash burguer, doble queso Edam, trozo de piña asada, costillar desmenuzado (Receta de la Abuela), salsas de la casa y miel",
+    description: "Pan brioche, doble Smash burguer, Doble Queso Edam, trozo de piña asada, Costillar desmenuzado ( Receta de la Abuela) salsas de la casa y miel",
     price: 17.0,
     category: "burguers",
     image: PRODUCT_CARD_PLACEHOLDER,

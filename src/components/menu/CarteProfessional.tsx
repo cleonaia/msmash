@@ -110,6 +110,7 @@ export function CarteProfessional() {
   const [catalogItems, setCatalogItems] = useState(menuItems);
   const [catalogCategories, setCatalogCategories] = useState(categories);
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [zoomedImage, setZoomedImage] = useState<{ src: string; alt: string } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -226,7 +227,12 @@ export function CarteProfessional() {
               key={item.id}
               className="surface-smoke overflow-hidden border border-smash-border hover:border-smash-fire/50 transition-all duration-300 flex flex-col"
             >
-              <div className="relative h-44 sm:h-48 w-full bg-smash-smoke-mid">
+              <button
+                type="button"
+                onClick={() => setZoomedImage({ src: item.image, alt: item.name })}
+                className="relative h-44 sm:h-48 w-full bg-smash-smoke-mid text-left"
+                aria-label={`Ampliar imagen de ${item.name}`}
+              >
                 <ProductImage
                   src={item.image}
                   alt={item.name}
@@ -241,7 +247,7 @@ export function CarteProfessional() {
                     </span>
                   </div>
                 )}
-              </div>
+              </button>
 
               <div className="p-5">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
@@ -285,6 +291,25 @@ export function CarteProfessional() {
             Pedir ahora
           </Link>
         </div>
+
+        {zoomedImage && (
+          <div
+            className="fixed inset-0 z-[120] bg-black/85 backdrop-blur-sm p-4 sm:p-8"
+            onClick={() => setZoomedImage(null)}
+          >
+            <div className="mx-auto flex h-full max-w-5xl items-center justify-center">
+              <div className="relative w-full h-[70vh] sm:h-[80vh]">
+                <Image
+                  src={zoomedImage.src}
+                  alt={zoomedImage.alt}
+                  fill
+                  className="object-contain"
+                  sizes="100vw"
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </section>
     </div>
   );
