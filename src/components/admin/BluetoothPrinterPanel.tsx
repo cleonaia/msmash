@@ -1,7 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { epsonBluetoothPrinter, type EpsonPrinterConfig, type EpsonPrinterStatus } from '@/lib/epson-bluetooth-printer'
+import {
+  epsonBluetoothPrinter,
+  getBluetoothSupportInfo,
+  type EpsonPrinterConfig,
+  type EpsonPrinterStatus,
+} from '@/lib/epson-bluetooth-printer'
 
 interface BluetoothPrinterPanelProps {
   title: string
@@ -19,7 +24,7 @@ const STATUS_STYLE: Record<EpsonPrinterStatus, string> = {
 }
 
 const STATUS_LABEL: Record<EpsonPrinterStatus, string> = {
-  unsupported: 'Sin soporte Web Bluetooth',
+  unsupported: 'Navegador no compatible',
   idle: 'Desconectada',
   connecting: 'Conectando...',
   connected: 'Conectada',
@@ -27,6 +32,7 @@ const STATUS_LABEL: Record<EpsonPrinterStatus, string> = {
 }
 
 export function BluetoothPrinterPanel({ title, description, testLabel = 'Ticket de prueba', onTestPrint }: BluetoothPrinterPanelProps) {
+  const supportInfo = getBluetoothSupportInfo()
   const [status, setStatus] = useState<EpsonPrinterStatus>(epsonBluetoothPrinter.getState().status)
   const [deviceName, setDeviceName] = useState<string | null>(epsonBluetoothPrinter.getState().deviceName)
   const [lastError, setLastError] = useState<string | null>(epsonBluetoothPrinter.getState().lastError)
@@ -47,6 +53,14 @@ export function BluetoothPrinterPanel({ title, description, testLabel = 'Ticket 
   }
 
   const handleConnect = async () => {
+    if (!supportInfo.supported) {
+      const message = supportInfo.recommendation
+        ? `${supportInfo.reason} ${supportInfo.recommendation}`
+        : supportInfo.reason || 'No se pudo iniciar la conexion Bluetooth.'
+      alert(message)
+      return
+    }
+
     try {
       setBusy(true)
       await epsonBluetoothPrinter.connect()
@@ -87,6 +101,11 @@ export function BluetoothPrinterPanel({ title, description, testLabel = 'Ticket 
             {deviceName ? <span className="ml-2 text-xs text-gray-600">{deviceName}</span> : null}
           </div>
           {lastError ? <p className="text-xs text-rose-600">{lastError}</p> : null}
+          {!supportInfo.supported ? (
+            <p className="text-xs text-amber-700">
+              {supportInfo.reason} {supportInfo.recommendation}
+            </p>
+          ) : null}
         </div>
 
         <div className="flex flex-wrap gap-2">

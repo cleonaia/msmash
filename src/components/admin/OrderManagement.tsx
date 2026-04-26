@@ -415,13 +415,13 @@ export function OrderManagement() {
       <BluetoothPrinterPanel
         title="Epson Bluetooth TPV"
         description="Conexion manual para imprimir tickets de pedidos directamente en Epson Bluetooth."
-        testLabel="Ticket de prueba TPV"
+        testLabel="Imprimir ticket TPV"
         onTestPrint={async () => {
           await epsonBluetoothPrinter.printReceipt(
             formatOrderReceipt({
-              id: 'TPV-TEST-0001',
+              id: 'TPV-MANUAL-0001',
               createdAt: new Date(),
-              customerName: 'Cliente TPV',
+              customerName: 'Cliente mostrador',
               customerPhone: '600 000 000',
               paymentStatus: 'PAGADO',
               paymentMethod: 'TPV',

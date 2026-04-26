@@ -166,14 +166,14 @@ export function InvoiceManager() {
       <BluetoothPrinterPanel
         title="Epson Bluetooth"
         description="Conecta una Epson compatible por Bluetooth y manda facturas sin pasar por el dialogo del navegador."
-        testLabel="Factura de prueba"
+        testLabel="Imprimir factura"
         onTestPrint={async () => {
           await epsonBluetoothPrinter.printReceipt(
             formatInvoiceReceipt({
-              invoiceNumber: 'TEST-BLUETOOTH',
+              invoiceNumber: 'MANUAL-BLUETOOTH',
               createdAt: new Date(),
-              customerName: 'Cliente de prueba',
-              customerEmail: 'demo@msmashburger.page',
+              customerName: 'Cliente mostrador',
+              customerEmail: 'pedidos@msmashburger.page',
               customerPhone: '600 000 000',
               customerTaxId: 'X0000000X',
               subtotal: 2890,

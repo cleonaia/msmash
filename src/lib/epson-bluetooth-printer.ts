@@ -29,6 +29,12 @@ export interface ReceiptData {
   footerLines?: string[]
 }
 
+export interface BluetoothSupportInfo {
+  supported: boolean
+  reason: string | null
+  recommendation: string | null
+}
+
 interface PrinterState {
   status: EpsonPrinterStatus
   deviceName: string | null
@@ -278,7 +284,61 @@ type BluetoothDeviceLike = {
 }
 
 type BluetoothAdapterLike = {
-  requestDevice(options: { acceptAllDevices?: boolean; optionalServices?: string[] }): Promise<BluetoothDeviceLike>
+  requestDevice(options: {
+    acceptAllDevices?: boolean
+    filters?: Array<{ name?: string; namePrefix?: string; services?: Array<string | number> }>
+    optionalServices?: Array<string | number>
+  }): Promise<BluetoothDeviceLike>
+}
+
+const EPSON_SERVICE_UUIDS: Array<string | number> = [
+  0x18f0,
+  0x1812,
+  0xff00,
+  0xffe0,
+  0xfff0,
+  '49535343-fe7d-4ae5-8fa9-9fafd205e455',
+  '0000ff00-0000-1000-8000-00805f9b34fb',
+  '0000ffe0-0000-1000-8000-00805f9b34fb',
+  '0000fff0-0000-1000-8000-00805f9b34fb',
+  'generic_access',
+  'device_information',
+]
+
+function detectBrowserSupport(): BluetoothSupportInfo {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+    return {
+      supported: false,
+      reason: 'No se detecta entorno de navegador.',
+      recommendation: null,
+    }
+  }
+
+  if (!window.isSecureContext) {
+    return {
+      supported: false,
+      reason: 'La conexion Bluetooth requiere HTTPS.',
+      recommendation: 'Abre el panel desde https:// o desde localhost en local.',
+    }
+  }
+
+  if (!('bluetooth' in navigator)) {
+    return {
+      supported: false,
+      reason: 'Este navegador no soporta Web Bluetooth.',
+      recommendation: 'Usa Google Chrome o Microsoft Edge en escritorio para conectar la Epson por Bluetooth.',
+    }
+  }
+
+  return {
+    supported: true,
+    reason: null,
+    recommendation: null,
+  }
+}
+
+export function getBluetoothSupportInfo() {
+  return detectBrowserSupport()
 }
 
 async function findWritableCharacteristic(server: BluetoothRemoteGATTServerLike) {
@@ -357,9 +417,12 @@ class EpsonBluetoothPrinter {
   }
 
   async connect() {
-    if (typeof navigator === 'undefined' || !('bluetooth' in navigator)) {
-      this.setState({ status: 'unsupported', lastError: 'Este navegador no soporta Web Bluetooth.' })
-      throw new Error('Este navegador no soporta Web Bluetooth')
+    const support = detectBrowserSupport()
+
+    if (!support.supported) {
+      const lastError = support.recommendation ? `${support.reason} ${support.recommendation}` : support.reason
+      this.setState({ status: 'unsupported', lastError })
+      throw new Error(lastError || 'No se pudo iniciar la conexion Bluetooth.')
     }
 
     this.setState({ status: 'connecting', lastError: null })
@@ -367,8 +430,8 @@ class EpsonBluetoothPrinter {
     try {
       const bluetooth = navigator.bluetooth as BluetoothAdapterLike
       const device = await bluetooth.requestDevice({
-        acceptAllDevices: true,
-        optionalServices: ['generic_access', 'device_information'],
+        filters: [{ namePrefix: 'TM' }, { namePrefix: 'Epson' }, { namePrefix: 'EPSON' }],
+        optionalServices: EPSON_SERVICE_UUIDS,
       })
 
       this.device = device
@@ -394,7 +457,12 @@ class EpsonBluetoothPrinter {
         lastError: null,
       })
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'No se pudo conectar a la impresora Bluetooth.'
+      const message =
+        error instanceof DOMException && error.name === 'NotFoundError'
+          ? 'No se selecciono ningun dispositivo Bluetooth.'
+          : error instanceof Error
+            ? error.message
+            : 'No se pudo conectar a la impresora Bluetooth.'
       this.device = null
       this.resetConnectionState('error', message)
       throw error
