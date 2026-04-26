@@ -428,7 +428,7 @@ class EpsonBluetoothPrinter {
     this.setState({ status: 'connecting', lastError: null })
 
     try {
-      const bluetooth = navigator.bluetooth as BluetoothAdapterLike
+      const bluetooth = (navigator as Navigator & { bluetooth: BluetoothAdapterLike }).bluetooth
       const device = await bluetooth.requestDevice({
         filters: [{ namePrefix: 'TM' }, { namePrefix: 'Epson' }, { namePrefix: 'EPSON' }],
         optionalServices: EPSON_SERVICE_UUIDS,
