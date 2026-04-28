@@ -293,3 +293,83 @@ input[type="date"].admin-filter-control::-webkit-calendar-picker-indicator {
 .reveal-d4 { transition-delay: 360ms; }
 .reveal-d5 { transition-delay: 500ms; }
 .reveal-d6 { transition-delay: 650ms; }
+
+/* ════════════════════════════════════════════════════
+   ALFAJORINA — brand utilities
+════════════════════════════════════════════════════ */
+
+/* Warm caramel divider */
+.alfe-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #C8833B, #E8B46A, #C8833B, transparent);
+}
+
+/* Alfajorina button primary (caramel) */
+.btn-alfe-primary {
+  @apply inline-flex items-center justify-center gap-2 px-7 py-3.5
+         bg-alfe-caramel text-white text-xs font-bold uppercase tracking-[0.15em]
+         rounded-full hover:bg-alfe-choco-mid active:scale-95
+         shadow-md hover:shadow-lg transition-all duration-200;
+}
+
+/* Alfajorina button outline */
+.btn-alfe-outline {
+  @apply inline-flex items-center justify-center gap-2 px-7 py-3.5
+         border border-alfe-choco/35 text-alfe-choco text-xs font-bold uppercase tracking-[0.15em]
+         rounded-full hover:bg-alfe-choco hover:text-alfe-cream active:scale-95
+         transition-all duration-200;
+}
+
+/* Alfajorina card */
+.card-alfe {
+  @apply relative bg-white rounded-2xl overflow-hidden border border-alfe-border
+         hover:border-alfe-caramel/60 hover:shadow-xl
+         transition-all duration-300 cursor-pointer;
+}
+
+/* Alfajorina section label */
+.alfe-label-caramel { @apply text-[10px] font-black uppercase tracking-[0.5em] text-alfe-caramel; }
+.alfe-label-choco   { @apply text-[10px] font-black uppercase tracking-[0.5em] text-alfe-choco-mid; }
+.alfe-label-rosa    { @apply text-[10px] font-black uppercase tracking-[0.5em] text-alfe-rosa; }
+
+/* Tags */
+.tag-alfe { @apply inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.2em] bg-alfe-caramel/15 text-alfe-caramel border border-alfe-caramel/30; }
+.tag-alfe-rosa { @apply inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.2em] bg-alfe-rosa/15 text-alfe-rosa border border-alfe-rosa/30; }
+
+/* Input style */
+.input-alfe {
+  @apply w-full rounded-xl border border-alfe-border bg-white px-4 py-3
+         text-sm text-alfe-text placeholder:text-alfe-choco-light/50
+         focus:outline-none focus:border-alfe-caramel focus:ring-2 focus:ring-alfe-caramel/20
+         transition-all duration-150;
+}
+
+/* Alfajorina hero background */
+.alfe-hero-bg {
+  background: linear-gradient(
+    160deg,
+    #FDF6ED 0%,
+    #F5EBD5 40%,
+    #EDD5B0 70%,
+    #E8C898 100%
+  );
+}
+
+/* Caramel text glow */
+.text-caramel-glow {
+  color: #C8833B;
+  text-shadow:
+    0 0 30px rgba(200,131,59,0.5),
+    0 0 60px rgba(200,131,59,0.25);
+}
+
+/* Chocolate text fill */
+.text-choco-fill {
+  background: linear-gradient(180deg, #6B3A2A 0%, #2E1810 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Alfajorina surface */
+.surface-alfe { @apply bg-white border border-alfe-border rounded-2xl; }
