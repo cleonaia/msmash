@@ -17,19 +17,6 @@ const config: Config = {
         "2xl": "1536px",
       },
       colors: {
-        alfe: {
-          cream:        "#FDF6ED",
-          "cream-dark": "#F5EBD5",
-          choco:        "#2E1810",
-          "choco-mid":  "#6B3A2A",
-          "choco-light":"#A06040",
-          caramel:      "#C8833B",
-          dulce:        "#E8B46A",
-          rosa:         "#D4776A",
-          verde:        "#7A9E7E",
-          border:       "#E8D5B5",
-          text:         "#3D2315",
-        },
         smash: {
           black:        "#21142B",
           dark:         "#2A1B37",
