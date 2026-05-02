@@ -16,7 +16,7 @@ export function CookieBanner() {
       <div className="fire-divider" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))] flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
         <p className="text-sm sm:text-[15px] leading-relaxed text-smash-cream/75 text-center sm:text-left max-w-3xl">
-          Usamos cookies para mejorar tu experiencia en M SMASH.{" "}
+          Usamos cookies para mejorar tu experiencia en The M Smash Lab.{" "}
           <Link href="/cookies" className="underline text-smash-sky-light hover:text-white transition-colors">
             Más información
           </Link>

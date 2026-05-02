@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jsPDF } from 'jspdf';
 import { MenuItem } from '@/features/menu/data/menu';
+import { siteConfig } from '@/config/site';
 
 type CategoryInput = { id: string; label: string };
 type GroupedCategory = { label: string; items: MenuItem[] };
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
     // Título
     pdf.setFontSize(24);
     pdf.setFont('helvetica', 'bold');
-    pdf.text('M SMASH BURGER', pageWidth / 2, yPosition, { align: 'center' });
+    pdf.text(siteConfig.name.toUpperCase(), pageWidth / 2, yPosition, { align: 'center' });
 
     yPosition += 8;
     pdf.setFontSize(12);
@@ -131,7 +132,7 @@ export async function POST(request: NextRequest) {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition':
-          'attachment; filename="carta-msmash.pdf"',
+          'attachment; filename="carta-the-m-smash-lab.pdf"',
       },
     });
   } catch (error) {

@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { siteConfig } from '@/config/site';
 
 export const metadata = {
-  title: 'QR Codes - M SMASH BURGER',
+  title: 'QR Codes - The M Smash Lab',
   description: 'Códigos QR de la carta digital y reseñas en Google Maps',
 };
 
@@ -84,7 +84,7 @@ export default function QRPage() {
             <div className="bg-white p-8 rounded-2xl shadow-2xl">
               <Image
                 src={locationQrUrl}
-                alt="QR Ubicación M SMASH"
+                alt="QR Ubicación The M Smash Lab"
                 width={400}
                 height={400}
                 className="w-full h-auto"

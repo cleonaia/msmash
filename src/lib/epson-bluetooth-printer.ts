@@ -519,10 +519,11 @@ export function formatOrderReceipt(order: {
   paymentMethod: string
   status: string
   totalAmount: number
+  discountAmount?: number | null
   items: Array<{ quantity: number; product?: { name?: string | null } }>
 }) {
   return {
-    title: 'M SMASH BURGER',
+    title: 'The M Smash Lab',
     subtitle: 'TICKET TPV',
     referenceLabel: 'Pedido',
     referenceValue: `#${order.id.slice(-8)}`,
@@ -538,7 +539,10 @@ export function formatOrderReceipt(order: {
       label: item.product?.name || 'Producto',
       quantity: item.quantity,
     })),
-    summaryLines: [`TOTAL: ${moneyFromCents(order.totalAmount)}`],
+    summaryLines: [
+      ...(order.discountAmount && order.discountAmount > 0 ? [`DESCUENTO: -${moneyFromCents(order.discountAmount)}`] : []),
+      `TOTAL: ${moneyFromCents(order.totalAmount)}`,
+    ],
     footerLines: ['Gracias por tu compra', 'www.msmashburger.page'],
   } satisfies ReceiptData
 }
@@ -553,10 +557,11 @@ export function formatInvoiceReceipt(invoice: {
   subtotal: number
   taxAmount: number
   totalAmount: number
+  discountAmount?: number | null
   items: Array<{ description: string; quantity: number; subtotal: number }>
 }) {
   return {
-    title: 'M SMASH BURGER',
+    title: 'The M Smash Lab',
     subtitle: 'FACTURA',
     referenceLabel: 'Factura',
     referenceValue: invoice.invoiceNumber,
@@ -576,12 +581,13 @@ export function formatInvoiceReceipt(invoice: {
     summaryLines: [
       `Base: ${moneyFromCents(invoice.subtotal)}`,
       `IVA: ${moneyFromCents(invoice.taxAmount)}`,
+      ...(invoice.discountAmount && invoice.discountAmount > 0 ? [`DESCUENTO: -${moneyFromCents(invoice.discountAmount)}`] : []),
       `TOTAL: ${moneyFromCents(invoice.totalAmount)}`,
       'Datos bancarios',
       'Titular: Pablo Edelmer Marin Sierra',
       'IBAN: ES65 2100 0087 6902 0210 0294',
       'BIC/SWIFT: CAIXESBBXXX',
     ],
-    footerLines: ['Factura generada desde M SMASH'],
+    footerLines: ['Factura generada desde The M Smash Lab'],
   } satisfies ReceiptData
 }

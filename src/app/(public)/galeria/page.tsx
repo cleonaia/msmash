@@ -25,7 +25,7 @@ function Cloud({ className, opacity = 0.55, width = 280 }: { className?: string;
 }
 
 const galleryItemsRaw = [
-  { src: "/images/products/the-m-smash.jpeg", alt: "The M Smash Burger", caption: "The M Smash" },
+  { src: "/images/products/the-m-smash.jpeg", alt: "The M Smash Lab", caption: "The M Smash Lab" },
   { src: "/images/products/burger-the-basic.jpeg", alt: "Burger The Basic", caption: "The Basic Blue" },
   { src: "/images/products/the-crispy.jpeg", alt: "The Crispy", caption: "The Crispy" },
   { src: "/images/products/the-super-crispy.jpeg", alt: "The Súper Chicken Burger", caption: "The Súper Chicken" },
@@ -58,7 +58,7 @@ export default function GaleriaPage() {
       <div className="relative mt-20 h-64 sm:h-80 flex items-end overflow-hidden sky-bg">
         <Image
           src="/images/products/the-m-smash.jpeg"
-          alt="Galería M SMASH"
+          alt="Galería The M Smash Lab"
           fill
           className="object-cover opacity-20"
           priority

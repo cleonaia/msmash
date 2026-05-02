@@ -20,6 +20,7 @@ type TicketOrder = {
   paymentStatus: string
   paymentMethod: string
   status: string
+  discountAmount: number
   totalAmount: number
   notes: string | null
   items: Array<{
@@ -40,6 +41,7 @@ function getFallbackOrder(orderId: string): TicketOrder {
     paymentStatus: 'PENDING',
     paymentMethod: 'LOCAL',
     status: 'PENDING',
+    discountAmount: 0,
     totalAmount: 0,
     notes: 'No se pudieron cargar todos los datos del ticket. Imprime este comprobante y revisa el pedido en admin.',
     items: []
@@ -56,6 +58,7 @@ function getTestOrder(): TicketOrder {
     paymentStatus: 'PENDING',
     paymentMethod: 'LOCAL',
     status: 'PENDING',
+    discountAmount: 0,
     totalAmount: 2890,
     notes: 'Ticket de prueba TPV (puedes ignorarlo).',
     items: [
@@ -63,7 +66,7 @@ function getTestOrder(): TicketOrder {
         id: 'item-test-1',
         quantity: 1,
         subtotal: 1290,
-        productName: 'The M Smash'
+        productName: 'The M Smash Lab'
       },
       {
         id: 'item-test-2',
@@ -196,7 +199,7 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
 
       <section className="ticket mx-auto w-[360px] max-w-full border border-dashed border-gray-400 p-3 font-mono text-[12px]">
         <header className="text-center">
-          <p className="text-[16px] font-bold">M SMASH BURGER</p>
+          <p className="text-[16px] font-bold">The M Smash Lab</p>
           <p>{isTestTicket ? 'Ticket de prueba' : 'Ticket de pedido'}</p>
           <p>{formatDate(order.createdAt)}</p>
           <p>Pedido: #{order.id.slice(-8)}</p>
@@ -232,6 +235,12 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
             <span>Items</span>
             <span>{itemCount}</span>
           </div>
+          {order.discountAmount > 0 ? (
+            <div className="flex items-center justify-between text-red-700">
+              <span>Descuento</span>
+              <span>-{formatMoney(order.discountAmount)}</span>
+            </div>
+          ) : null}
           <div className="flex items-center justify-between text-[15px] font-bold">
             <span>TOTAL</span>
             <span>{formatMoney(order.totalAmount)}</span>

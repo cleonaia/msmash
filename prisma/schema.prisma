@@ -120,6 +120,7 @@ model Order {
   paymentStatus    String                 @default("PENDING")
   paymentMethod    String                 @default("LOCAL")
   notes            String?
+  discountAmount   Int                    @default(0)
   totalAmount      Int
   items            OrderItem[]
   invoice          Invoice?

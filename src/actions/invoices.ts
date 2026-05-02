@@ -34,7 +34,7 @@ export async function createInvoiceFromOrder(
   try {
     const existingInvoice = await prisma.invoice.findUnique({
       where: { orderId },
-      include: { items: true }
+      include: { items: true, order: true }
     })
 
     if (existingInvoice) {
@@ -44,6 +44,7 @@ export async function createInvoiceFromOrder(
     const order = await prisma.order.findUnique({
       where: { id: orderId },
       include: {
+        invoice: true,
         items: {
           include: {
             product: {
@@ -89,9 +90,11 @@ export async function createInvoiceFromOrder(
     )
 
     // Ajuste por redondeo para cuadrar exactamente con el total de la orden
-    const roundingDiff = order.totalAmount - (taxBreakdown.subtotal + taxBreakdown.tax)
-    const subtotal = taxBreakdown.subtotal
-    const ivaTax = taxBreakdown.tax + roundingDiff
+    const discountAmount = Math.max(order.discountAmount || 0, 0)
+    const grossTotal = taxBreakdown.subtotal + taxBreakdown.tax
+    const discountRatio = grossTotal > 0 ? discountAmount / grossTotal : 0
+    const subtotal = Math.max(0, Math.round(taxBreakdown.subtotal * (1 - discountRatio)))
+    const ivaTax = Math.max(0, order.totalAmount - subtotal)
 
     // Generar número de factura único
     const invoiceCount = await prisma.invoice.count()
@@ -121,7 +124,7 @@ export async function createInvoiceFromOrder(
           }))
         }
       },
-      include: { items: true }
+      include: { items: true, order: true }
     })
 
     // Actualizar la orden con referencia a factura

@@ -26,6 +26,7 @@ export function AdminComandero() {
   const [customerTaxId, setCustomerTaxId] = useState('')
   const [notes, setNotes] = useState('')
   const [customItemPrices, setCustomItemPrices] = useState<Record<string, number>>({})
+  const [discountAmount, setDiscountAmount] = useState(0)
   const [paymentMethod, setPaymentMethod] = useState<'DATAPHONE' | 'CASH'>('DATAPHONE')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
@@ -97,6 +98,8 @@ export function AdminComandero() {
   }, [cart, customItemPrices, catalogItems])
 
   const total = useMemo(() => cartItems.reduce((sum, item) => sum + item.subtotal, 0), [cartItems])
+  const appliedDiscount = useMemo(() => Math.min(Math.max(discountAmount, 0), total), [discountAmount, total])
+  const finalTotal = useMemo(() => Math.max(total - appliedDiscount, 0), [total, appliedDiscount])
   const totalItems = useMemo(() => cartItems.reduce((sum, item) => sum + item.qty, 0), [cartItems])
   const normalizedPhone = customerPhone.replace(/\D/g, '')
   const isCustomerDataValid = customerName.trim().length >= 2
@@ -141,6 +144,22 @@ export function AdminComandero() {
     })
   }
 
+  const setDiscountFromInput = (rawValue: string) => {
+    const normalized = rawValue.replace(',', '.').trim()
+
+    if (!normalized) {
+      setDiscountAmount(0)
+      return
+    }
+
+    const parsed = Number(normalized)
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      return
+    }
+
+    setDiscountAmount(parsed)
+  }
+
   const submitOrder = async () => {
     if (cartItems.length === 0 || isSubmitting) return
 
@@ -161,12 +180,13 @@ export function AdminComandero() {
         customerTaxId: customerTaxId.trim() || undefined,
         notes: notes.trim(),
         paymentMethod,
+        discountAmount: appliedDiscount,
         items: cartItems.map((item) => ({
           productId: item.id,
           quantity: item.qty,
           unitPrice: item.price
         })),
-        totalAmount: total
+        totalAmount: finalTotal
       })
 
       if (!result.success) {
@@ -176,6 +196,7 @@ export function AdminComandero() {
       setCreatedOrderId(result.order.id)
       setCart({})
       setCustomItemPrices({})
+      setDiscountAmount(0)
       setNotes('')
       window.open(`/admin/orders/print/${result.order.id}`, '_blank', 'noopener,noreferrer')
     } catch (error) {
@@ -308,6 +329,15 @@ export function AdminComandero() {
               rows={3}
               className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-black placeholder-gray-400"
             />
+            <input
+              type="number"
+              min={0}
+              step="0.01"
+              value={discountAmount || ''}
+              onChange={(e) => setDiscountFromInput(e.target.value)}
+              placeholder="Descuento (€)"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-black placeholder-gray-400"
+            />
             <select
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value as 'DATAPHONE' | 'CASH')}
@@ -352,8 +382,21 @@ export function AdminComandero() {
 
           <div className="mt-4 flex items-center justify-between">
             <span className="text-sm text-gray-600">Total ({totalItems} uds)</span>
-            <span className="text-xl font-bold text-gray-900">{formatPrice(total)}</span>
+            <span className="text-xl font-bold text-gray-900">{formatPrice(finalTotal)}</span>
           </div>
+
+          {appliedDiscount > 0 ? (
+            <div className="mt-2 space-y-1 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+              <div className="flex items-center justify-between">
+                <span>Subtotal</span>
+                <span>{formatPrice(total)}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Descuento</span>
+                <span>-{formatPrice(appliedDiscount)}</span>
+              </div>
+            </div>
+          ) : null}
 
           <button
             onClick={submitOrder}

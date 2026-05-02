@@ -1,4 +1,4 @@
-// ─── M SMASH Menu Data ─────────────────────────────────────────────────────
+// ─── The M Smash Lab Menu Data ─────────────────────────────────────────────
 export type Allergen =
   | "apio"
   | "crustaceos"
@@ -85,7 +85,7 @@ export const menuItems: MenuItem[] = [
   },
   {
     id: "the-m-smash",
-    name: "The M Smash Burger",
+    name: "The M Smash Lab",
     description: "Pan brioche, doble Smash Burger, queso Gouda, queso Cheddar, bacon crispy, cebolla caramelizada, huevo, salsa tártara koreana, salsa de la casa",
     price: 13.0,
     category: "burguers",

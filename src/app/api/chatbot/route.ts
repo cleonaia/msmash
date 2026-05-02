@@ -190,7 +190,7 @@ function findMenuItemInText(raw: string) {
     if (item.id === "the-three-max" && /(three max|triple smash|triple burger)/.test(text)) return true;
     if (item.id === "the-hawaian-burger" && /(hawaian|hawaiian|hawaiana|hamburguesa hawaiana|piña asada)/.test(text)) return true;
     if (item.id === "cheesecake-nutella" && /(cheesecake lottus|cheesecake lotus|lottus|lotus)/.test(text)) return true;
-    if (item.id === "the-m-smash" && /(m smash|double smash|doble smash)/.test(text)) return true;
+    if (item.id === "the-m-smash" && /(m smash|the m smash lab|double smash|doble smash)/.test(text)) return true;
     if (item.id === "the-crispy" && /(the crispy|crispy|crujiente)/.test(text)) return true;
     if (item.id === "the-basic" && /(the basic|basic|burger basica|burger básica|la basica|la básica)/.test(text)) return true;
     if (item.id === "menu-kids" && /(kids|ninos|niños|infantil)/.test(text)) return true;
@@ -208,7 +208,7 @@ function fallbackReply(raw: string): string {
   }
 
   if (/(hola|buenas|hey|hello)/.test(text)) {
-    return "Hola. Soy el asistente de M SMASH. Te ayudo con carta, hamburguesas, alérgenos, pedidos, reservas, direccion y contacto.";
+    return "Hola. Soy el asistente de The M Smash Lab. Te ayudo con carta, hamburguesas, alérgenos, pedidos, reservas, direccion y contacto.";
   }
 
   if (/(horario|abierto|cerrado|hora)/.test(text)) {
@@ -283,7 +283,7 @@ function buildSystemPrompt() {
     .join("\n");
 
   return [
-    "Eres el asistente virtual de M SMASH (smash burger en Terrassa).",
+    "Eres el asistente virtual de The M Smash Lab (smash burger en Terrassa).",
     "Responde siempre en espanol, tono cercano, claro y breve.",
     "Nunca inventes datos. Si no sabes algo, dilo y deriva al contacto humano.",
     "Si piden hablar con alguien, sugiere WhatsApp.",

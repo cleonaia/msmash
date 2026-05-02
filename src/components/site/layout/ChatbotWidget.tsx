@@ -73,7 +73,7 @@ function getFallbackReply(raw: string): Reply {
 
   if (/(hola|buenas|hey|hello)/.test(text)) {
     return {
-      text: "Hola. Soy el asistente de M SMASH. Te ayudo con carta, pedidos, reservas, direccion y contacto.",
+      text: "Hola. Soy el asistente de The M Smash Lab. Te ayudo con carta, pedidos, reservas, direccion y contacto.",
     };
   }
 
@@ -140,7 +140,7 @@ export function ChatbotWidget() {
     {
       id: 1,
       from: "bot",
-        text: "Hola. Soy tu asistente M SMASH. Preguntame por hamburguesas, alérgenos, pedidos, reservas o la carta.",
+        text: "Hola. Soy tu asistente de The M Smash Lab. Preguntame por hamburguesas, alérgenos, pedidos, reservas o la carta.",
     },
   ]);
   const [lastCta, setLastCta] = useState<Reply["cta"]>();
@@ -236,7 +236,7 @@ export function ChatbotWidget() {
       {isOpen && (
         <section
           role="dialog"
-          aria-label="Asistente de M SMASH"
+          aria-label="Asistente de The M Smash Lab"
           className="fixed left-2 right-2 bottom-20 z-[60] h-[calc(100dvh-7rem)] sm:left-auto sm:right-6 sm:bottom-24 sm:w-[min(24rem,calc(100vw-3rem))] sm:h-[min(38rem,calc(100dvh-8rem))] rounded-3xl border border-smash-border/60 bg-smash-dark/95 backdrop-blur-xl shadow-2xl overflow-hidden flex flex-col"
         >
           <header className="relative px-3 sm:px-4 py-3 border-b border-smash-border/50 bg-gradient-to-r from-smash-fire/20 via-smash-black/50 to-smash-sky/10 shrink-0">
@@ -246,7 +246,7 @@ export function ChatbotWidget() {
                   <Bot className="h-4 w-4" />
                 </span>
                 <div>
-                  <p className="font-display text-lg sm:text-xl leading-none uppercase tracking-wide text-white">M SMASH BOT</p>
+                  <p className="font-display text-lg sm:text-xl leading-none uppercase tracking-wide text-white">THE M SMASH LAB BOT</p>
                   <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-smash-cream/55">Online ahora</p>
                 </div>
               </div>

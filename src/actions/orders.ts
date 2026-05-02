@@ -394,6 +394,7 @@ export interface CreateCounterOrderData {
   customerTaxId?: string
   notes?: string
   paymentMethod: 'DATAPHONE' | 'CASH'
+  discountAmount?: number
   items: Array<{
     productId: string
     quantity: number
@@ -483,11 +484,22 @@ export async function createCounterOrder(data: CreateCounterOrderData): Promise<
       }
     })
 
+    const grossTotalAmount = normalizedItems.reduce((sum, item) => sum + item.subtotal, 0)
+    const requestedDiscount = Number(data.discountAmount)
+    const discountAmount = Math.min(
+      Math.max(Number.isFinite(requestedDiscount) ? Math.round(requestedDiscount * 100) : 0, 0),
+      grossTotalAmount
+    )
+    const finalTotalAmount = grossTotalAmount - discountAmount
+
     const notes = data.notes?.trim()
     const customerAddress = data.customerAddress?.trim()
     const customerTaxId = data.customerTaxId?.trim()
 
     const noteLines = [notes ? `[COMANDERO] ${notes}` : '[COMANDERO] Pedido creado en el local']
+    if (discountAmount > 0) {
+      noteLines.push(`DESCUENTO:${(discountAmount / 100).toFixed(2)}`)
+    }
     if (customerAddress) {
       noteLines.push(`FACTURA_DIRECCION:${customerAddress}`)
     }
@@ -503,9 +515,10 @@ export async function createCounterOrder(data: CreateCounterOrderData): Promise<
           customerName: data.customerName,
           customerEmail: data.customerEmail?.trim() || '',
           customerPhone: data.customerPhone?.trim() || '',
-          totalAmount: Math.round(data.totalAmount * 100),
+          totalAmount: finalTotalAmount,
           deliveryMethod: 'Retiro en local',
           notes: counterNotes,
+          discountAmount,
           status: 'CONFIRMED',
           paymentStatus: 'COMPLETED',
           paymentMethod: data.paymentMethod,

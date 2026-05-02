@@ -3,7 +3,7 @@ import { siteConfig, contactInfo } from "@/config/site";
 
 export const metadata = {
   title: "Aviso legal",
-  description: "Información legal del sitio web de M SMASH Burger."
+  description: "Información legal del sitio web de The M Smash Lab."
 };
 
 export default function AvisoLegalPage() {

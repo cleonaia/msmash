@@ -2,7 +2,7 @@ import { legalInfo } from "@/config/site";
 
 export const metadata = {
   title: "Términos y condiciones",
-  description: "Condiciones de compra y uso de la web de M SMASH Burger."
+  description: "Condiciones de compra y uso de la web de The M Smash Lab."
 };
 
 export default function TerminosPage() {
@@ -17,7 +17,7 @@ export default function TerminosPage() {
         <div className="space-y-7 text-smash-cream/70 leading-relaxed">
           <section>
             <h2 className="text-xl text-smash-cream font-semibold mb-2">1. Ámbito</h2>
-            <p>Estas condiciones regulan el uso de la web y la compra de productos ofrecidos por M SMASH Burger.</p>
+            <p>Estas condiciones regulan el uso de la web y la compra de productos ofrecidos por The M Smash Lab.</p>
           </section>
 
           <section>

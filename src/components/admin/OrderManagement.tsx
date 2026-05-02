@@ -427,8 +427,9 @@ export function OrderManagement() {
               paymentMethod: 'TPV',
               status: 'COMPLETED',
               totalAmount: 1890,
+              discountAmount: 0,
               items: [
-                { quantity: 1, product: { name: 'The M Smash' } },
+                { quantity: 1, product: { name: 'The M Smash Lab' } },
                 { quantity: 1, product: { name: 'Patatas' } },
                 { quantity: 1, product: { name: 'Bebida' } },
               ],

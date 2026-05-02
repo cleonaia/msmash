@@ -1,9 +1,9 @@
-// ─── M SMASH Brand Data ──────────────────────────────────────────────────────
+// ─── The M Smash Lab Brand Data ─────────────────────────────────────────────
 export const siteConfig = {
-  name: "M SMASH",
-  tagline: "Smash Burger",
+  name: "The M Smash Lab",
+  tagline: "Smash Burger Lab",
   slogan: "Aplastado. Dorado. Perfecto.",
-  sloganSub: "El smash burger definitivo de Terrassa.",
+  sloganSub: "El laboratorio smash definitivo de Terrassa.",
   city: "Terrassa",
   description:
     "Smash burgers de fuego en Terrassa. Carne aplastada al momento, queso fundido hasta los bordes y sabores que no se olvidan.",
@@ -27,7 +27,7 @@ export const contactInfo = {
 export const legalInfo = {
   taxName: "WILLIAM DA SILVA FERRARI",
   taxId: "Z0944573Z",
-  commercialName: "M SMASH BURGUER",
+  commercialName: "The M Smash Lab",
   typeEntity: "autónomo",
   address: "Carrer del Col-legi 5, 08221 Terrassa, Barcelona",
   legalEmail: contactInfo.email,

@@ -90,7 +90,7 @@ export default async function PrintDeliveryOrderPage({ params }: PrintDeliveryOr
 
       <section className="ticket mx-auto w-[360px] max-w-full border border-dashed border-gray-400 p-3 font-mono text-[12px]">
         <header className="text-center">
-          <p className="text-[16px] font-bold">M SMASH BURGER</p>
+          <p className="text-[16px] font-bold">The M Smash Lab</p>
           <p>Ticket de delivery</p>
           <p>{formatDate(order.createdAt)}</p>
           <p>Pedido: {order.platformOrderId}</p>

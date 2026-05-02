@@ -155,7 +155,7 @@ export function CarteProfessional() {
       <div className="relative mt-20 h-52 sm:h-64 flex items-end overflow-hidden sky-bg">
         <Image
           src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=1600&q=80"
-          alt="Carta M SMASH"
+          alt="Carta The M Smash Lab"
           fill
           className="object-cover object-center opacity-20"
           priority

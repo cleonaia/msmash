@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export const metadata = {
   title: "Política de cookies",
-  description: "Información sobre cookies y tecnologías similares en M SMASH Burger."
+  description: "Información sobre cookies y tecnologías similares en The M Smash Lab."
 };
 
 export default function CookiesPage() {

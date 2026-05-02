@@ -2,7 +2,7 @@ import { siteConfig, contactInfo, legalInfo } from "@/config/site";
 
 export const metadata = {
   title: "Política de privacidad",
-  description: "Cómo tratamos tus datos personales en M SMASH Burger."
+  description: "Cómo tratamos tus datos personales en The M Smash Lab."
 };
 
 export default function PrivacidadPage() {

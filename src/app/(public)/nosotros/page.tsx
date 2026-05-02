@@ -29,7 +29,7 @@ export default function NosotrosPage() {
       <div className="relative mt-20 h-[60vh] min-h-[420px] flex items-center justify-center overflow-hidden sky-bg">
         <Image
           src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1920&q=80"
-          alt="El equipo de M SMASH"
+          alt="El equipo de The M Smash Lab"
           fill
           className="object-cover opacity-20"
           priority
@@ -211,7 +211,7 @@ export default function NosotrosPage() {
             Ven a conocernos
           </h2>
           <p className="text-smash-cream/50 text-lg mb-10 font-light">
-            La mejor manera de entender M SMASH es comiéndola.
+            La mejor manera de entender The M Smash Lab es comiéndola.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/menu" className="btn-smash">

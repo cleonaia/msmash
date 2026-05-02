@@ -245,7 +245,7 @@ export default function PedidosPage() {
       {/* ── Page header ── */}
       <div className="relative mt-20 h-52 sm:h-64 flex items-end overflow-hidden sky-bg">
         <Image src="/images/products/the-crispy.jpeg"
-          alt="Pedidos M SMASH" fill className="object-cover opacity-20" priority sizes="100vw" />
+          alt="Pedidos The M Smash Lab" fill className="object-cover opacity-20" priority sizes="100vw" />
         <div className="absolute inset-0 bg-gradient-to-t from-smash-black/90 via-smash-black/30 to-transparent" />
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
           <span className="label-fire block mb-3">Haz tu pedido</span>

@@ -154,10 +154,23 @@ function renderA4Invoice(pdf: jsPDF, invoice: any, paidAt: Date, customerAddress
   pdf.setFontSize(10)
   pdf.text(`Base: ${formatMoneyFromCents(invoice.subtotal)}`, totalsBoxX + totalsBoxWidth - 3, totalsBoxY + 7, { align: 'right' })
   pdf.text(`IVA: ${formatMoneyFromCents(invoice.taxAmount)}`, totalsBoxX + totalsBoxWidth - 3, totalsBoxY + 13, { align: 'right' })
+  if ((invoice.order?.discountAmount || 0) > 0) {
+    pdf.text(
+      `Desc.: -${formatMoneyFromCents(invoice.order.discountAmount)}`,
+      totalsBoxX + totalsBoxWidth - 3,
+      totalsBoxY + 19,
+      { align: 'right' }
+    )
+  }
 
   pdf.setFont('helvetica', 'bold')
   pdf.setFontSize(13)
-  pdf.text(`TOTAL: ${formatMoneyFromCents(invoice.totalAmount)}`, totalsBoxX + totalsBoxWidth - 3, totalsBoxY + 21, { align: 'right' })
+  pdf.text(
+    `TOTAL: ${formatMoneyFromCents(invoice.totalAmount)}`,
+    totalsBoxX + totalsBoxWidth - 3,
+    totalsBoxY + 21,
+    { align: 'right' }
+  )
 
   // Footer
   pdf.setFont('helvetica', 'normal')
@@ -286,6 +299,10 @@ function renderTicketInvoice(pdf: jsPDF, invoice: any, paidAt: Date, customerAdd
   pdf.text(`Base: ${formatMoneyFromCents(invoice.subtotal)}`, totalsX, y, { align: 'right' })
   y += 4
   pdf.text(`IVA: ${formatMoneyFromCents(invoice.taxAmount)}`, totalsX, y, { align: 'right' })
+  if ((invoice.order?.discountAmount || 0) > 0) {
+    y += 4
+    pdf.text(`Desc.: -${formatMoneyFromCents(invoice.order.discountAmount)}`, totalsX, y, { align: 'right' })
+  }
   y += 4
   pdf.setFont('helvetica', 'bold')
   pdf.setFontSize(9.4)

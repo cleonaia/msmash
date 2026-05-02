@@ -1,10 +1,11 @@
 import Script from "next/script";
+import { siteConfig } from "@/config/site";
 
 export function SchemaMarkup() {
   const schema = {
     "@context": "https://schema.org",
     "@type": "Restaurant",
-    name: "M SMASH",
+    name: siteConfig.name,
     image: "https://msmashburger.page/og-image.png",
     description:
       "Smash burgers auténticos de fuego. Carne aplastada al momento, queso fundido hasta los bordes.",

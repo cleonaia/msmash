@@ -1,7 +1,7 @@
 import { DashboardOverview } from '@/components/admin/DashboardOverview'
 
 export const metadata = {
-  title: 'Admin Dashboard - M SMASH',
+  title: 'Admin Dashboard - The M Smash Lab',
   description: 'Operations & Compliance Dashboard'
 }
 

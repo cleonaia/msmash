@@ -283,7 +283,7 @@ export default function ReservasPage() {
               <div className="relative h-40 overflow-hidden">
                 <Image
                   src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&q=80"
-                  alt="Plancha M SMASH"
+                  alt="Plancha The M Smash Lab"
                   fill
                   className="object-cover"
                   sizes="320px"

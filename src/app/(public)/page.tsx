@@ -89,16 +89,16 @@ export default function HomePage() {
           {/* Display headline */}
           <div className="leading-none animate-fade-up">
             <h1 className="font-display display-xl text-white text-fire-glow tracking-widest uppercase block">
-              M
+              THE
             </h1>
             <h1 className="font-display display-xl text-smash-cream tracking-widest uppercase block -mt-4 sm:-mt-8 lg:-mt-14">
-              SMASH
+              M SMASH LAB
             </h1>
           </div>
 
           {/* Sub */}
           <p className="font-sans text-[11px] sm:text-sm font-extrabold uppercase tracking-[0.6em] text-smash-turquoise/75 animate-fade-up-200 mt-7 mb-2">
-            Smash Burger
+            Smash Burger Lab
           </p>
           <p className="font-sans text-[clamp(0.95rem,2.2vw,1.4rem)] text-smash-cream/50 animate-fade-up-400 mb-10 font-light tracking-wide">
             Fuego. Carne. Obsesión.

@@ -270,7 +270,7 @@ export default function ContactoPage() {
           allowFullScreen
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
-          title="Localización M SMASH Terrassa"
+          title="Localización The M Smash Lab Terrassa"
         />
       </section>
     </div>

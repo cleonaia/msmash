@@ -20,7 +20,7 @@ export function GoogleReviewsWidget() {
                 Reseñas en Google
               </h2>
               <p className="text-smash-cream/60 text-base sm:text-lg leading-relaxed">
-                Mira lo que dicen nuestros clientes sobre M SMASH BURGER. Cada reseña confirma nuestro compromiso con la calidad.
+                Mira lo que dicen nuestros clientes sobre The M Smash Lab. Cada reseña confirma nuestro compromiso con la calidad.
               </p>
             </div>
 
@@ -76,7 +76,7 @@ export function GoogleReviewsWidget() {
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   className="w-full h-[320px] sm:h-[360px] lg:h-[400px]"
-                  title="Ubicación M SMASH en Google Maps"
+                  title="Ubicación The M Smash Lab en Google Maps"
                 />
               </div>
             </div>

@@ -8,6 +8,7 @@ import { ChatbotWidget } from "@/components/site/layout/ChatbotWidget";
 import { SchemaMarkup } from "@/components/shared/SchemaMarkup";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { CartProvider } from "@/providers/CartProvider";
+import { siteConfig } from "@/config/site";
 
 // ── Google Fonts ──────────────────────────────────────────────────────────────
 const bebasNeue = Bebas_Neue({
@@ -32,15 +33,15 @@ export const metadata: Metadata = {
     shortcut: "/icon.png",
   },
   title: {
-    default: "M SMASH — Smash Burger Terrassa | Hamburguesería",
-    template: "%s | M SMASH Burger",
+    default: "The M Smash Lab — Smash Burger Terrassa | Hamburguesería",
+    template: `%s | ${siteConfig.name}`,
   },
   description:
-    "M SMASH: Smash burgers auténticos de fuego en Terrassa. Carne aplastada al momento, queso fundido hasta los bordes. Ubicación: Carrer del Col·legi, 5. Sabor que no se olvida.",
+    "The M Smash Lab: Smash burgers auténticos de fuego en Terrassa. Carne aplastada al momento, queso fundido hasta los bordes. Ubicación: Carrer del Col·legi, 5. Sabor que no se olvida.",
   keywords: [
     "smash burger terrassa",
     "hamburguesa terrassa",
-    "m smash",
+    "the m smash lab",
     "smash burger barcelona",
     "msmashburguer",
     "mejor hamburguesa terrassa",
@@ -49,9 +50,9 @@ export const metadata: Metadata = {
     "hamburguesería terrassa",
     "smash burger carrer col·legi",
   ],
-  authors: { name: "M SMASH Burger" },
-  creator: "M SMASH Burger",
-  publisher: "M SMASH Burger",
+  authors: { name: siteConfig.name },
+  creator: siteConfig.name,
+  publisher: siteConfig.name,
   robots: {
     index: true,
     follow: true,
@@ -72,32 +73,32 @@ export const metadata: Metadata = {
     telephone: false,
   },
   openGraph: {
-    title: "M SMASH — Smash Burger Terrassa",
+    title: "The M Smash Lab — Smash Burger Terrassa",
     description: "Smash burgers auténticos de fuego. Carne aplastada, queso fundido, sabor inolvidable.",
     type: "website",
     locale: "es_ES",
     url: "https://msmashburger.page",
-    siteName: "M SMASH Burger",
+    siteName: siteConfig.name,
     images: [
       {
         url: "/og-image-social.png",
         width: 1200,
         height: 630,
-        alt: "M SMASH - Smash Burger Terrassa",
+        alt: "The M Smash Lab - Smash Burger Terrassa",
         type: "image/png",
       },
       {
         url: "/og-image.png",
         width: 1244,
         height: 1242,
-        alt: "Logo M SMASH",
+        alt: "Logo The M Smash Lab",
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "M SMASH — Smash Burger Terrassa",
+    title: "The M Smash Lab — Smash Burger Terrassa",
     description: "Smash burgers auténticos de fuego. Carne aplastada, queso fundido, sabor inolvidable.",
     images: ["/og-image-social.png"],
     creator: "@smashburgerbcn",

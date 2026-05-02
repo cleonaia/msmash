@@ -21,7 +21,7 @@ export function Footer() {
           {/* Brand block */}
           <div className="xs:col-span-2 lg:col-span-1">
             <p className="font-display text-3xl tracking-wider uppercase text-smash-cream">
-              M SMASH
+              {siteConfig.name}
             </p>
             <p className="mt-1 xs:mt-1.5 text-[9px] xs:text-[10px] font-black uppercase tracking-[0.2em] xs:tracking-[0.3em] text-smash-cream/25">
               {siteConfig.tagline} · {siteConfig.city}
@@ -104,7 +104,7 @@ export function Footer() {
               <div className="p-2 bg-white rounded-xl border border-smash-border shadow-sm">
                 <Image
                   src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https%3A%2F%2Fmsmashburger.page%2Fmenu&color=C4B5FD&bgcolor=111111&qzone=1"
-                  alt="QR La Carta M SMASH"
+                  alt="QR La Carta The M Smash Lab"
                   width={80}
                   height={80}
                   className="rounded-lg"
@@ -121,7 +121,7 @@ export function Footer() {
               <div className="p-2 bg-white rounded-xl border border-smash-border shadow-sm">
                 <Image
                   src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https%3A%2F%2Fwww.instagram.com%2Fmsmashburguer%2F&color=C4B5FD&bgcolor=111111&qzone=1"
-                  alt="QR Instagram M SMASH"
+                  alt="QR Instagram The M Smash Lab"
                   width={80}
                   height={80}
                   className="rounded-lg"
@@ -138,7 +138,7 @@ export function Footer() {
               <div className="p-2 bg-white rounded-xl border border-smash-border shadow-sm">
                 <Image
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(siteConfig.googleReviewsUrl)}&color=C4B5FD&bgcolor=111111&qzone=1`}
-                  alt="QR Reseñas Google M SMASH"
+                  alt="QR Reseñas Google The M Smash Lab"
                   width={80}
                   height={80}
                   className="rounded-lg"
@@ -157,7 +157,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-10 pt-6 border-t border-smash-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-smash-cream/20 text-center sm:text-left">
-            © M SMASH Burger. Todos los derechos reservados.
+            © {siteConfig.name}. Todos los derechos reservados.
           </p>
           <div className="flex items-center gap-6 text-xs text-smash-cream/20">
             <Link href="/privacidad" className="hover:text-smash-turquoise transition-colors">Privacidad</Link>

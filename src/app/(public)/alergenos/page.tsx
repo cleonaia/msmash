@@ -1,6 +1,6 @@
 export const metadata = {
   title: "Información de alérgenos",
-  description: "Información orientativa sobre alérgenos en los productos de M SMASH Burger."
+  description: "Información orientativa sobre alérgenos en los productos de The M Smash Lab."
 };
 
 const alergenoBase = [

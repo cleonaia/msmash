@@ -22,6 +22,7 @@ interface Invoice {
   status: string
   createdAt: string | Date
   orderId?: string | null
+  order?: { discountAmount?: number | null } | null
   items?: Array<{ description: string; quantity: number; subtotal: number }>
 }
 
@@ -141,6 +142,7 @@ export function InvoiceManager() {
       const items = invoice.items || []
       const subtotal = items.reduce((sum, item) => sum + item.subtotal, 0)
       const taxAmount = Math.max(invoice.totalAmount - subtotal, 0)
+      const discountAmount = invoice.order?.discountAmount ?? Math.max(subtotal + taxAmount - invoice.totalAmount, 0)
 
       await epsonBluetoothPrinter.printReceipt(
         formatInvoiceReceipt({
@@ -152,6 +154,7 @@ export function InvoiceManager() {
           subtotal: subtotal || invoice.totalAmount,
           taxAmount: subtotal ? taxAmount : 0,
           totalAmount: invoice.totalAmount,
+          discountAmount,
           items,
         })
       )
@@ -179,8 +182,9 @@ export function InvoiceManager() {
               subtotal: 2890,
               taxAmount: 290,
               totalAmount: 3180,
+              discountAmount: 0,
               items: [
-                { description: 'The M Smash', quantity: 1, subtotal: 1290 },
+                { description: 'The M Smash Lab', quantity: 1, subtotal: 1290 },
                 { description: 'Patatas', quantity: 1, subtotal: 400 },
                 { description: 'Combo bebida', quantity: 1, subtotal: 1200 },
               ],

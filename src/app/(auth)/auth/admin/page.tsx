@@ -54,7 +54,7 @@ export default function AdminLoginPage() {
         {/* Logo/Branding */}
         <div className="mb-12 text-center">
           <h1 className="font-display text-5xl uppercase tracking-widest text-smash-cream mb-2">
-            M SMASH
+            The M Smash Lab
           </h1>
           <p className="text-smash-cream/50 text-sm uppercase tracking-[0.2em]">Panel Administrativo</p>
         </div>
@@ -143,7 +143,7 @@ export default function AdminLoginPage() {
 
         {/* Footer */}
         <div className="mt-8 text-center text-xs text-smash-cream/40">
-          <p>© 2026 M SMASH BURGER · Acceso Privado</p>
+          <p>© 2026 The M Smash Lab · Acceso Privado</p>
         </div>
       </div>
     </div>
