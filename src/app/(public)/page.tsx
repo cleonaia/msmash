@@ -87,14 +87,14 @@ export default function HomePage() {
         <div className="relative z-10 text-center px-4 sm:px-10 max-w-6xl mx-auto flex flex-col items-center">
 
           {/* Display headline */}
-          <div className="leading-none animate-fade-up">
-            <h1 className="font-display display-xl text-white text-fire-glow tracking-widest uppercase block">
+          <div className="mx-auto flex w-fit flex-col items-center justify-center leading-none text-center animate-fade-up">
+            <h1 className="font-display display-xl text-white text-fire-glow tracking-widest uppercase block text-center">
               M
             </h1>
-            <h1 className="font-display display-xl text-smash-cream tracking-widest uppercase block -mt-4 sm:-mt-8 lg:-mt-14">
+            <h1 className="font-display display-xl text-smash-cream tracking-widest uppercase block text-center -mt-4 sm:-mt-8 lg:-mt-14">
               SMASH
             </h1>
-            <h1 className="font-display display-sm text-smash-turquoise tracking-widest uppercase block -mt-2 sm:-mt-4">
+            <h1 className="font-display display-sm text-smash-cream tracking-[0.55em] uppercase block text-center -mt-2 sm:-mt-4">
               LAB
             </h1>
           </div>
