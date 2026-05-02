@@ -89,10 +89,13 @@ export default function HomePage() {
           {/* Display headline */}
           <div className="leading-none animate-fade-up">
             <h1 className="font-display display-xl text-white text-fire-glow tracking-widest uppercase block">
-              THE
+              M
             </h1>
             <h1 className="font-display display-xl text-smash-cream tracking-widest uppercase block -mt-4 sm:-mt-8 lg:-mt-14">
-              M SMASH LAB
+              SMASH
+            </h1>
+            <h1 className="font-display display-sm text-smash-turquoise tracking-widest uppercase block -mt-2 sm:-mt-4">
+              LAB
             </h1>
           </div>
 
