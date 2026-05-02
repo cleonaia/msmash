@@ -25,7 +25,7 @@ export const contactInfo = {
   whatsappNumber: "34612598899",
 };
 export const legalInfo = {
-  taxName: "WILLIAM DA SILVA FERRARI",
+  taxName: "Pablo Edelmer Marin Sierra",
   taxId: "Z0944573Z",
   commercialName: "The M Smash Lab",
   typeEntity: "autónomo",

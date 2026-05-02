@@ -35,14 +35,14 @@ function renderA4Invoice(pdf: jsPDF, invoice: any, paidAt: Date, customerAddress
   // Header
   pdf.setFont('helvetica', 'bold')
   pdf.setFontSize(24)
-  pdf.text(siteConfig.name, margin, y)
+  pdf.text(siteConfig.name, pageWidth / 2, y, { align: 'center' })
 
   pdf.setFont('helvetica', 'normal')
   pdf.setFontSize(10.5)
   y += 6
-  pdf.text(siteConfig.address, margin, y)
+  pdf.text(siteConfig.address, pageWidth / 2, y, { align: 'center' })
   y += 5
-  pdf.text(`Tel: ${contactInfo.phonePretty}`, margin, y)
+  pdf.text(`Tel: ${contactInfo.phonePretty}`, pageWidth / 2, y, { align: 'center' })
 
   pdf.setFont('helvetica', 'bold')
   pdf.setFontSize(12)
@@ -63,10 +63,13 @@ function renderA4Invoice(pdf: jsPDF, invoice: any, paidAt: Date, customerAddress
   const leftBoxX = margin
   const rightBoxX = margin + contentWidth / 2 + 4
   const boxWidth = contentWidth / 2 - 4
+  const leftBoxLines = 3
+  const rightBoxLines = 4 + (customerAddress ? 1 : 0)
+  const boxHeight = Math.max(34, Math.max(leftBoxLines, rightBoxLines) * 5 + 11)
 
   pdf.setFillColor(248, 248, 248)
-  pdf.rect(leftBoxX, y, boxWidth, 34, 'F')
-  pdf.rect(rightBoxX, y, boxWidth, 34, 'F')
+  pdf.rect(leftBoxX, y, boxWidth, boxHeight, 'F')
+  pdf.rect(rightBoxX, y, boxWidth, boxHeight, 'F')
 
   pdf.setFont('helvetica', 'bold')
   pdf.setFontSize(10)
@@ -93,7 +96,7 @@ function renderA4Invoice(pdf: jsPDF, invoice: any, paidAt: Date, customerAddress
   }
 
   // Table
-  y += 44
+  y += boxHeight + 10
   const tableX = margin
   const tableWidth = contentWidth
   const colDescX = tableX + 3
@@ -143,21 +146,22 @@ function renderA4Invoice(pdf: jsPDF, invoice: any, paidAt: Date, customerAddress
   }
 
   // Totals box
-  const totalsBoxWidth = 74
+  const totalsBoxWidth = 88
   const totalsBoxX = pageWidth - margin - totalsBoxWidth
   const totalsBoxY = y + 4
+  const totalsRowRight = totalsBoxX + totalsBoxWidth - 4
 
   pdf.setFillColor(250, 250, 250)
-  pdf.rect(totalsBoxX, totalsBoxY, totalsBoxWidth, 25, 'F')
+  pdf.rect(totalsBoxX, totalsBoxY, totalsBoxWidth, 31, 'F')
 
   pdf.setFont('helvetica', 'normal')
   pdf.setFontSize(10)
-  pdf.text(`Base: ${formatMoneyFromCents(invoice.subtotal)}`, totalsBoxX + totalsBoxWidth - 3, totalsBoxY + 7, { align: 'right' })
-  pdf.text(`IVA: ${formatMoneyFromCents(invoice.taxAmount)}`, totalsBoxX + totalsBoxWidth - 3, totalsBoxY + 13, { align: 'right' })
+  pdf.text(`Base: ${formatMoneyFromCents(invoice.subtotal)}`, totalsRowRight, totalsBoxY + 7, { align: 'right' })
+  pdf.text(`IVA: ${formatMoneyFromCents(invoice.taxAmount)}`, totalsRowRight, totalsBoxY + 13, { align: 'right' })
   if ((invoice.order?.discountAmount || 0) > 0) {
     pdf.text(
       `Desc.: -${formatMoneyFromCents(invoice.order.discountAmount)}`,
-      totalsBoxX + totalsBoxWidth - 3,
+      totalsRowRight,
       totalsBoxY + 19,
       { align: 'right' }
     )
@@ -167,8 +171,8 @@ function renderA4Invoice(pdf: jsPDF, invoice: any, paidAt: Date, customerAddress
   pdf.setFontSize(13)
   pdf.text(
     `TOTAL: ${formatMoneyFromCents(invoice.totalAmount)}`,
-    totalsBoxX + totalsBoxWidth - 3,
-    totalsBoxY + 21,
+    totalsRowRight,
+    totalsBoxY + 27,
     { align: 'right' }
   )
 
