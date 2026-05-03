@@ -54,6 +54,16 @@ async function main() {
   for (const product of products) {
     const categoryId = categoryMap.get(product.categorySlug);
     if (!categoryId) continue;
+    const explicitImageMap: Record<string, string> = {
+      'the-special': 'The_Special.jpeg',
+      'the-hawaian-burger': 'The_Hawaiana.jpeg',
+      'fries-bacon-jam': 'Fries_Bacon_Jam.jpeg',
+      'menu-kids': 'Menu_Kids.jpeg',
+      'fries-m': 'fries-m.jpeg',
+    };
+
+    const imageFile = explicitImageMap[product.slug] || `${product.slug}.jpeg`;
+
     await prisma.product.create({
       data: {
         id: product.id,
@@ -67,7 +77,7 @@ async function main() {
         isFeatured: true,
         badges: JSON.stringify([]),
         images: {
-          create: [{ url: `/images/products/${product.slug}.jpeg`, alt: product.name, order: 0 }],
+          create: [{ url: `/images/products/${imageFile}`, alt: product.name, order: 0 }],
         },
       },
     });
