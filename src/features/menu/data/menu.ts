@@ -45,15 +45,18 @@ const THE_BASIC = "/images/products/the-basic.jpeg";
 const THE_SUPER_CRISPY = "/images/products/the-super-crispy.jpeg";
 const THE_SUPER_CHICKEN = THE_SUPER_CRISPY;
 const THE_VEGANA = "/images/products/placeholder.svg";
-const THE_SPECIAL = "/images/products/placeholder.svg";
+const THE_SPECIAL = "/images/products/the-special.jpeg";
 const CHEESECAKE_OREO = "/images/products/placeholder.svg";
 const MENU_KIDS = "/images/products/menu-kids.jpeg";
+const THE_HAWAIIAN = "/images/products/the-hawaian-burger.jpeg";
 const FRANKFURT = "/images/products/frankfurt.jpeg";
 const TEQUENOS = "/images/products/tequenos.jpeg";
 const FRIES_M = "/images/products/fries-m.jpeg";
 const CRISPY_FINGER = "/images/products/crispy-chicken.jpeg";
 const CHEESECAKE_NUTELLA = "/images/products/cheesecake-nutella.svg";
 const PRODUCT_CARD_PLACEHOLDER = "/images/products/placeholder.svg";
+const FRIES_AND_RIBS_IMG = "/images/products/fries-and-ribs.jpeg";
+const FRIES_BACON_JAM = "/images/products/fries-bacon-jam.jpeg";
 const PEPSI_CLASICA = "/images/products/pepsi-cola.png";
 const LIPTON = "/images/products/lipton.jpeg";
 const PEPSI_ZERO = "/images/products/pepsi-cola-light.jpeg";
@@ -107,7 +110,7 @@ export const menuItems: MenuItem[] = [
     id: "super-crispy-chicken",
     name: "THE SÚPER CHICKEN BURGER",
     description: "Pollo extra crujiente marinado con especias japonesas, queso cheddar, tomate Pera, Salsa M, salsa tártara koreana, cebolla caramelizada y su pan brioche",
-    price: 11.9,
+    price: 12.5,
     category: "burguers",
     image: THE_SUPER_CHICKEN,
     allergens: ["gluten", "lacteos", "huevos"],
@@ -129,7 +132,7 @@ export const menuItems: MenuItem[] = [
     description: "Pan brioche, Smash Burguer, queso cheddar, lechuga, tomate, huevo, salsas de la casa y bacon.",
     price: 12.5,
     category: "burguers",
-    image: PRODUCT_CARD_PLACEHOLDER,
+    image: THE_SPECIAL,
     allergens: ["gluten", "lacteos", "huevos"],
     featured: true,
   },
@@ -150,7 +153,7 @@ export const menuItems: MenuItem[] = [
     description: "Pan brioche, doble Smash burguer, Doble Queso Edam, trozo de piña asada, Costillar desmenuzado ( Receta de la Abuela) salsas de la casa y miel",
     price: 17.0,
     category: "burguers",
-    image: PRODUCT_CARD_PLACEHOLDER,
+    image: THE_HAWAIIAN,
     allergens: ["gluten", "lacteos", "huevos"],
     featured: true,
     badge: "Nuevo",
@@ -190,7 +193,7 @@ export const menuItems: MenuItem[] = [
     id: "crispy-chicken",
     name: "CRISPY FINGER",
     description: "6 tiras de pollo rebozadas con especias japonesas y acompañadas con una tártara koreana",
-    price: 6.0,
+    price: 7.0,
     category: "entrantres",
     image: CRISPY_FINGER,
     allergens: ["gluten", "huevos"],
@@ -201,7 +204,16 @@ export const menuItems: MenuItem[] = [
     description: "Patatas fritas caseras con barbecue sauce y mermelada de bacon.",
     price: 7.0,
     category: "entrantres",
-    image: PRODUCT_CARD_PLACEHOLDER,
+    image: FRIES_AND_RIBS_IMG,
+    allergens: ["gluten", "lacteos"],
+  },
+  {
+    id: "fries-bacon-jam",
+    name: "Fries Bacon Jam",
+    description: "Patatas fritas caseras con mermelada de bacon a un precio de 7 euros.",
+    price: 7.0,
+    category: "entrantres",
+    image: FRIES_BACON_JAM,
     allergens: ["gluten", "lacteos"],
   },
 

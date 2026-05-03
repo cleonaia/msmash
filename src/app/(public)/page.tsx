@@ -91,10 +91,10 @@ export default function HomePage() {
             <h1 className="font-display display-xl text-white text-fire-glow tracking-widest uppercase block text-center">
               M
             </h1>
-            <h1 className="font-display display-xl text-smash-cream tracking-widest uppercase block text-center -mt-4 sm:-mt-8 lg:-mt-14">
+            <h1 className="font-display display-xl text-smash-cream tracking-widest uppercase block text-center -mt-2 sm:-mt-6 lg:-mt-10">
               SMASH
             </h1>
-            <h1 className="font-display display-sm text-smash-cream tracking-[0.55em] uppercase block text-center -mt-2 sm:-mt-4">
+            <h1 className="font-display display-sm text-smash-cream tracking-[0.55em] uppercase block text-center mt-0 sm:mt-2">
               LAB
             </h1>
           </div>
