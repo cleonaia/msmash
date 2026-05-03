@@ -46,7 +46,7 @@ const THE_SUPER_CRISPY = "/images/products/the-super-crispy.jpeg";
 const THE_SUPER_CHICKEN = THE_SUPER_CRISPY;
 const THE_VEGANA = "/images/products/placeholder.svg";
 const THE_SPECIAL = "/images/products/The_Special.jpeg";
-const CHEESECAKE_OREO = "/images/products/placeholder.svg";
+const CHEESECAKE_OREO = "/images/products/chessecake_oreo.jpg";
 const MENU_KIDS = "/images/products/Menu_Kids.jpeg";
 const THE_HAWAIIAN = "/images/products/The_Hawaiana.jpeg";
 const FRANKFURT = "/images/products/frankfurt.jpeg";
@@ -65,8 +65,8 @@ const SCHWEPPES_NARANJA = "/images/products/schweppes-naranja.jpeg";
 const SCHWEPPES_LIMON = "/images/products/schweppes-limon.png";
 const AGUA_SOLAN = "/images/products/agua-solan-de-cabras.webp";
 const AGUA_GAS = "/images/products/agua-con-gas-solan.jpeg";
-const CAFE = "/images/products/placeholder.svg";
-const CAPUCCINO = "/images/products/placeholder.svg";
+const CAFE = "/images/products/cafe.png";
+const CAPUCCINO = "/images/products/capuccino.jpg";
 const CERVEZA_RADLER = "/images/products/cerveza-radler-33cl.jpeg";
 const CERVEZA_ALAMBRE = "/images/products/cerveza-alambre-33cl.jpeg";
 const CERVEZA_TOSTADA_SIN_ALCOHOL = "/images/products/cerveza-tostada-sin-alcohol.jpeg";
@@ -269,7 +269,7 @@ export const menuItems: MenuItem[] = [
     id: "tinto-de-verano",
     name: "Tinto de Verano",
     description: "Tinto de verano.",
-    price: 5.0,
+    price: 3.5,
     category: "cervezas",
     image: TINTO_DE_VERANO,
     allergens: ["gluten"],
@@ -281,7 +281,7 @@ export const menuItems: MenuItem[] = [
     id: "pepsi-clasica",
     name: "PEPSI COLA CLÁSICA",
     description: "Refresco Pepsi Cola clásica, 330ml",
-    price: 2.5,
+    price: 2.0,
     category: "bebidas",
     image: PEPSI_CLASICA,
     allergens: [],
@@ -290,7 +290,7 @@ export const menuItems: MenuItem[] = [
     id: "lipton",
     name: "LIPTON",
     description: "Lipton té limón, 330ml",
-    price: 2.5,
+    price: 2.0,
     category: "bebidas",
     image: LIPTON,
     allergens: [],
@@ -299,7 +299,7 @@ export const menuItems: MenuItem[] = [
     id: "pepsi-zero",
     name: "PEPSI COLA ZERO",
     description: "Pepsi Cola Zero azúcar, 330ml",
-    price: 2.5,
+    price: 2.0,
     category: "bebidas",
     image: PEPSI_ZERO,
     allergens: [],
@@ -308,7 +308,7 @@ export const menuItems: MenuItem[] = [
     id: "sprite",
     name: "Sprite",
     description: "Refresco Sprite, 330ml",
-    price: 2.5,
+    price: 2.0,
     category: "bebidas",
     image: SPRITE,
     allergens: [],
@@ -317,7 +317,7 @@ export const menuItems: MenuItem[] = [
     id: "schweppes-naranja",
     name: "SCHWEPPES DE NARANJA",
     description: "Schweppes naranja, 250ml",
-    price: 2.5,
+    price: 2.0,
     category: "bebidas",
     image: SCHWEPPES_NARANJA,
     allergens: [],
@@ -326,7 +326,7 @@ export const menuItems: MenuItem[] = [
     id: "schweppes-limon",
     name: "SCHWEPPES DE LIMÓN",
     description: "Schweppes limón, 250ml",
-    price: 2.5,
+    price: 2.0,
     category: "bebidas",
     image: SCHWEPPES_LIMON,
     allergens: [],
@@ -353,7 +353,7 @@ export const menuItems: MenuItem[] = [
     id: "cafe",
     name: "Cafe",
     description: "Cafe solo",
-    price: 1.4,
+    price: 2.0,
     category: "bebidas",
     image: CAFE,
     allergens: [],
@@ -362,7 +362,7 @@ export const menuItems: MenuItem[] = [
     id: "capuccino",
     name: "Cafuccino",
     description: "Cafe con leche cremada",
-    price: 3.0,
+    price: 2.0,
     category: "bebidas",
     image: CAPUCCINO,
     allergens: ["lacteos"],
@@ -375,7 +375,7 @@ export const menuItems: MenuItem[] = [
     description: "La clásica tarta de queso junto a una base de Lottus y lluvia de chocolate caliente.",
     price: 6.5,
     category: "postres",
-    image: PRODUCT_CARD_PLACEHOLDER,
+    image: "/images/products/chessecake_lottus.jpeg",
     allergens: ["gluten", "lacteos", "huevos"],
   },
   {
@@ -384,7 +384,7 @@ export const menuItems: MenuItem[] = [
     description: "La clásica tarta de queso junto a una base de Oreo y lluvia de cacao en polvo. Es un buen final feliz",
     price: 6.5,
     category: "postres",
-    image: PRODUCT_CARD_PLACEHOLDER,
+    image: CHEESECAKE_OREO,
     allergens: ["gluten", "lacteos", "huevos"],
   },
 ];

@@ -82,6 +82,7 @@ export default function PedidosPage() {
   const [cashOrderConfirmed, setCashOrderConfirmed] = useState(false);
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [orderError, setOrderError] = useState<string | null>(null);
+  const [zoomedImage, setZoomedImage] = useState<{ src: string; alt: string } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -303,7 +304,12 @@ export default function PedidosPage() {
                       ${qty > 0 ? "border-smash-fire/40 bg-smash-fire/5" : "border-smash-border bg-smash-smoke hover:border-smash-fire/25"}`}>
 
                     {/* Image */}
-                    <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-xl overflow-hidden shrink-0 self-start">
+                    <button
+                      type="button"
+                      onClick={() => setZoomedImage({ src: item.image, alt: item.name })}
+                      className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-xl overflow-hidden shrink-0 self-start cursor-zoom-in"
+                      aria-label={`Ampliar imagen de ${item.name}`}
+                    >
                       <Image src={item.image} alt={item.name} fill
                         className={isDrinkItem(item.id) ? "object-contain p-1" : "object-cover object-[var(--mobile-pos)] sm:object-[var(--desktop-pos)]"}
                         style={{ '--mobile-pos': mobilePosition, '--desktop-pos': desktopPosition } as Record<string, string>}
@@ -313,7 +319,7 @@ export default function PedidosPage() {
                           <span className={`${badge[item.badge] ?? "tag-fire"} text-[8px] px-1.5 py-0.5`}>{item.badge}</span>
                         </div>
                       )}
-                    </div>
+                    </button>
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
@@ -405,7 +411,12 @@ export default function PedidosPage() {
                           const mobilePosition = getItemMobilePreviewPosition(item.id);
                           const desktopPosition = getItemPreviewPosition(item.id);
                           return (
-                        <div className="relative h-10 w-10 rounded-lg overflow-hidden shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setZoomedImage({ src: item.image, alt: item.name })}
+                          className="relative h-10 w-10 rounded-lg overflow-hidden shrink-0 cursor-zoom-in"
+                          aria-label={`Ampliar imagen de ${item.name}`}
+                        >
                           <Image
                             src={item.image}
                             alt={item.name}
@@ -414,7 +425,7 @@ export default function PedidosPage() {
                             style={{ '--mobile-pos': mobilePosition, '--desktop-pos': desktopPosition } as Record<string, string>}
                             sizes="40px"
                           />
-                        </div>
+                        </button>
                           );
                         })()}
                         <div className="flex-1 min-w-0">
@@ -714,6 +725,25 @@ export default function PedidosPage() {
               <ShoppingBag className="h-4 w-4" />
               Ver pedido
             </button>
+          </div>
+        </div>
+      )}
+
+      {zoomedImage && (
+        <div
+          className="fixed inset-0 z-[120] bg-black/85 backdrop-blur-sm p-4 sm:p-8"
+          onClick={() => setZoomedImage(null)}
+        >
+          <div className="mx-auto flex h-full max-w-5xl items-center justify-center">
+            <div className="relative h-[70vh] w-full sm:h-[80vh]">
+              <Image
+                src={zoomedImage.src}
+                alt={zoomedImage.alt}
+                fill
+                className="object-contain"
+                sizes="100vw"
+              />
+            </div>
           </div>
         </div>
       )}
