@@ -237,16 +237,23 @@ export function ChatbotWidget() {
         <section
           role="dialog"
           aria-label="Asistente de The M Smash Lab"
-          className="fixed left-2 right-2 bottom-20 z-[60] h-[calc(100dvh-7rem)] sm:left-auto sm:right-6 sm:bottom-24 sm:w-[min(24rem,calc(100vw-3rem))] sm:h-[min(38rem,calc(100dvh-8rem))] rounded-3xl border border-smash-border/60 bg-smash-dark/95 backdrop-blur-xl shadow-2xl overflow-hidden flex flex-col"
+          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/70 px-0 py-0 backdrop-blur-sm sm:inset-auto sm:bg-transparent sm:px-0 sm:py-0"
         >
-          <header className="relative px-3 sm:px-4 py-3 border-b border-smash-border/50 bg-gradient-to-r from-smash-fire/20 via-smash-black/50 to-smash-sky/10 shrink-0">
+          <div
+            className="absolute inset-0 sm:hidden"
+            aria-hidden="true"
+            onClick={() => setIsOpen(false)}
+          />
+
+          <div className="relative z-10 flex h-[100dvh] w-full max-h-[100dvh] flex-col overflow-hidden rounded-none border border-smash-border/60 bg-smash-dark/98 shadow-2xl sm:pointer-events-auto sm:h-[min(40rem,calc(100dvh-8rem))] sm:w-[min(24rem,calc(100vw-3rem))] sm:rounded-3xl sm:shadow-[0_30px_80px_rgba(0,0,0,0.5)]">
+          <header className="relative shrink-0 border-b border-smash-border/50 bg-gradient-to-r from-smash-fire/20 via-smash-black/50 to-smash-sky/10 px-4 py-4 sm:px-4 sm:py-3">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <span className="w-8 h-8 rounded-full bg-smash-fire/90 text-white flex items-center justify-center shadow-fire-sm">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-smash-fire/90 text-white shadow-fire-sm">
                   <Bot className="h-4 w-4" />
                 </span>
                 <div>
-                  <p className="font-display text-lg sm:text-xl leading-none uppercase tracking-wide text-white">THE M SMASH LAB BOT</p>
+                  <p className="font-display text-lg leading-none uppercase tracking-wide text-white sm:text-xl">THE M SMASH LAB BOT</p>
                   <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-smash-cream/55">Online ahora</p>
                 </div>
               </div>
@@ -261,27 +268,28 @@ export function ChatbotWidget() {
             </div>
           </header>
 
-          <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto px-3 sm:px-4 py-4 space-y-3 bg-gradient-to-b from-smash-black to-smash-dark">
+          <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto bg-gradient-to-b from-smash-black to-smash-dark px-4 py-4 sm:px-4 sm:py-4">
+            <div className="space-y-3 pb-2">
             {messages.map((message) => (
-              <div key={message.id} className={`max-w-[90%] ${message.from === "bot" ? "mr-auto" : "ml-auto"}`}>
+              <div key={message.id} className={`flex ${message.from === "bot" ? "justify-start" : "justify-end"}`}>
                 {message.card ? (
-                  <div className="rounded-3xl border border-smash-fire/25 bg-gradient-to-br from-smash-smoke to-smash-dark p-4 shadow-[0_12px_40px_rgba(0,0,0,0.25)]">
+                  <div className="w-full max-w-[92%] rounded-3xl border border-smash-fire/25 bg-gradient-to-br from-smash-smoke to-smash-dark p-4 shadow-[0_12px_40px_rgba(0,0,0,0.25)] sm:max-w-[88%]">
                     <div className="flex items-start justify-between gap-3 mb-3">
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-[10px] uppercase tracking-[0.3em] text-smash-turquoise/75 font-black">Ficha premium</p>
-                        <h3 className="font-display text-xl uppercase tracking-wide text-white leading-none mt-1">
+                        <h3 className="mt-1 font-display text-xl uppercase tracking-wide text-white leading-none break-words">
                           {message.card.title}
                         </h3>
                         <p className="text-xs text-smash-cream/45 mt-1">{message.card.subtitle}</p>
                       </div>
-                      <span className="font-display text-2xl text-smash-fire leading-none whitespace-nowrap">
+                      <span className="shrink-0 whitespace-nowrap font-display text-2xl leading-none text-smash-fire">
                         {message.card.price}
                       </span>
                     </div>
 
-                    <div className="space-y-2.5 mb-3">
+                    <div className="mb-3 space-y-2.5">
                       {message.card.facts.map((fact) => (
-                        <p key={fact} className="text-sm text-smash-cream/80 leading-relaxed">
+                        <p key={fact} className="text-sm leading-relaxed text-smash-cream/80 break-words [overflow-wrap:anywhere]">
                           {fact}
                         </p>
                       ))}
@@ -308,10 +316,10 @@ export function ChatbotWidget() {
                   </div>
                 ) : (
                   <div
-                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed whitespace-pre-line ${
+                    className={`max-w-[92%] rounded-2xl px-3.5 py-2.5 text-[0.95rem] leading-relaxed whitespace-pre-wrap break-words [overflow-wrap:anywhere] shadow-sm sm:max-w-[85%] ${
                       message.from === "bot"
-                        ? "bg-smash-smoke text-smash-cream/90 border border-smash-border/50"
-                        : "ml-auto bg-smash-fire text-white"
+                        ? "rounded-bl-md bg-smash-smoke text-smash-cream/90 border border-smash-border/50"
+                        : "rounded-br-md bg-smash-fire text-white"
                     }`}
                   >
                     {message.text}
@@ -320,13 +328,14 @@ export function ChatbotWidget() {
               </div>
             ))}
             {isLoading && (
-              <div className="max-w-[70%] rounded-2xl px-3 py-2 text-sm leading-relaxed bg-smash-smoke text-smash-cream/80 border border-smash-border/50">
+              <div className="max-w-[70%] rounded-2xl rounded-bl-md border border-smash-border/50 bg-smash-smoke px-3.5 py-2.5 text-sm leading-relaxed text-smash-cream/80">
                 Escribiendo...
               </div>
             )}
+            </div>
           </div>
 
-          <div className="px-3 sm:px-4 py-3 border-t border-smash-border/50 bg-smash-black/95 space-y-3 shrink-0">
+          <div className="shrink-0 space-y-3 border-t border-smash-border/50 bg-smash-black/95 px-4 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:px-4 sm:py-3">
             <div className="grid grid-cols-3 gap-2">
               {categoryButtons.map((button) => {
                 const active = activePanel === button.id;
@@ -353,11 +362,11 @@ export function ChatbotWidget() {
             </div>
 
             {activePanel && panelItems.length > 0 && (
-              <div className="space-y-2 rounded-2xl border border-smash-border/50 bg-smash-dark/60 p-3">
+              <div className="space-y-2 rounded-2xl border border-smash-border/50 bg-smash-dark/60 p-3 shadow-inner">
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-smash-cream/35">
                   {activePanel === "burgers" ? "Burgers" : activePanel === "starters" ? "Entrantes" : "Bebidas"}
                 </p>
-                <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto pr-1">
+                <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto pr-1">
                   {panelItems.map((itemName) => (
                     <button
                       key={itemName}
@@ -373,7 +382,7 @@ export function ChatbotWidget() {
               </div>
             )}
 
-            <div className="flex flex-wrap gap-2 max-h-20 overflow-y-auto pr-1">
+            <div className="flex flex-nowrap gap-2 overflow-x-auto pb-1 pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {quickPrompts.map((prompt) => (
                 <button
                   key={prompt}
@@ -421,18 +430,19 @@ export function ChatbotWidget() {
                 }}
                 disabled={isLoading}
                 placeholder="Escribe: horario, carta, pedido..."
-                className="flex-1 h-11 rounded-xl border border-smash-border/70 bg-smash-dark px-3 text-sm text-smash-cream placeholder:text-smash-cream/35 focus:outline-none focus:border-smash-fire/70"
+                className="flex-1 h-12 rounded-xl border border-smash-border/70 bg-smash-dark px-3.5 text-sm text-smash-cream placeholder:text-smash-cream/35 focus:border-smash-fire/70 focus:outline-none"
               />
               <button
                 type="button"
                 onClick={() => void handleSend(input)}
                 disabled={isLoading}
-                className="w-full sm:w-11 h-11 rounded-xl bg-smash-fire text-white hover:bg-smash-ember transition-colors flex items-center justify-center"
+                className="flex h-12 w-full items-center justify-center rounded-xl bg-smash-fire text-white transition-colors hover:bg-smash-ember sm:w-12"
                 aria-label="Enviar mensaje"
               >
                 <Send className="h-4 w-4" />
               </button>
             </div>
+          </div>
           </div>
         </section>
       )}
@@ -440,7 +450,7 @@ export function ChatbotWidget() {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="fixed right-4 sm:right-6 bottom-24 sm:bottom-24 z-[55] h-14 px-5 rounded-full border border-smash-fire/60 bg-smash-black/90 backdrop-blur-md text-smash-fire hover:text-white hover:bg-smash-fire transition-all duration-200 flex items-center gap-2 shadow-lg"
+        className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] right-4 z-[55] flex h-14 items-center gap-2 rounded-full border border-smash-fire/60 bg-smash-black/90 px-5 text-smash-fire shadow-lg backdrop-blur-md transition-all duration-200 hover:bg-smash-fire hover:text-white sm:right-6 sm:bottom-24"
         aria-label="Abrir chatbot"
       >
         {isOpen ? <X className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />}
