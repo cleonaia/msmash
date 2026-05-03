@@ -28,7 +28,7 @@ export default function NosotrosPage() {
       {/* ── Hero ── */}
       <div className="relative mt-20 h-[60vh] min-h-[420px] flex items-center justify-center overflow-hidden sky-bg">
         <Image
-          src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1920&q=80"
+          src="/images/products/empleados.png"
           alt="El equipo de The M Smash Lab"
           fill
           className="object-cover opacity-20"
@@ -87,7 +87,7 @@ export default function NosotrosPage() {
       {/* ── Pull quote con nubes ── */}
       <div className="relative h-64 lg:h-80 overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=1800&q=80"
+          src="/images/products/The_Special_hero.jpeg"
           alt="Burger smash en la plancha"
           fill
           className="object-cover object-center"

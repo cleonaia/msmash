@@ -120,7 +120,7 @@ export default function HomePage() {
           </div>
 
           {/* Social links */}
-          <div className="flex flex-wrap items-center justify-center gap-4 xs:gap-6 mt-8 xs:mt-12 animate-fade-up-600">
+          <div className="flex flex-wrap items-center justify-center gap-4 xs:gap-6 mt-8 xs:mt-12 pb-20 xs:pb-24 animate-fade-up-600">
             {[
               { href: socialLinks.instagram, icon: <Instagram className="h-4 w-4" />, label: "Instagram" },
               { href: socialLinks.tiktok,    icon: <TikTokIcon className="h-4 w-4" />, label: "TikTok" },
