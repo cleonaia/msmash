@@ -378,7 +378,10 @@ export default function AdminOrdersPanel() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
+    <div
+      className="min-h-screen bg-gray-100 p-4 sm:p-6 overflow-x-auto"
+      style={{ WebkitOverflowScrolling: 'touch' as any }}
+    >
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -531,8 +534,133 @@ export default function AdminOrdersPanel() {
         </div>
 
         {/* Orders Table */}
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
+        <div className="space-y-4 lg:hidden">
+          {filteredOrders.length === 0 ? (
+            <div className="rounded-lg border border-gray-200 bg-white p-6 text-center text-gray-500 shadow-sm">
+              No se encontraron pedidos
+            </div>
+          ) : (
+            filteredOrders.map((order) => (
+              <div key={order.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Pedido</p>
+                    <h3 className="mt-1 text-lg font-bold text-gray-900">#{order.id.slice(-8)}</h3>
+                    <p className="text-sm text-gray-600">{order.customerName}</p>
+                    <p className="text-xs text-gray-500">{order.customerPhone}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-gray-500">Fecha</p>
+                    <p className="text-sm font-medium text-gray-800">
+                      {new Date(order.createdAt).toLocaleDateString('es-ES', {
+                        day: '2-digit',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                  <div className="rounded-lg bg-gray-50 p-3">
+                    <p className="text-xs text-gray-500">Items</p>
+                    <p className="font-semibold text-gray-900">{order.items.reduce((sum, item) => sum + item.quantity, 0)} items</p>
+                  </div>
+                  <div className="rounded-lg bg-gray-50 p-3">
+                    <p className="text-xs text-gray-500">Monto</p>
+                    <p className="font-semibold text-gray-900">€{(order.totalAmount / 100).toFixed(2)}</p>
+                  </div>
+                  <div className="rounded-lg bg-gray-50 p-3">
+                    <p className="text-xs text-gray-500">Estado</p>
+                    <span className={`mt-1 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${getStatusColor(order.status)}`}>
+                      {getStatusIcon(order.status)}
+                      {order.status}
+                    </span>
+                  </div>
+                  <div className="rounded-lg bg-gray-50 p-3">
+                    <p className="text-xs text-gray-500">Pago</p>
+                    <div className="mt-1 flex flex-col gap-1">
+                      <span
+                        className={`inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${getPaymentMethodLabel(order.paymentMethod).classes}`}
+                      >
+                        {getPaymentMethodLabel(order.paymentMethod).label}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {getPaymentStatusIcon(order.paymentStatus)}
+                        <span className="text-sm text-gray-700">{order.paymentStatus}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 space-y-3">
+                  <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">
+                    Cambiar estado
+                  </label>
+                  <select
+                    defaultValue=""
+                    onChange={(e) => {
+                      if (!e.target.value) return
+                      handleStatusChange(order.id, e.target.value)
+                      e.target.value = ''
+                    }}
+                    className="w-full min-h-[44px] rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900"
+                  >
+                    <option value="">Selecciona una acción...</option>
+                    <option value="PREPARING">Preparando</option>
+                    <option value="READY">Listo</option>
+                    <option value="COMPLETED">Completado</option>
+                  </select>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => window.open(`/admin/orders/print/${order.id}`, '_blank', 'noopener,noreferrer')}
+                      className="min-h-[44px] rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700"
+                    >
+                      Imprimir
+                    </button>
+
+                    {!order.invoice && order.status !== 'CANCELED' && order.status !== 'REFUNDED' ? (
+                      <button
+                        onClick={() => handleGenerateInvoice(order)}
+                        className="min-h-[44px] rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700"
+                      >
+                        Factura
+                      </button>
+                    ) : (
+                      <button
+                        disabled
+                        className="min-h-[44px] rounded-lg border border-gray-200 bg-gray-100 px-3 py-2 text-sm font-medium text-gray-400"
+                      >
+                        Factura
+                      </button>
+                    )}
+
+                    <button
+                      onClick={() => {
+                        window.location.href = `mailto:${order.customerEmail}?subject=Tu pedido #${order.id.slice(-8)}`
+                      }}
+                      className="min-h-[44px] rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700"
+                    >
+                      Email
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteOrder(order)}
+                      className="min-h-[44px] rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="hidden overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm lg:block">
+          <div className="overflow-x-auto pb-2">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
