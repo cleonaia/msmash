@@ -123,7 +123,7 @@ export default function RootLayout({
         <SchemaMarkup />
       </head>
       <body
-        className={`${bebasNeue.variable} ${inter.variable} font-sans bg-smash-black text-smash-cream antialiased min-h-screen overflow-x-hidden`}
+        className={`${bebasNeue.variable} ${inter.variable} font-sans bg-smash-black text-smash-cream antialiased min-h-screen`}
       >
         <AuthProvider>
           <CartProvider>
