@@ -614,7 +614,7 @@ export function OrderManagement() {
 
       {/* Table View */}
       {viewMode === 'table' && (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="hidden rounded-lg bg-white shadow lg:block">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
@@ -767,7 +767,7 @@ export function OrderManagement() {
 
       {/* Cards View */}
       {viewMode === 'cards' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           {sortedOrders.map((order) => {
             const displayStatus = getDisplayedStatus(order)
             const statusInfo = STATUS_COLORS[displayStatus]
@@ -857,6 +857,124 @@ export function OrderManagement() {
                   >
                     Eliminar pedido
                   </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {viewMode === 'table' && (
+        <div className="grid grid-cols-1 gap-4 lg:hidden">
+          {sortedOrders.map((order) => {
+            const displayStatus = getDisplayedStatus(order)
+            const statusInfo = STATUS_COLORS[displayStatus]
+            const paymentLabel = getPaymentLabel(order.paymentStatus)
+            const isPaid = order.paymentStatus === 'COMPLETED'
+            return (
+              <div key={order.id} className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden hover:shadow-lg transition">
+                <div className="p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-mono text-sm text-gray-900">{order.externalOrderId}</p>
+                      <p className="font-medium text-gray-900">{order.customerName}</p>
+                      <p className="text-xs text-gray-500">{order.customerPhone}</p>
+                    </div>
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${PLATFORM_COLORS[order.platform]}`}>
+                      {order.platform}
+                    </span>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">Productos:</p>
+                    <ul className="text-sm text-gray-700 space-y-1">
+                      {order.items.map((item, idx) => (
+                        <li key={idx}>
+                          {item.quantity}x {item.name} - €{item.price.toFixed(2)}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 pt-3 border-t">
+                    <div>
+                      <p className="text-xs text-gray-500">Precio</p>
+                      <p className="font-bold text-lg">€{order.totalPrice.toFixed(2)}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${statusInfo?.bg} ${statusInfo?.text}`}>
+                        {statusInfo?.icon} {displayStatus}
+                      </span>
+                      <p className={`mt-1 text-[10px] font-semibold ${isPaid ? 'text-emerald-700' : 'text-amber-700'}`}>
+                        Pago: {paymentLabel}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700">
+                    <span className="font-medium text-gray-900">Fecha:</span>{' '}
+                    {new Date(order.receivedAt).toLocaleString('es-ES', {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => {
+                        const printUrl =
+                          order.platform === 'WEB'
+                            ? `/admin/orders/print/${order.id}`
+                            : `/admin/delivery/print/${order.id}`
+                        window.open(printUrl, '_blank', 'noopener,noreferrer')
+                      }}
+                      className="min-h-[44px] rounded border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50"
+                      style={lightFieldStyle}
+                    >
+                      Imprimir
+                    </button>
+
+                    <button
+                      onClick={() => handleBluetoothPrintOrder(order)}
+                      className="min-h-[44px] rounded border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-800 hover:bg-sky-100"
+                    >
+                      Epson BT
+                    </button>
+
+                    {order.platform === 'WEB' ? (
+                      <select
+                        value={order.status}
+                        onChange={(e) => handleWebStatusChange(order, e.target.value)}
+                        className="col-span-2 min-h-[44px] rounded border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-900"
+                        style={lightFieldStyle}
+                      >
+                        <option value="PENDING">⏳ Pendiente</option>
+                        <option value="CONFIRMED">✅ Confirmado</option>
+                        <option value="PREPARING">👨‍🍳 Preparando</option>
+                        <option value="READY">📦 Listo</option>
+                        <option value="COMPLETED">✓ Completado</option>
+                        <option value="CANCELED">✗ Cancelado</option>
+                      </select>
+                    ) : null}
+
+                    {!isPaid && (
+                      <button
+                        onClick={() => handleMarkAsPaid(order)}
+                        className="min-h-[44px] rounded border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"
+                      >
+                        Marcar pagado
+                      </button>
+                    )}
+
+                    <button
+                      onClick={() => handleDeleteOrder(order)}
+                      className="min-h-[44px] rounded bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </div>
               </div>
             )
